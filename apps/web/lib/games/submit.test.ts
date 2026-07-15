@@ -112,6 +112,40 @@ describe('submitGame — gating', () => {
   });
 });
 
+describe('submitGame — played_at derivation', () => {
+  // A realistic client wall clock (June 2025, mirroring the shared fixtures),
+  // received 90 seconds later.
+  const STARTED_AT = 1_750_000_000_000;
+  const RECEIVED_AT = STARTED_AT + 90_000;
+
+  it('uses the client startedAtMs when it is plausible', async () => {
+    const { port, inserted } = makePort();
+    await submitGame(record({ startedAtMs: STARTED_AT }), USER_ID, RECEIVED_AT, port);
+    expect(inserted[0]?.playedAt).toBe(new Date(STARTED_AT).toISOString());
+  });
+
+  it('falls back to the server clock when startedAtMs is in the future', async () => {
+    const { port, inserted } = makePort();
+    await submitGame(record({ startedAtMs: RECEIVED_AT + 60_000 }), USER_ID, RECEIVED_AT, port);
+    expect(inserted[0]?.playedAt).toBe(new Date(RECEIVED_AT).toISOString());
+  });
+
+  it('falls back to the server clock for an implausibly old startedAtMs', async () => {
+    const { port, inserted } = makePort();
+    // 0 and anything before 2020-01-01 are treated as a broken client clock.
+    await submitGame(record({ startedAtMs: 0 }), USER_ID, RECEIVED_AT, port);
+    await submitGame(record({ startedAtMs: 1_500_000_000_000 }), USER_ID, RECEIVED_AT, port);
+    expect(inserted[0]?.playedAt).toBe(new Date(RECEIVED_AT).toISOString());
+    expect(inserted[1]?.playedAt).toBe(new Date(RECEIVED_AT).toISOString());
+  });
+
+  it('accepts startedAtMs exactly at the receive instant (boundary)', async () => {
+    const { port, inserted } = makePort();
+    await submitGame(record({ startedAtMs: RECEIVED_AT }), USER_ID, RECEIVED_AT, port);
+    expect(inserted[0]?.playedAt).toBe(new Date(RECEIVED_AT).toISOString());
+  });
+});
+
 describe('submitGame — judging and persistence', () => {
   it('accepts a clean human game and returns the server score', async () => {
     const { port, inserted } = makePort();
