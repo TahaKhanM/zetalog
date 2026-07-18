@@ -1,5 +1,5 @@
-import type { GameRecord } from '../schemas.js';
-import type { RecomputedScore } from '../score.js';
+import type { GameRecord } from '../schemas';
+import type { RecomputedScore } from '../score';
 
 /** Recorder jitter allowance beyond the configured duration (spec §5 step 3). */
 export const DURATION_TOLERANCE_MS = 2000;
