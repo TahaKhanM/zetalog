@@ -3,6 +3,7 @@ import { browser, defineBackground } from '#imports';
 import { createApiClient } from '../lib/api.js';
 import { createAuthController, type FetchLike } from '../lib/auth.js';
 import { bgRequestSchema, type BgResponse } from '../lib/messages.js';
+import { singleFlight } from '../lib/single-flight.js';
 import { createStore } from '../lib/store.js';
 import { createSyncQueueStore, drainSync } from '../lib/sync.js';
 
@@ -28,8 +29,11 @@ export default defineBackground(() => {
   const api = createApiClient({ fetch: httpFetch, auth });
   const queue = createSyncQueueStore(area);
 
-  const drain = (): Promise<unknown> =>
-    drainSync({ api, store, queue, now: () => Date.now(), isLinked: () => auth.isLinked() });
+  // Single-flight: a message-triggered drain and the retry alarm can coincide;
+  // concurrent triggers share one pass instead of double-submitting.
+  const drain = singleFlight(() =>
+    drainSync({ api, store, queue, now: () => Date.now(), isLinked: () => auth.isLinked() }),
+  );
 
   browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     void (async (): Promise<void> => {

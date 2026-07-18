@@ -2,6 +2,7 @@ import { ZETAMAC_DEFAULT_SETTINGS, err, ok, type GameRecord, type Result } from 
 import { describe, expect, it } from 'vitest';
 
 import { type ApiClient, type ApiError, type SubmitSuccess } from './api.js';
+import { singleFlight } from './single-flight.js';
 import { createStore, type StorageArea, type StoredGame } from './store.js';
 import {
   BACKOFF_CAP_MS,
@@ -135,6 +136,18 @@ describe('reconcileJobs / reconcileQueue', () => {
     ]);
   });
 
+  it('derives NO job for a removed game already revoked (terminal — no re-fire)', () => {
+    const revoked = game('r', { status: 'removed', sync: { state: 'revoked' } });
+    expect(reconcileQueue([revoked], [], 0)).toEqual([]);
+  });
+
+  it('queues a re-submit for a restored (kept) game whose upload was revoked', () => {
+    const restored = game('r', { status: 'kept', sync: { state: 'revoked' } });
+    expect(reconcileQueue([restored], [], 0)).toEqual([
+      { clientGameId: 'r', kind: 'submit', attempts: 0, nextAttemptAtMs: 0 },
+    ]);
+  });
+
   it('preserves attempts and schedule of an entry that still applies', () => {
     const prior: SyncEntry = {
       clientGameId: 'a',
@@ -239,7 +252,7 @@ describe('drainSync', () => {
     expect(summary.failed).toBe(1);
   });
 
-  it('revokes an uploaded-then-removed game', async () => {
+  it('revokes an uploaded-then-removed game and marks it terminally revoked', async () => {
     const removed = game(R, { status: 'removed', sync: { state: 'uploaded' } });
     const area = fakeArea({ [GAMES_KEY]: [removed] });
     const api = fakeApi({});
@@ -249,14 +262,52 @@ describe('drainSync', () => {
     expect(api.revoked).toEqual([R]);
     expect(summary.revoked).toBe(1);
     expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
+    expect((area.data[GAMES_KEY] as StoredGame[])[0]?.sync).toEqual({ state: 'revoked' });
   });
 
-  it('treats a revoke 404 as done', async () => {
+  it('treats a revoke 404 as done and still terminalizes the sync state', async () => {
     const removed = game(R, { status: 'removed', sync: { state: 'uploaded' } });
     const area = fakeArea({ [GAMES_KEY]: [removed] });
     const api = fakeApi({ revoke: () => err({ kind: 'not-found' }) });
     const summary = await drainSync(deps(area, api));
     expect(summary.revoked).toBe(1);
+    expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
+    expect((area.data[GAMES_KEY] as StoredGame[])[0]?.sync).toEqual({ state: 'revoked' });
+  });
+
+  it('never re-fires a completed revoke: a second drain issues no request', async () => {
+    const removed = game(R, { status: 'removed', sync: { state: 'uploaded' } });
+    const area = fakeArea({ [GAMES_KEY]: [removed] });
+    const api = fakeApi({});
+    const d = deps(area, api);
+
+    await drainSync(d); // revoke succeeds
+    const second = await drainSync(d); // the 1-minute alarm re-fires
+
+    expect(api.revoked).toEqual([R]); // exactly one DELETE, ever
+    expect(second.processed).toBe(0);
+    expect(second.remaining).toBe(0);
+    expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
+  });
+
+  it('re-submits a restored game whose upload was revoked', async () => {
+    const removed = game(R, { status: 'removed', sync: { state: 'uploaded' } });
+    const area = fakeArea({ [GAMES_KEY]: [removed] });
+    const api = fakeApi({});
+    const d = deps(area, api);
+
+    await drainSync(d); // revoke completes -> sync.state 'revoked'
+
+    // The user restores the game (store.restore flips removed -> kept).
+    const store = createStore(area);
+    await store.restore(R);
+
+    const summary = await drainSync(d);
+
+    expect(api.submitted).toEqual([R]); // re-submitted through validation
+    expect(summary.uploaded).toBe(1);
+    const row = (area.data[GAMES_KEY] as StoredGame[])[0];
+    expect(row?.sync?.state).toBe('uploaded');
     expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
   });
 
@@ -311,5 +362,18 @@ describe('drainSync', () => {
     const api = fakeApi({ submit: () => ok({ id: 's', outcome: 'quarantined', serverScore: 30 }) });
     await drainSync(deps(area, api));
     expect((area.data[GAMES_KEY] as StoredGame[])[0]?.sync?.outcome).toBe('quarantined');
+  });
+
+  it('single-flight: two simultaneous drain triggers share one underlying pass', async () => {
+    const area = fakeArea({ [GAMES_KEY]: [game(A)] });
+    const api = fakeApi({});
+    const d = deps(area, api);
+    const drain = singleFlight(() => drainSync(d));
+
+    const [first, second] = await Promise.all([drain(), drain()]);
+
+    expect(api.submitted).toEqual([A]); // the API was hit exactly once
+    expect(first).toBe(second); // both callers observed the same pass
+    expect(first.uploaded).toBe(1);
   });
 });
