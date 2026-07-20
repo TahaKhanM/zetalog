@@ -9,3 +9,4 @@ Assets/
 
 
 apps/extension/test/fixtures/
+apps/web/next-env.d.ts
