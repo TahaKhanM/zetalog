@@ -3,6 +3,7 @@ import type { OperandRange, ZetamacSettings } from './schemas.js';
 /** Durations (seconds) whose default-config games rank on leaderboards (spec §1). */
 export const RANKABLE_DURATIONS = [30, 60, 120] as const;
 
+/** One of the leaderboard-eligible game durations in seconds: 30, 60, or 120. */
 export type RankableDuration = (typeof RANKABLE_DURATIONS)[number];
 
 /**

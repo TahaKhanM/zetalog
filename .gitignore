@@ -9,5 +9,6 @@ dist/
 .next/
 .vercel/
 .turbo/
+coverage/
 *.log
 .superpowers/
