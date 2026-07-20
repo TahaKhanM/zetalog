@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1784588392637" clover="3.2.0">
-  <project timestamp="1784588392637" name="All files">
-    <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0" elements="3" coveredelements="3" complexity="0" loc="3" ncloc="3" packages="1" files="2" classes="2"/>
+<coverage generated="1784588675309" clover="3.2.0">
+  <project timestamp="1784588675310" name="All files">
+    <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1" elements="10" coveredelements="10" complexity="0" loc="9" ncloc="9" packages="1" files="3" classes="3"/>
     <file name="index.ts" path="/Users/tahakhan/Documents/Work/Projects/ZetaLog/packages/shared/src/index.ts">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+    </file>
+    <file name="schemas.ts" path="/Users/tahakhan/Documents/Work/Projects/ZetaLog/packages/shared/src/schemas.ts">
+      <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="7" count="1" type="stmt"/>
+      <line num="9" count="20" type="stmt"/>
+      <line num="15" count="1" type="stmt"/>
+      <line num="33" count="1" type="stmt"/>
+      <line num="44" count="1" type="stmt"/>
     </file>
     <file name="tokens.ts" path="/Users/tahakhan/Documents/Work/Projects/ZetaLog/packages/shared/src/tokens.ts">
       <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
