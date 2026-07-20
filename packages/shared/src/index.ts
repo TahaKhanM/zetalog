@@ -18,13 +18,6 @@ export {
 } from './zetamac.js';
 export { err, ok, type Result } from './result.js';
 export {
-  parseProblem,
-  solve,
-  type Operator,
-  type Problem,
-  type ProblemParseError,
-} from './problems.js';
-export {
   recomputeScore,
   type ProblemOutcome,
   type RecomputedScore,
@@ -36,7 +29,6 @@ export {
   OUTLIER_WINDOW,
   RESTART_PLAYED_FRACTION,
   evaluateQuarantine,
-  median,
   type QuarantineInput,
   type QuarantineReason,
 } from './quarantine.js';
@@ -45,20 +37,13 @@ export {
   MIN_CADENCE_VARIATION,
   MIN_HUMAN_SOLVE_MS,
   MIN_INPUTS_FOR_CADENCE,
-  checkPhysiology,
-  coefficientOfVariation,
   type PhysiologyFlag,
 } from './validation/physiology.js';
-export {
-  DURATION_TOLERANCE_MS,
-  checkConsistency,
-  type ConsistencyViolation,
-} from './validation/consistency.js';
+export { DURATION_TOLERANCE_MS, type ConsistencyViolation } from './validation/consistency.js';
 export {
   PB_JUMP_ABSOLUTE_MARGIN,
   PB_JUMP_MIN_HISTORY,
   PB_JUMP_RELATIVE_MARGIN,
-  checkHistory,
   type HistoryContext,
 } from './validation/history.js';
 export { judge, type ValidationOutcome, type Verdict } from './validation/verdict.js';
