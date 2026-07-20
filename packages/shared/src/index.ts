@@ -54,3 +54,11 @@ export {
   checkConsistency,
   type ConsistencyViolation,
 } from './validation/consistency.js';
+export {
+  PB_JUMP_ABSOLUTE_MARGIN,
+  PB_JUMP_MIN_HISTORY,
+  PB_JUMP_RELATIVE_MARGIN,
+  checkHistory,
+  type HistoryContext,
+} from './validation/history.js';
+export { judge, type ValidationOutcome, type Verdict } from './validation/verdict.js';
