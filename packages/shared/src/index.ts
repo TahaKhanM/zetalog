@@ -16,3 +16,11 @@ export {
   rankableDuration,
   type RankableDuration,
 } from './zetamac.js';
+export { err, ok, type Result } from './result.js';
+export {
+  parseProblem,
+  solve,
+  type Operator,
+  type Problem,
+  type ProblemParseError,
+} from './problems.js';
