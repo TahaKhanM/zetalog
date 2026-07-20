@@ -15,17 +15,18 @@ ZetaLog has two halves:
 
 ### Core product decisions (locked)
 
-| Decision | Choice |
-|---|---|
-| Score scope | Track **all** games locally (tagged with settings); only **default-ranges** games at **30s / 60s / 120s** durations rank on leaderboards |
-| Ranking metric | **Personal best per duration** (all-time highest accepted score) |
-| Board views | Global board + per-university boards, each with 30s / 60s / 120s tabs. No time-windowed boards in v1 |
-| Auto-removal | **Quarantine, restorable** — never silently deleted |
-| Identity | Sign in with any email (magic link) or Google. A UK uni email at sign-up ⇒ instant badge. Otherwise: empty badge with "+" on your own leaderboard row ⇒ verify later |
-| Anti-cheat | **Aggressive**: full per-problem event streams, server-side score recomputation, statistical validation, admin review queue |
-| Stack | Supabase (Postgres + Auth + RLS) · Next.js on Vercel · WXT extension · pnpm monorepo |
-| Browsers | Chrome-family (Chrome/Edge/Brave/Arc) via WXT for v1; Firefox later (WXT makes it cheap) |
-| Email | **Resend** as custom SMTP for Supabase Auth — never Supabase's built-in sender |
+| Decision       | Choice                                                                                                                                                               |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Score scope    | Track **all** games locally (tagged with settings); only **default-ranges** games at **30s / 60s / 120s** durations rank on leaderboards                             |
+| Ranking metric | **Personal best per duration** (all-time highest accepted score)                                                                                                     |
+| Board views    | Global board + per-university boards, each with 30s / 60s / 120s tabs. No time-windowed boards in v1                                                                 |
+| Auto-removal   | **Quarantine, restorable** — never silently deleted                                                                                                                  |
+| Identity       | Sign in with any email (magic link) or Google. A UK uni email at sign-up ⇒ instant badge. Otherwise: empty badge with "+" on your own leaderboard row ⇒ verify later |
+| Anti-cheat     | **Aggressive**: full per-problem event streams, server-side score recomputation, statistical validation, admin review queue                                          |
+| Stack          | Supabase (Postgres + Auth + RLS) · Next.js on Vercel · WXT extension · pnpm monorepo                                                                                 |
+| Browsers       | Chrome-family (Chrome/Edge/Brave/Arc) via WXT for v1; Firefox later (WXT makes it cheap)                                                                             |
+| Email          | **Resend** as custom SMTP for Supabase Auth — never Supabase's built-in sender                                                                                       |
+| Quality bar    | **Quant-firm recruiting grade** — flagship CV project; see §11                                                                                                       |
 
 ---
 
@@ -72,7 +73,7 @@ Quarantined games are greyed out in history, excluded from graphs/stats/leaderbo
 
 Typography and colour per the fixed design language (§8). Contents:
 
-- Latest score + **PB callout** (Archivo display; red `#c1121f` only when the PB is *new*)
+- Latest score + **PB callout** (Archivo display; red `#c1121f` only when the PB is _new_)
 - **Adaptive trend graph:** < 5 games on the selected config → recent-scores list only; 5–19 → sparkline; ≥ 20 → full line chart with range selector. The user can override which settings config the graph shows (default: most-played config) and the time range; choices persist.
 - Recent games list with per-game Restore / Remove
 - Quarantine indicator on auto-flagged games
@@ -122,14 +123,14 @@ Outcomes: `accepted` (ranks) · `quarantined` (appears in `/admin` review queue 
 
 ## 6. Website (Next.js on Vercel)
 
-| Route | Purpose |
-|---|---|
-| `/` | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Spline Sans Mono `tabular-nums`, the visual hero |
-| `/uni/[slug]` | Per-university board, same duration tabs |
-| `/me` | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change |
-| `/link` | Extension linking page (sign-in + token handoff) |
-| `/verify` | Uni email verification (OTP entry) |
-| `/admin` | Review queue for quarantined submissions — `is_admin` gated |
+| Route         | Purpose                                                                                                                                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Spline Sans Mono `tabular-nums`, the visual hero |
+| `/uni/[slug]` | Per-university board, same duration tabs                                                                                                                                                                          |
+| `/me`         | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change              |
+| `/link`       | Extension linking page (sign-in + token handoff)                                                                                                                                                                  |
+| `/verify`     | Uni email verification (OTP entry)                                                                                                                                                                                |
+| `/admin`      | Review queue for quarantined submissions — `is_admin` gated                                                                                                                                                       |
 
 Public profiles expose **only** display name, badge, and PBs. Full history and graphs are private. Account deletion purges all rows.
 
@@ -170,7 +171,7 @@ Palette: `#780000` maroon · `#c1121f` red · `#fdf0d5` cream · `#003049` navy 
 - **Zetamac DOM drift:** versioned selector module; `capture_failed` records + popup banner rather than silent loss.
 - **Clock skew:** client uses monotonic timestamps; server records `received_at`; ordering/rate rules use server time.
 - **Email cap exhaustion:** logged, surfaced as "try again later" (§7).
-- **Storage pressure:** event streams are compact JSON; oldest *non-rankable* telemetry is pruned first if extension storage nears quota (scores themselves are never pruned).
+- **Storage pressure:** event streams are compact JSON; oldest _non-rankable_ telemetry is pruned first if extension storage nears quota (scores themselves are never pruned).
 
 ## 10. Testing
 
@@ -180,6 +181,18 @@ Palette: `#780000` maroon · `#c1121f` red · `#fdf0d5` cream · `#003049` navy 
 - **RLS:** policy tests (user cannot read others' telemetry; anon reads views only).
 - **E2E:** Playwright drives the extension against a **local static replica** of the Zetamac game page (never live Zetamac in CI).
 
-## 11. Out of scope for v1
+## 11. Engineering quality bar
+
+This is a flagship portfolio project: assume every line will be read by senior engineers at quantitative trading firms during recruiting. Quality outranks scope — cut v1 features before cutting rigor. These standards are enforced by CI, not convention:
+
+- **Types:** TypeScript strict everywhere plus `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`. No `any`, no non-null assertions, no `@ts-expect-error` without an explanatory comment. Lint is typescript-eslint strict-type-checked with zero warnings — warnings fail CI.
+- **Determinism and purity:** all scoring, validation, fingerprinting, and quarantine logic lives in `packages/shared` as pure functions — no I/O, no clocks, no randomness; time and effects are injected. Property-based tests (fast-check) run alongside example-based fixtures.
+- **Test discipline:** TDD for all behaviour-bearing code. `packages/shared` enforces 100% branch coverage in CI; apps track coverage and cover critical flows end-to-end (Playwright). No skipped tests on `main`.
+- **Errors are values:** fallible operations return typed results; no silent `catch`; failures are logged with context. Every external boundary — DOM scraping, network, storage — validates inputs with zod schemas. No unchecked casts at boundaries.
+- **Small, documented units:** each module has one purpose; exported symbols carry TSDoc; invariants are stated where they are enforced.
+- **Reviewable history:** Conventional Commits, small single-purpose commits, CI (format, lint, typecheck, unit, e2e, build) green on every commit to `main`.
+- **Security hygiene:** secrets only via env vars documented in `.env.example`; RLS is default-deny; the service-role key never reaches a client bundle; every dependency must justify its existence — prefer the standard library.
+
+## 12. Out of scope for v1
 
 Firefox/Safari store releases · time-windowed (weekly) boards · friends/follows · shareable score images · custom-config leaderboards · mobile.
