@@ -54,7 +54,7 @@ pnpm workspaces. `packages/shared` is the single source of truth for: `GameRecor
 ### 3.1 Capture (content script on `arithmetic.zetamac.com`)
 
 - **Game start:** detected from the DOM transition into play mode. At start, the settings fingerprint is captured from the pre-game form (operations enabled, operand ranges, duration) plus the URL `?key=` parameter. A game is **rankable** iff ranges/operations equal Zetamac defaults and duration ∈ {30, 60, 120}. ("Defaults" = the exact values Zetamac's settings form ships with, all four operations enabled; the canonical constants are captured verbatim from the live page during implementation and frozen in `packages/shared`.)
-- **During play:** records a per-problem event stream — problem text shown, each keystroke timestamp, answer-accepted timestamp, running score. Timestamps come from `performance.now()` (monotonic, immune to clock changes).
+- **During play:** records a per-problem event stream — problem text shown, each answer-box input as a full value snapshot (what the DOM exposes; see CO-1 in `docs/superpowers/plans/`), answer-accepted timestamp, running score. Timestamps come from `performance.now()` (monotonic, immune to clock changes).
 - **Game end:** on the game-over state (or page exit mid-game), a complete `GameRecord` is persisted to extension storage: `{ id, startedAt, settingsFingerprint, rankableDuration | null, events[], finalScore, playedMs, status }`.
 - Telemetry is captured for **every** game, signed-in or not, so pre-account history can later backfill through server validation.
 
