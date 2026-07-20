@@ -49,3 +49,8 @@ export {
   coefficientOfVariation,
   type PhysiologyFlag,
 } from './validation/physiology.js';
+export {
+  DURATION_TOLERANCE_MS,
+  checkConsistency,
+  type ConsistencyViolation,
+} from './validation/consistency.js';
