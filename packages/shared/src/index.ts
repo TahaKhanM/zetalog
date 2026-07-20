@@ -40,3 +40,12 @@ export {
   type QuarantineInput,
   type QuarantineReason,
 } from './quarantine.js';
+export {
+  FAST_SOLVE_FLAG_FRACTION,
+  MIN_CADENCE_VARIATION,
+  MIN_HUMAN_SOLVE_MS,
+  MIN_INPUTS_FOR_CADENCE,
+  checkPhysiology,
+  coefficientOfVariation,
+  type PhysiologyFlag,
+} from './validation/physiology.js';
