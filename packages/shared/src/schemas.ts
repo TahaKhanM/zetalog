@@ -50,7 +50,11 @@ export const gameRecordSchema = z.object({
   claimedScore: z.number().int().nonnegative(),
 });
 
+/** An inclusive min/max operand bound, inferred from operandRangeSchema. */
 export type OperandRange = z.infer<typeof operandRangeSchema>;
+/** A full Zetamac configuration, inferred from zetamacSettingsSchema. */
 export type ZetamacSettings = z.infer<typeof zetamacSettingsSchema>;
+/** One recorder observation, inferred from gameEventSchema. */
 export type GameEvent = z.infer<typeof gameEventSchema>;
+/** A complete recorded game, inferred from gameRecordSchema. */
 export type GameRecord = z.infer<typeof gameRecordSchema>;
