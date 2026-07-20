@@ -9,3 +9,10 @@ export {
   type OperandRange,
   type ZetamacSettings,
 } from './schemas.js';
+export {
+  RANKABLE_DURATIONS,
+  ZETAMAC_DEFAULT_SETTINGS,
+  fingerprint,
+  rankableDuration,
+  type RankableDuration,
+} from './zetamac.js';
