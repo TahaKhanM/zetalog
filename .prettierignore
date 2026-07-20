@@ -9,3 +9,4 @@ Assets/
 .agents/
 .claude/
 apps/extension/test/fixtures/
+apps/web/next-env.d.ts
