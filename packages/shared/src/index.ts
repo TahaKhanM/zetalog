@@ -24,3 +24,9 @@ export {
   type Problem,
   type ProblemParseError,
 } from './problems.js';
+export {
+  recomputeScore,
+  type ProblemOutcome,
+  type RecomputedScore,
+  type ScoreAnomaly,
+} from './score.js';
