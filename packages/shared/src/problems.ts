@@ -1,5 +1,6 @@
 import { err, ok, type Result } from './result.js';
 
+/** A canonical arithmetic operation, normalised from whatever glyph Zetamac rendered. */
 export type Operator = '+' | '-' | '*' | '/';
 
 /** A parsed Zetamac problem, e.g. "34 + 66 = " → { left: 34, op: '+', right: 66 }. */
@@ -9,6 +10,7 @@ export interface Problem {
   readonly right: number;
 }
 
+/** The typed failure returned when scraped text does not look like a binary problem. */
 export interface ProblemParseError {
   readonly reason: 'malformed';
   readonly text: string;
