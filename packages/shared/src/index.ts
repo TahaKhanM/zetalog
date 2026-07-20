@@ -30,3 +30,13 @@ export {
   type RecomputedScore,
   type ScoreAnomaly,
 } from './score.js';
+export {
+  OUTLIER_MEDIAN_FRACTION,
+  OUTLIER_MIN_HISTORY,
+  OUTLIER_WINDOW,
+  RESTART_PLAYED_FRACTION,
+  evaluateQuarantine,
+  median,
+  type QuarantineInput,
+  type QuarantineReason,
+} from './quarantine.js';
