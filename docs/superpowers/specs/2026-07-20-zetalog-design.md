@@ -1,7 +1,7 @@
 # ZetaLog — Design Spec
 
 **Date:** 2026-07-20
-**Status:** Approved pending user review
+**Status:** Approved 2026-07-20
 **One-liner:** A frictionless score tracker (browser extension) and leaderboard (website) for Zetamac (https://arithmetic.zetamac.com/), with UK-university badges.
 
 ---
