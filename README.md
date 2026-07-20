@@ -77,5 +77,6 @@ Copy `.env.example` and fill in Supabase + Resend credentials for the web app
 ## Status
 
 In active development. The design spec is complete
-(`docs/superpowers/specs/2026-07-20-zetalog-design.md`); implementation follows the phased
-plan in `docs/superpowers/plans/`.
+(`docs/superpowers/specs/2026-07-20-zetalog-design.md`). The domain core (`packages/shared`)
+is complete; the extension (Plan 2) is next — see
+`docs/superpowers/plans/2026-07-20-zetalog-roadmap.md`.
