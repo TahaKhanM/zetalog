@@ -183,6 +183,23 @@ describe('submitGame — judging and persistence', () => {
     expect(result.body).toMatchObject({ outcome: 'quarantined' });
   });
 
+  it('rejects a tampered stream with out-of-range problems and stores the violation', async () => {
+    const { port, inserted } = makePort();
+    // Default settings claimed, but "50 × 50" is impossible (mul_left caps at 12).
+    const events: GameEvent[] = [
+      { kind: 'problem', at: 0, text: '50 × 50' },
+      { kind: 'input', at: 900, value: '2500' },
+      { kind: 'accepted', at: 1000, answer: 2500 },
+    ];
+    const result = await submitGame(record({ events, claimedScore: 1 }), USER_ID, NOW_MS, port);
+    expect(result.status).toBe(201);
+    expect(result.body).toMatchObject({ outcome: 'rejected' });
+    // The W6 verdict fields flow through the pipeline into the validation jsonb.
+    expect(inserted[0]?.validation.problemViolations.map((v) => v.rule)).toContain(
+      'range-nonconforming',
+    );
+  });
+
   it('rejects a fabricated stream with non-monotonic timestamps', async () => {
     const { port, inserted } = makePort();
     const events: GameEvent[] = [

@@ -41,6 +41,19 @@ export {
 } from './validation/physiology';
 export { DURATION_TOLERANCE_MS, type ConsistencyViolation } from './validation/consistency';
 export {
+  ENTROPY_FALSE_POSITIVE_RATE,
+  ENTROPY_MIN_PROBLEMS,
+  MARGINAL_FALSE_POSITIVE_RATE,
+  MARGINAL_MIN_PROBLEMS,
+  MIX_FALSE_POSITIVE_RATE,
+  MIX_MIN_PROBLEMS,
+  checkProblems,
+  producibleUnderSettings,
+  type ProblemConformity,
+  type ProblemFlag,
+  type ProblemViolation,
+} from './validation/problems';
+export {
   PB_JUMP_ABSOLUTE_MARGIN,
   PB_JUMP_MIN_HISTORY,
   PB_JUMP_RELATIVE_MARGIN,
