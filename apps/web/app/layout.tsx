@@ -13,6 +13,7 @@ import '@fontsource/azeret-mono/500.css';
 import '@fontsource/azeret-mono/700.css';
 
 import './globals.css';
+import { BrandMark } from './_components/BrandMark';
 import { HeaderNav } from './_components/HeaderNav';
 
 const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
@@ -37,8 +38,8 @@ export default function RootLayout({ children }: { children: ReactNode }): React
       <body>
         <header className="site-header">
           <div className="shell site-header__row">
-            <Link href="/" className="wordmark">
-              ZetaLog
+            <Link href="/" className="brand-link" aria-label="ZetaLog home">
+              <BrandMark variant="lockup" />
             </Link>
             <HeaderNav />
           </div>
@@ -48,7 +49,10 @@ export default function RootLayout({ children }: { children: ReactNode }): React
         </main>
         <footer className="site-footer">
           <div className="shell site-footer__row">
-            <span>Not affiliated with Zetamac.</span>
+            <span className="site-footer__brand">
+              <BrandMark variant="mark" size={18} />
+              <span>Not affiliated with Zetamac.</span>
+            </span>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
               GitHub
             </a>
