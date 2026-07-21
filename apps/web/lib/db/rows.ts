@@ -71,6 +71,8 @@ export const leaderboardEntrySchema = z.object({
   /** NULL unless the profile's `uni_verified_at` is set (view hides it otherwise). */
   university_name: z.string().nullable(),
   university_slug: z.string().nullable(),
+  /** Public avatar URL (CO-6), null until one is uploaded. */
+  avatar_url: z.string().nullable(),
 });
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
@@ -105,6 +107,8 @@ export const profileRowSchema = z.object({
   uni_verified_at: z.string().nullable(),
   is_admin: z.boolean(),
   created_at: z.string(),
+  /** Public avatar URL (CO-6), null until one is uploaded. */
+  avatar_url: z.string().nullable(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;
 
