@@ -142,4 +142,28 @@ describe('syncTag', () => {
     });
     expect(syncTag(game({ sync: { state: 'uploaded' } }))).toEqual({ label: 'Synced', tone: 'ok' });
   });
+
+  it('shows a muted Revoked chip — never "Synced" — for a revoked upload', () => {
+    expect(syncTag(game({ status: 'removed', sync: { state: 'revoked' } }))).toEqual({
+      label: 'Revoked',
+      tone: 'muted',
+    });
+  });
+});
+
+describe('RecentGames — revoked row', () => {
+  it('renders the Revoked chip as muted meta text, not a failure tone', () => {
+    render(
+      <RecentGames
+        games={[game({ status: 'removed', sync: { state: 'revoked' } })]}
+        nowMs={NOW}
+        onRestore={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    );
+    const chip = screen.getByText('Revoked');
+    expect(chip.className).toContain('zl-synctag--muted');
+    expect(chip.className).not.toContain('zl-synctag--fail');
+    expect(screen.queryByText('Synced')).toBeNull();
+  });
 });

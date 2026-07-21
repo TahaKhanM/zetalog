@@ -437,6 +437,12 @@ body {
   background: var(--zl-warn-bg);
 }
 
+/* Terminal revoked marker: quiet meta text, deliberately not a warning tone. */
+.zl-synctag--muted {
+  color: var(--zl-faint);
+  background: color-mix(in srgb, var(--zl-faint) 10%, transparent);
+}
+
 .zl-game__actions {
   display: flex;
   gap: 4px;

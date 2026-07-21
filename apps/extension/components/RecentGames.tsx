@@ -23,11 +23,13 @@ function flagLabel(game: StoredGame): string | null {
 /** A per-game leaderboard-sync chip, or null when signed out (no sync bookkeeping). */
 export function syncTag(
   game: StoredGame,
-): { label: string; tone: 'pending' | 'ok' | 'fail' } | null {
+): { label: string; tone: 'pending' | 'ok' | 'fail' | 'muted' } | null {
   const sync = game.sync;
   if (sync === undefined) return null;
   if (sync.state === 'pending') return { label: 'Syncing…', tone: 'pending' };
   if (sync.state === 'failed') return { label: 'Sync failed', tone: 'fail' };
+  // Terminal after a completed server-side removal — informational, not an error.
+  if (sync.state === 'revoked') return { label: 'Revoked', tone: 'muted' };
   switch (sync.outcome) {
     case 'quarantined':
       return { label: 'Under review', tone: 'ok' };

@@ -483,3 +483,22 @@ describe('createStore.markSync / clearAllSync', () => {
     if (!result.ok) expect(result.error.reason).toBe('corrupt-games');
   });
 });
+
+describe('createStore.restore — sync bookkeeping', () => {
+  it('preserves the sync field across remove and restore', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const saved = await store.saveGame(gameRecord({ score: 42 }));
+    if (!saved.ok) throw new Error('setup failed');
+    const id = saved.value.record.id;
+    await store.markSync(id, { state: 'revoked' });
+    await store.remove(id);
+
+    const restored = await store.restore(id);
+
+    if (!restored.ok || restored.value === null) throw new Error('expected a game');
+    expect(restored.value.status).toBe('kept');
+    // The revoked marker survives, so the sync queue re-derives a submit for it.
+    expect(restored.value.sync).toEqual({ state: 'revoked' });
+  });
+});

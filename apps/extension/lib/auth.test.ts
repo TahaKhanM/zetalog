@@ -333,6 +333,26 @@ describe('createAuthController', () => {
     expect(await controller.refresh()).toBeNull();
   });
 
+  it('refresh is single-flight: concurrent callers share one token exchange', async () => {
+    let fetches = 0;
+    const counting: FetchLike = () => {
+      fetches += 1;
+      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(tokenBody) });
+    };
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, { fetch: counting, config: CONFIG });
+
+    const tokens = await Promise.all([controller.refresh(), controller.refresh()]);
+
+    expect(fetches).toBe(1); // one exchange, not two
+    expect(tokens).toEqual(['access-NEW', 'access-NEW']);
+    expect(area.data.get(SESSION_KEY)).toEqual({
+      accessToken: 'access-NEW',
+      refreshToken: 'refresh-NEW',
+      userId: 'user-1',
+    });
+  });
+
   it('refresh returns null when the network exchange fails', async () => {
     const area = fakeArea({ [SESSION_KEY]: SESSION });
     const controller = createAuthController(area, {
