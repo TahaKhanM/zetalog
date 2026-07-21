@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { handleGameDelete, type GameDeleteDeps } from './handler';
+import { REVOCABLE_STATUSES, handleGameDelete, type GameDeleteDeps } from './handler';
 
 function request(): Request {
   return new Request('http://localhost/api/games/abc', { method: 'DELETE' });
@@ -13,6 +13,17 @@ function deps(over: Partial<GameDeleteDeps> = {}): GameDeleteDeps {
     ...over,
   };
 }
+
+describe('REVOCABLE_STATUSES', () => {
+  it('permits revoking only accepted and quarantined games', () => {
+    expect([...REVOCABLE_STATUSES].sort()).toEqual(['accepted', 'quarantined']);
+  });
+
+  it('never permits revoking rejected or already-removed games', () => {
+    expect(REVOCABLE_STATUSES).not.toContain('rejected');
+    expect(REVOCABLE_STATUSES).not.toContain('user_removed');
+  });
+});
 
 describe('DELETE /api/games/[clientGameId]', () => {
   it('returns 401 when the request is not authenticated', async () => {

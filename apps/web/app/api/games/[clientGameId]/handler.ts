@@ -6,6 +6,13 @@ import { apiError, apiJson } from '@/lib/http';
  * view recomputes the PB naturally.
  */
 
+/**
+ * The only statuses a user may revoke. Rejected games are kept for audit and
+ * are not user-revocable; already-removed games have nothing left to revoke.
+ * The route's update filters on this set, so anything else 404s.
+ */
+export const REVOCABLE_STATUSES = ['accepted', 'quarantined'] as const;
+
 /** Injected dependencies for the core handler. */
 export interface GameDeleteDeps {
   authenticate: (request: Request) => Promise<string | null>;

@@ -1,38 +1,31 @@
 import { z } from 'zod';
 
 /**
- * Environment access for the web app.
+ * Client-safe environment access. Server-only variables live in
+ * `env.server.ts` — keeping them out of this module means client chunks never
+ * even carry the server variable NAMES, let alone their values.
  *
  * Parsing is **lazy on purpose**: CI builds this app with zero env vars
  * (`pnpm build` must succeed), so schemas are never evaluated at module load.
- * Each getter validates `process.env` on call and throws a single, readable
- * error naming every offending variable. Callers on hot paths may cache the
- * result themselves; the getters intentionally do not memoise so that tests
- * (and long-lived dev servers) observe env changes.
+ * Each getter validates on call and throws a single, readable error naming
+ * every offending variable. The getters intentionally do not memoise so that
+ * tests (and long-lived dev servers) observe env changes.
  */
 
 /** Client-safe variables — inlined into the browser bundle by Next.js. */
-const clientSchema = z.object({
+export const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
 });
 
-/** Server-only variables. The service-role key must never reach the browser. */
-const serverSchema = z.object({
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  RESEND_API_KEY: z.string().min(1),
-  EMAIL_FROM: z.string().min(1),
-});
-
-/** Client and server-only variables together — the shape server code receives. */
-const fullServerSchema = clientSchema.extend(serverSchema.shape);
-
 /** Client-safe configuration, validated. */
 export type ClientEnv = z.infer<typeof clientSchema>;
-/** Full server configuration (client vars plus server-only secrets), validated. */
-export type ServerEnv = z.infer<typeof fullServerSchema>;
 
-function parse<T>(schema: z.ZodType<T>, source: Record<string, string | undefined>): T {
+/**
+ * Validate an env source against a schema, throwing one readable error that
+ * names every offending variable. Shared with `env.server.ts`.
+ */
+export function parseEnv<T>(schema: z.ZodType<T>, source: Record<string, string | undefined>): T {
   const result = schema.safeParse(source);
   if (result.success) return result.data;
   const detail = result.error.issues
@@ -51,16 +44,8 @@ function parse<T>(schema: z.ZodType<T>, source: Record<string, string | undefine
  * `process.env` would be empty client-side and this would wrongly throw.
  */
 export function clientEnv(): ClientEnv {
-  return parse(clientSchema, {
+  return parseEnv(clientSchema, {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   });
-}
-
-/**
- * Full server env, validated on access. Import only from server-only modules
- * and API routes — it exposes the service-role key.
- */
-export function serverEnv(): ServerEnv {
-  return parse(fullServerSchema, process.env);
 }
