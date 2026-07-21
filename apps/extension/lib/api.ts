@@ -135,7 +135,11 @@ export function createApiClient(deps: ApiDeps): ApiClient {
     },
 
     async revokeGame(clientGameId) {
-      const response = await authed('DELETE', `/api/games/${clientGameId}`, undefined);
+      const response = await authed(
+        'DELETE',
+        `/api/games/${encodeURIComponent(clientGameId)}`,
+        undefined,
+      );
       if (!response.ok) return response;
       const { status } = response.value;
       switch (status) {

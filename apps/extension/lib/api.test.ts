@@ -198,6 +198,13 @@ describe('createApiClient.revokeGame', () => {
     expect(await client.revokeGame('game-9')).toEqual({ ok: false, error: { kind: 'not-found' } });
   });
 
+  it('percent-encodes the client game id in the path', async () => {
+    const { fetch, calls } = scriptedFetch([{ status: 200, body: { ok: true } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    await client.revokeGame('a/b c?d');
+    expect(calls[0]?.url).toBe('https://app.test/api/games/a%2Fb%20c%3Fd');
+  });
+
   it('refreshes and retries on 401', async () => {
     const { fetch, calls } = scriptedFetch([{ status: 401 }, { status: 200, body: { ok: true } }]);
     const client = createApiClient({
