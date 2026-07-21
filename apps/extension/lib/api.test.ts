@@ -177,7 +177,7 @@ describe('createApiClient.submitGame', () => {
     const { fetch, calls } = scriptedFetch([OK_SUBMIT]);
     const client = createApiClient({ fetch, auth: fakeAuth('t') });
     await client.submitGame(RECORD);
-    expect(calls[0]?.url).toBe('https://zetalog.vercel.app/api/games');
+    expect(calls[0]?.url).toBe('https://www.zetalog.co.uk/api/games');
   });
 });
 

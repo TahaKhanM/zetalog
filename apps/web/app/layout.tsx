@@ -15,7 +15,7 @@ import '@fontsource/azeret-mono/700.css';
 import './globals.css';
 import { HeaderNav } from './_components/HeaderNav';
 
-const GITHUB_URL = 'https://github.com/zetalog/zetalog';
+const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
 
 export const metadata: Metadata = {
   title: {

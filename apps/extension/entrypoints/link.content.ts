@@ -22,7 +22,7 @@ import { type BgRequest, type BgResponse } from '../lib/messages.js';
  * so the published extension ships the production origin alone.
  */
 export default defineContentScript({
-  matches: ['https://zetalog.vercel.app/link*', 'http://localhost:3000/link*'],
+  matches: ['https://www.zetalog.co.uk/link*', 'http://localhost:3000/link*'],
   main() {
     window.addEventListener('message', (event) => {
       const parsed = parseLinkMessage(event, window, LINK_ORIGINS);

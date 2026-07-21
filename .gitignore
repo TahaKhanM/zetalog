@@ -17,3 +17,4 @@ playwright-report/
 .superpowers/
 .claude/worktrees/
 *.tsbuildinfo
+.vercel
