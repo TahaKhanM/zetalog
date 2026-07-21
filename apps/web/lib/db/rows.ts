@@ -32,10 +32,23 @@ const physiologyFlagSchema = z.object({
   detail: z.string(),
 });
 
+/** One hard problem-stream impossibility, as recorded by `judge` (mirrors ProblemViolation). */
+const problemViolationSchema = z.object({
+  rule: z.enum(['range-nonconforming']),
+  detail: z.string(),
+});
+
+/** One statistical problem-stream flag, as recorded by `judge` (mirrors ProblemFlag). */
+const problemFlagSchema = z.object({
+  rule: z.enum(['operation-mix', 'low-entropy', 'problem-switch']),
+  detail: z.string(),
+});
+
 /**
  * The `validation` jsonb column: the full {@link Verdict} `judge` produced for a
  * game. Parsed back out to render status chips (/me) and flag/violation chips
- * plus reviewer context (/admin).
+ * plus reviewer context (/admin). `problemViolations`/`problemFlags` default to
+ * empty so rows judged before the W6 checks shipped still parse.
  */
 export const storedValidationSchema = z.object({
   outcome: z.enum(['accepted', 'quarantined', 'rejected']),
@@ -43,6 +56,8 @@ export const storedValidationSchema = z.object({
   violations: z.array(consistencyViolationSchema),
   flags: z.array(physiologyFlagSchema),
   historyFlag: z.enum(['pb-jump']).nullable(),
+  problemViolations: z.array(problemViolationSchema).default([]),
+  problemFlags: z.array(problemFlagSchema).default([]),
 });
 export type StoredValidation = z.infer<typeof storedValidationSchema>;
 

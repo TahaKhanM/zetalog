@@ -59,6 +59,13 @@ describe('storedValidationSchema', () => {
       violations: [{ rule: 'claimed-score-mismatch', detail: 'claimed 80, recomputed 71' }],
       flags: [{ rule: 'answer-floor', detail: '4/10 problems solved faster than 250ms' }],
       historyFlag: 'pb-jump',
+      problemViolations: [
+        {
+          rule: 'range-nonconforming',
+          detail: '3 problem(s) impossible under the claimed settings',
+        },
+      ],
+      problemFlags: [{ rule: 'operation-mix', detail: 'operation shares deviate' }],
     };
     expect(storedValidationSchema.parse(verdict)).toEqual(verdict);
   });
@@ -70,8 +77,38 @@ describe('storedValidationSchema', () => {
       violations: [],
       flags: [],
       historyFlag: null,
+      problemViolations: [],
+      problemFlags: [],
     };
     expect(storedValidationSchema.parse(verdict)).toEqual(verdict);
+  });
+
+  it('defaults the W6 problem fields to empty for rows judged before they shipped', () => {
+    const legacy = {
+      outcome: 'accepted',
+      serverScore: 40,
+      violations: [],
+      flags: [],
+      historyFlag: null,
+    };
+    expect(storedValidationSchema.parse(legacy)).toEqual({
+      ...legacy,
+      problemViolations: [],
+      problemFlags: [],
+    });
+  });
+
+  it('rejects an unknown problem-flag rule', () => {
+    expect(() =>
+      storedValidationSchema.parse({
+        outcome: 'accepted',
+        serverScore: 1,
+        violations: [],
+        flags: [],
+        historyFlag: null,
+        problemFlags: [{ rule: 'clairvoyance', detail: 'x' }],
+      }),
+    ).toThrow();
   });
 
   it('rejects an unknown flag rule', () => {
@@ -110,6 +147,8 @@ describe('gameRowSchema', () => {
       violations: [],
       flags: [],
       historyFlag: null,
+      problemViolations: [],
+      problemFlags: [],
     },
   };
 
