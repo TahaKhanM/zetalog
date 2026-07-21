@@ -40,7 +40,7 @@ const problemViolationSchema = z.object({
 
 /** One statistical problem-stream flag, as recorded by `judge` (mirrors ProblemFlag). */
 const problemFlagSchema = z.object({
-  rule: z.enum(['operation-mix', 'low-entropy', 'problem-switch']),
+  rule: z.enum(['operation-mix', 'operand-marginal', 'low-entropy', 'problem-switch']),
   detail: z.string(),
 });
 

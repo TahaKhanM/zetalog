@@ -8,6 +8,7 @@ import {
   checkProblems,
   producibleUnderSettings,
   ENTROPY_MIN_PROBLEMS,
+  MARGINAL_MIN_PROBLEMS,
   MIX_MIN_PROBLEMS,
   type ProblemConformity,
 } from './problems';
@@ -89,6 +90,20 @@ function balancedTexts(perOp: number): string[] {
 
 function flagRules(result: ProblemConformity): string[] {
   return result.flags.map((flag) => flag.rule);
+}
+
+/**
+ * The reviewer's bypass fixture: 60 distinct, in-range problems with a
+ * perfectly uniform op mix, but every operand pinned to the easy (low) end of
+ * its range — "2 + k", "k − 2", "2 × k", "2k ÷ 2" with small k.
+ */
+function easyOperandTexts(): string[] {
+  const texts: string[] = [];
+  for (let k = 2; k <= 16; k += 1) texts.push(`2 + ${String(k)}`);
+  for (let k = 4; k <= 18; k += 1) texts.push(`${String(k)} – 2`);
+  for (let k = 2; k <= 16; k += 1) texts.push(`2 × ${String(k)}`);
+  for (let k = 2; k <= 16; k += 1) texts.push(`${String(2 * k)} ÷ 2`);
+  return texts;
 }
 
 describe('producibleUnderSettings — range conformity', () => {
@@ -273,10 +288,129 @@ describe('checkProblems — operation-mix plausibility', () => {
   });
 });
 
+describe('checkProblems — operand-marginal plausibility', () => {
+  it('flags the all-easy attack: uniform mix, in range, every operand in the low half', () => {
+    const result = judgeTexts(easyOperandTexts());
+    // No other rule sees anything wrong — this is the bypass being closed.
+    expect(result.violations).toEqual([]);
+    expect(flagRules(result)).not.toContain('operation-mix');
+    expect(flagRules(result)).not.toContain('low-entropy');
+    expect(flagRules(result)).toContain('operand-marginal');
+  });
+
+  it('flags a single pinned operand slot on a longer single-op game', () => {
+    const mulOnly = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      addEnabled: false,
+      subEnabled: false,
+      divEnabled: false,
+    };
+    // Right factor sweeps its range near-uniformly; left factor is pinned at 2.
+    const texts = Array.from({ length: 40 }, (_unused, i) => `2 × ${String(2 + ((i * 37) % 99))}`);
+    const result = judgeTexts(texts, mulOnly);
+    const flag = result.flags.find((f) => f.rule === 'operand-marginal');
+    expect(flag).toBeDefined();
+    expect(flag?.detail).toContain('* left');
+  });
+
+  it('does not run below the minimum sample size', () => {
+    const result = judgeTexts(easyOperandTexts().slice(0, MARGINAL_MIN_PROBLEMS - 1));
+    expect(flagRules(result)).not.toContain('operand-marginal');
+  });
+
+  it('abstains when the divisor range spans zero (generator re-rolls)', () => {
+    const zeroDivisor = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      mulLeft: { min: 0, max: 5 },
+    };
+    const result = judgeTexts(easyOperandTexts(), zeroDivisor);
+    expect(flagRules(result)).not.toContain('operand-marginal');
+  });
+
+  it('abstains when no enabled operation matches the observed problems', () => {
+    const mulOnly = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      addEnabled: false,
+      subEnabled: false,
+      divEnabled: false,
+    };
+    // 30 additions claimed as mul-only: the additions are nonconforming (hard
+    // violation) and contribute no observations to any enabled slot.
+    const result = judgeTexts(opTexts('+', 30), mulOnly);
+    expect(flagRules(result)).not.toContain('operand-marginal');
+    expect(result.violations.map((v) => v.rule)).toContain('range-nonconforming');
+  });
+
+  it('abstains when no operation is enabled at all', () => {
+    const noneEnabled = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      addEnabled: false,
+      subEnabled: false,
+      mulEnabled: false,
+      divEnabled: false,
+    };
+    const result = judgeTexts(
+      Array.from({ length: 30 }, () => '2 + 2'),
+      noneEnabled,
+    );
+    expect(flagRules(result)).not.toContain('operand-marginal');
+  });
+
+  it('skips a zero divisor rather than observing an infinite quotient', () => {
+    // One nonconforming "5 ÷ 0" among an otherwise balanced game: the quotient
+    // slot must skip it (no NaN/Infinity), while the range rule rejects it.
+    const result = judgeTexts([...balancedTexts(8), '5 ÷ 0']);
+    expect(result.violations.map((v) => v.rule)).toContain('range-nonconforming');
+    for (const flag of result.flags) {
+      expect(flag.detail).not.toContain('NaN');
+      expect(flag.detail).not.toContain('Infinity');
+    }
+  });
+});
+
 describe('checkProblems — repetition / entropy', () => {
   it('flags "2 + 2 forever" against the wide default operand space', () => {
     const result = judgeTexts(Array.from({ length: 30 }, () => '2 + 2'));
     expect(flagRules(result)).toContain('low-entropy');
+  });
+
+  it('flags "2 + 2" over a plausible 19-problem 30-second game', () => {
+    // Below the old gate of 20; the birthday bound self-regulates at small n
+    // (threshold 4 at n = 19 on the default space), so this must still flag.
+    const result = judgeTexts(Array.from({ length: 19 }, () => '2 + 2'));
+    expect(flagRules(result)).toContain('low-entropy');
+  });
+
+  it('abstains when the divisor range spans zero (generator re-rolls)', () => {
+    // Same abstention as the mix rule: a re-rolling divisor skews the draw
+    // probabilities that pMax assumes, so the rule abstains rather than guess.
+    const zeroDivisor = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      mulLeft: { min: 0, max: 5 },
+    };
+    const result = judgeTexts(
+      Array.from({ length: 20 }, () => '2 + 2'),
+      zeroDivisor,
+    );
+    expect(flagRules(result)).not.toContain('low-entropy');
+  });
+
+  it('abstains on a degenerate zero-only divisor space instead of a NaN bound', () => {
+    // mulLeft {0,0} makes div's producible set empty (the real generator would
+    // re-roll forever): the space size is 0 and the naive bound NaN — abstain.
+    const divOnly = {
+      ...ZETAMAC_DEFAULT_SETTINGS,
+      addEnabled: false,
+      subEnabled: false,
+      mulEnabled: false,
+      mulLeft: { min: 0, max: 0 },
+    };
+    const result = judgeTexts(
+      Array.from({ length: 20 }, () => '4 ÷ 2'),
+      divOnly,
+    );
+    expect(flagRules(result)).not.toContain('low-entropy');
+    expect(result.violations.map((v) => v.rule)).toContain('range-nonconforming');
   });
 
   it('flags heavy repetition even when the operation mix is balanced', () => {
