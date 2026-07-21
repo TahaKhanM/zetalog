@@ -80,3 +80,9 @@ work" is rejected.
 Host `docs/store/privacy-policy.md` at a public, stable URL (e.g. GitHub Pages or
 the ZetaLog site at `/privacy`) and enter that URL in the dashboard. Required
 because ZetaLog transmits game results when an account is linked.
+
+## Third-party licenses
+
+The extension bundles self-hosted fonts under the SIL Open Font License 1.1. The
+required attribution and full license text ship in the repository at
+`THIRD-PARTY-LICENSES.md`; keep it in the published package.
