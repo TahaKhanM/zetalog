@@ -149,6 +149,29 @@ export function getOwnGames(client: Db, userId: string): Promise<GameRow[]> {
   );
 }
 
+const aliasEmailSchema = z.object({ email: z.string() });
+
+/**
+ * The user's verified university alias email (W8: it doubles as a login
+ * identifier), or null when none is verified. MUST be called with the service
+ * client — `uni_verifications` has no client policies by design.
+ */
+export async function getVerifiedAliasEmail(service: Db, userId: string): Promise<string | null> {
+  const row = await fetchMaybe(
+    service
+      .from('uni_verifications')
+      .select('email')
+      .eq('user_id', userId)
+      .not('verified_at', 'is', null)
+      .order('verified_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    aliasEmailSchema,
+    'getVerifiedAliasEmail',
+  );
+  return row?.email ?? null;
+}
+
 const quarantineJoinSchema = gameRowSchema.extend({
   profile: z.object({ display_name: z.string().nullable() }).nullable(),
 });
