@@ -1,9 +1,14 @@
 import { ZETAMAC_DEFAULT_SETTINGS, fingerprint, type ZetamacSettings } from '@zetalog/shared';
 import { describe, expect, it } from 'vitest';
 
+import type { GameEvent } from '@zetalog/shared';
+
 import type { StoredGame } from './store.js';
 import {
+  FOCUS_MIN_SOLVED,
+  FOCUS_WINDOW,
   fingerprintLabel,
+  focusArea,
   graphMode,
   isNewPersonalBest,
   latestGame,
@@ -23,6 +28,7 @@ function stored(opts: {
   rankableDuration?: StoredGame['rankableDuration'];
   fingerprint?: string;
   settings?: ZetamacSettings;
+  events?: GameEvent[];
 }): StoredGame {
   const settings = opts.settings ?? ZETAMAC_DEFAULT_SETTINGS;
   return {
@@ -31,7 +37,7 @@ function stored(opts: {
       startedAtMs: opts.savedAtMs,
       playedMs: 120_000,
       settings,
-      events: [],
+      events: opts.events ?? [],
       claimedScore: opts.claimedScore ?? opts.score,
     },
     verifiedScore: opts.score,
@@ -40,6 +46,19 @@ function stored(opts: {
     status: opts.status ?? 'kept',
     savedAtMs: opts.savedAtMs,
   };
+}
+
+/** `count` verified solves of the same problem, each taking `solveMs`. */
+function solves(text: string, answer: number, solveMs: number, count: number): GameEvent[] {
+  const events: GameEvent[] = [];
+  let at = 0;
+  for (let i = 0; i < count; i += 1) {
+    events.push({ kind: 'problem', at, text });
+    events.push({ kind: 'input', at: at + Math.max(0, solveMs - 20), value: String(answer) });
+    events.push({ kind: 'accepted', at: at + solveMs, answer });
+    at += solveMs + 200;
+  }
+  return events;
 }
 
 // The product truth is the recomputed verifiedScore, NOT the scraped
@@ -255,5 +274,108 @@ describe('recentGames', () => {
     ];
     const recent = recentGames(games, 2);
     expect(recent.map((g) => g.record.claimedScore)).toEqual([3, 2]);
+  });
+});
+
+describe('focusArea', () => {
+  it('names the slowest well-sampled skill area with a ratio vs the fastest', () => {
+    const games = [
+      stored({
+        score: 16,
+        savedAtMs: 1,
+        events: [
+          ...solves('2 + 3', 5, 1000, FOCUS_MIN_SOLVED),
+          ...solves('63 ÷ 9', 7, 3000, FOCUS_MIN_SOLVED),
+        ],
+      }),
+    ];
+    expect(focusArea(games)).toEqual({
+      label: '÷ by 7–12',
+      medianSolveMs: 3000,
+      ratio: 3,
+    });
+  });
+
+  it('returns null when no area reaches the sample floor', () => {
+    const games = [
+      stored({
+        score: 14,
+        savedAtMs: 1,
+        events: [
+          ...solves('2 + 3', 5, 1000, FOCUS_MIN_SOLVED - 1),
+          ...solves('63 ÷ 9', 7, 3000, FOCUS_MIN_SOLVED - 1),
+        ],
+      }),
+    ];
+    expect(focusArea(games)).toBeNull();
+  });
+
+  it('returns null when only one area is sampled (no comparison to make)', () => {
+    const games = [
+      stored({ score: 8, savedAtMs: 1, events: solves('2 + 3', 5, 1000, FOCUS_MIN_SOLVED) }),
+    ];
+    expect(focusArea(games)).toBeNull();
+  });
+
+  it('ignores non-kept games', () => {
+    const games = [
+      stored({ score: 8, savedAtMs: 1, events: solves('2 + 3', 5, 1000, FOCUS_MIN_SOLVED) }),
+      stored({
+        score: 8,
+        savedAtMs: 2,
+        status: 'quarantined',
+        events: solves('63 ÷ 9', 7, 4000, FOCUS_MIN_SOLVED),
+      }),
+    ];
+    expect(focusArea(games)).toBeNull();
+  });
+
+  it('only considers the most recent window of kept games', () => {
+    const games = [
+      // An old division-heavy game that must age out of the window.
+      stored({ score: 8, savedAtMs: 0, events: solves('63 ÷ 9', 7, 4000, FOCUS_MIN_SOLVED) }),
+      // FOCUS_WINDOW newer games: quick additions, slower borrow-free subtractions.
+      ...Array.from({ length: FOCUS_WINDOW }, (_, index) =>
+        stored({
+          score: 2,
+          savedAtMs: index + 1,
+          events: [...solves('2 + 3', 5, 1000, 1), ...solves('58 – 6', 52, 1500, 1)],
+        }),
+      ),
+    ];
+    expect(focusArea(games)).toEqual({
+      label: 'Subtraction, no borrow',
+      medianSolveMs: 1500,
+      ratio: 1.5,
+    });
+  });
+
+  it('keeps the earlier area when a later sampled area is faster', () => {
+    const games = [
+      stored({
+        score: 24,
+        savedAtMs: 1,
+        events: [
+          ...solves('2 + 3', 5, 1000, FOCUS_MIN_SOLVED),
+          ...solves('3 × 5', 15, 3000, FOCUS_MIN_SOLVED),
+          ...solves('12 ÷ 4', 3, 2000, FOCUS_MIN_SOLVED),
+        ],
+      }),
+    ];
+    expect(focusArea(games)).toEqual({ label: '× by 2–6', medianSolveMs: 3000, ratio: 3 });
+  });
+
+  it('reports a flat ratio when the fastest median is zero', () => {
+    const games = [
+      stored({
+        score: 16,
+        savedAtMs: 1,
+        events: [
+          ...solves('2 + 3', 5, 0, FOCUS_MIN_SOLVED),
+          ...solves('63 ÷ 9', 7, 3000, FOCUS_MIN_SOLVED),
+        ],
+      }),
+    ];
+    expect(focusArea(games)).toEqual({ label: '÷ by 7–12', medianSolveMs: 3000, ratio: 1 });
   });
 });
