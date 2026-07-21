@@ -221,6 +221,32 @@ button {
   margin-bottom: 0.9rem;
 }
 
+/* CO-3 university monogram badge — colours arrive inline from uni-brand.ts,
+ * the single sanctioned non-palette hex source; never set colours here. */
+.uni-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-weight: 700;
+  font-size: 0.62rem;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 1px 1px var(--surface-shadow);
+  user-select: none;
+}
+
+.uni-badge--profile {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+}
+
 .nav {
   display: flex;
   gap: 1.1rem;
