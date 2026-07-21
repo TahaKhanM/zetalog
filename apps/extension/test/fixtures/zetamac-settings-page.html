@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Arithmetic Game – Online Speed Drill</title>
+    <link href="/app.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="welcome">
+      <h1>Arithmetic Game</h1>
+      <p
+        >The Arithmetic Game is a fast-paced speed drill where you are given two
+        minutes to solve as many arithmetic problems as you can.</p
+      >
+      <p
+        >If you have any questions, please contact
+        <script type="text/javascript">
+          document.write(
+            '<n uers="znvygb:nevguzrgvp\100mrgnznp\056pbz">nevguzrgvp\100mrgnznp\056pbz<\057n>'.replace(
+              /[a-zA-Z]/g,
+              function (c) {
+                return String.fromCharCode(
+                  (c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13)
+                    ? c
+                    : c - 26,
+                );
+              },
+            ),
+          );</script
+        >.</p
+      >
+      <form action="/game" class="game-options" method="post">
+        <dl>
+          <dt>
+            <label>
+              <input checked name="add" type="checkbox" />
+              Addition
+            </label>
+          </dt>
+          <dd
+            >Range: (<input
+              type="text"
+              name="add_left_min"
+              id="add_left_min"
+              value="2"
+            />
+            to
+            <input
+              type="text"
+              name="add_left_max"
+              id="add_left_max"
+              value="100"
+            />) + (<input
+              type="text"
+              name="add_right_min"
+              id="add_right_min"
+              value="2"
+            />
+            to
+            <input
+              type="text"
+              name="add_right_max"
+              id="add_right_max"
+              value="100"
+            />)</dd
+          >
+          <dt>
+            <label>
+              <input checked name="sub" type="checkbox" />
+              Subtraction
+            </label>
+          </dt>
+          <dd>Addition problems in reverse.</dd>
+          <dt>
+            <label>
+              <input checked name="mul" type="checkbox" />
+              Multiplication
+            </label>
+          </dt>
+          <dd
+            >Range: (<input
+              type="text"
+              name="mul_left_min"
+              id="mul_left_min"
+              value="2"
+            />
+            to
+            <input
+              type="text"
+              name="mul_left_max"
+              id="mul_left_max"
+              value="12"
+            />) × (<input
+              type="text"
+              name="mul_right_min"
+              id="mul_right_min"
+              value="2"
+            />
+            to
+            <input
+              type="text"
+              name="mul_right_max"
+              id="mul_right_max"
+              value="100"
+            />)</dd
+          >
+          <dt>
+            <label>
+              <input checked name="div" type="checkbox" />
+              Division
+            </label>
+          </dt>
+          <dd>Multiplication problems in reverse.</dd>
+        </dl>
+        <p>
+          Duration:
+          <select name="duration">
+            <option value="30">30 seconds</option>
+            <option value="60">60 seconds</option>
+            <option selected value="120">120 seconds</option>
+            <option value="300">300 seconds</option>
+            <option value="600">600 seconds</option>
+          </select>
+        </p>
+        <input type="submit" value="Start" />
+      </form>
+    </div>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-4847317-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function () {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src =
+          ('https:' == document.location.protocol
+            ? 'https://ssl'
+            : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>
