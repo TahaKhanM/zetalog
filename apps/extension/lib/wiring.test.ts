@@ -116,6 +116,45 @@ describe('startCapture — a full clean game', () => {
     expect(recomputeScore(record.events).score).toBe(2);
   });
 
+  it('records a repeated identical problem so both accepts recompute (Zetamac ~0.7% of games)', async () => {
+    const { clock, set } = makeClock();
+    const { hooks, completed } = makeHooks();
+    // beforeEach painted the first problem '34 + 66'.
+    startCapture({ document, window, clock, hooks });
+
+    set(900);
+    typeAnswer('100');
+    // Zetamac legitimately shows the SAME problem text again after a correct answer.
+    advance('34 + 66', 1);
+    await flush();
+
+    set(1500);
+    typeAnswer('100');
+    advance('9 + 9', 2);
+    await flush();
+
+    set(2000);
+    answerEl().disabled = true;
+    await flush();
+
+    const record = completed[0];
+    if (record === undefined) throw new Error('no record');
+    // The repeated problem must get its own `problem` event, so the second
+    // accept has a problem to attach to.
+    expect(record.events.map((e) => e.kind)).toEqual([
+      'problem',
+      'input',
+      'accepted',
+      'problem',
+      'input',
+      'accepted',
+      'problem',
+    ]);
+    const recomputed = recomputeScore(record.events);
+    expect(recomputed.score).toBe(2);
+    expect(recomputed.anomalies).toEqual([]);
+  });
+
   it('emits the accepted answer before the next problem (server-recomputable order)', async () => {
     const { clock, set } = makeClock();
     const { hooks, completed } = makeHooks();
