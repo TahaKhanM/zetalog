@@ -36,12 +36,30 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   return response;
 }
 
-export const proxyConfig = {
+export const config = {
+  /*
+   * Run ONLY where a session matters. The public boards (`/`, `/uni/[slug]`)
+   * are cacheable, identity-free renders (they do their own client-side
+   * personalisation), so they must NOT trigger a per-request auth round-trip.
+   *
+   *   /me, /admin        — auth-gated dashboards (the redirect above)
+   *   /link, /verify     — session-dependent flows (handoff / OTP)
+   *   /signin            — reads the session (skips already-signed-in users);
+   *                        that getUser can rotate an expired session's refresh
+   *                        token, and lib/supabase/server.ts drops cookie writes
+   *                        by design, so the proxy must own the refresh here too
+   *   /auth/:path*       — the OAuth callback + signout write session cookies
+   *   /api/:path*        — cookie/bearer routes that read the session
+   *
+   * `:path*` (zero-or-more) matches the bare prefix too (e.g. `/me`).
+   */
   matcher: [
-    /*
-     * Every request path except Next internals and static asset files, so the
-     * session is refreshed site-wide without touching image/font requests.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)',
+    '/me/:path*',
+    '/admin/:path*',
+    '/link/:path*',
+    '/verify/:path*',
+    '/signin/:path*',
+    '/auth/:path*',
+    '/api/:path*',
   ],
 };

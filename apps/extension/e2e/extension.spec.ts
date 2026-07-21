@@ -186,7 +186,9 @@ test('records games from the replica and reflects them in the popup', async () =
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
-  // Recorded score: the hero shows the latest kept game's score (3).
+  // Recorded score: the hero shows the latest kept game's recomputed verified
+  // score (3) — recomputeScore over the captured events, not the scraped claimed
+  // number. Here the clean 3-problem game makes them equal.
   await expect(popup.getByTestId('hero-score')).toHaveText('3');
 
   // Quarantine: the aborted game appears as a restart-quarantined row.
