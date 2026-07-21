@@ -190,6 +190,54 @@ describe('startCapture — a full clean game', () => {
   });
 });
 
+describe('startCapture — page handler clears the input on accept (real Zetamac behaviour)', () => {
+  beforeEach(() => {
+    mountGamePage();
+    problemEl().textContent = '34 + 66';
+  });
+
+  it('still snapshots the accepting keystroke when the page clears the field synchronously', async () => {
+    const { clock, set } = makeClock();
+    const { hooks, completed } = makeHooks();
+
+    // Zetamac's own handler (test/fixtures/zetamac-app.js): registered on the
+    // input at page INIT — i.e. before the content script's document_idle
+    // listener — it accepts inside the same bubble-phase `input` dispatch and
+    // clears the field synchronously via problemGeng() → answer.val(''), which
+    // fires no further input event. Any later-registered same-target listener
+    // therefore reads "" on every accepting keystroke.
+    const input = answerEl();
+    input.addEventListener('input', () => {
+      if (input.value.trim() === '100') {
+        problemEl().textContent = '20 + 5';
+        input.value = '';
+        scoreEl().textContent = 'Score: 1';
+      }
+    });
+
+    startCapture({ document, window, clock, hooks });
+
+    set(900);
+    typeAnswer('100');
+    await flush();
+
+    set(1200);
+    answerEl().disabled = true;
+    await flush();
+
+    const record = completed[0];
+    if (record === undefined) throw new Error('no record');
+    const accepted = record.events.find((e) => e.kind === 'accepted');
+    // The recorder must have snapshotted "100" BEFORE the page handler cleared
+    // the field — the derived accept carries the real answer and the stream
+    // recomputes to the verified score with zero anomalies.
+    expect(accepted?.answer).toBe(100);
+    const recomputed = recomputeScore(record.events);
+    expect(recomputed.score).toBe(1);
+    expect(recomputed.anomalies).toEqual([]);
+  });
+});
+
 describe('startCapture — first problem arriving after start', () => {
   beforeEach(() => {
     mountGamePage();
