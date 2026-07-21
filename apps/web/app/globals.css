@@ -27,16 +27,16 @@
  * The page IS cream paper; maroon is structural ink (ruling, hairlines,
  * index numerals); navy is the working ink. Dark mode is the blackboard. */
 :root {
-  --surface-page: color-mix(in srgb, var(--color-zl-cream) 78%, white);
-  --surface-card: color-mix(in srgb, var(--color-zl-cream) 45%, white);
-  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 62%, white);
-  --surface-border: color-mix(in srgb, var(--color-zl-maroon) 18%, transparent);
-  --surface-hairline: color-mix(in srgb, var(--color-zl-maroon) 14%, transparent);
-  --rule-strong: color-mix(in srgb, var(--color-zl-maroon) 42%, transparent);
-  --surface-text: color-mix(in srgb, var(--color-zl-navy) 88%, white);
+  --surface-page: color-mix(in srgb, var(--color-zl-cream) 38%, white);
+  --surface-card: color-mix(in srgb, var(--color-zl-cream) 14%, white);
+  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 26%, white);
+  --surface-border: color-mix(in srgb, var(--color-zl-maroon) 13%, transparent);
+  --surface-hairline: color-mix(in srgb, var(--color-zl-maroon) 10%, transparent);
+  --rule-strong: color-mix(in srgb, var(--color-zl-maroon) 36%, transparent);
+  --surface-text: color-mix(in srgb, var(--color-zl-navy) 86%, white);
   --surface-heading: var(--color-zl-navy);
-  --surface-shadow: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
-  --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+  --surface-shadow: color-mix(in srgb, var(--color-zl-maroon) 6%, transparent);
+  --meta-text: color-mix(in srgb, var(--color-zl-steel) 44%, var(--surface-text));
   --ink-index: var(--color-zl-maroon);
   --ink-display: var(--color-zl-maroon);
   --chart-stroke: var(--color-zl-steel);
@@ -46,16 +46,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
-    --surface-card: color-mix(in srgb, var(--color-zl-navy) 88%, black);
-    --surface-raised: color-mix(in srgb, var(--color-zl-navy) 82%, black);
-    --surface-border: color-mix(in srgb, var(--color-zl-cream) 16%, transparent);
-    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 12%, transparent);
-    --rule-strong: color-mix(in srgb, var(--color-zl-cream) 34%, transparent);
-    --surface-text: color-mix(in srgb, var(--color-zl-cream) 90%, transparent);
+    --surface-page: color-mix(in srgb, var(--color-zl-navy) 58%, black);
+    --surface-card: color-mix(in srgb, var(--color-zl-navy) 74%, black);
+    --surface-raised: color-mix(in srgb, var(--color-zl-navy) 68%, black);
+    --surface-border: color-mix(in srgb, var(--color-zl-cream) 14%, transparent);
+    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 10%, transparent);
+    --rule-strong: color-mix(in srgb, var(--color-zl-cream) 30%, transparent);
+    --surface-text: color-mix(in srgb, var(--color-zl-cream) 88%, transparent);
     --surface-heading: var(--color-zl-cream);
     --surface-shadow: color-mix(in srgb, black 40%, transparent);
-    --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+    --meta-text: color-mix(in srgb, var(--color-zl-steel) 52%, var(--surface-text));
     --ink-index: var(--color-zl-cream);
     --ink-display: var(--color-zl-cream);
     --chart-stroke-opacity: 1;
@@ -456,19 +456,7 @@ button {
   color: var(--color-zl-maroon);
 }
 
-.auth-chip__signout {
-  background: transparent;
-  border: none;
-  color: var(--meta-text);
-  font-size: 0.8rem;
-  padding: 0.2rem 0;
-  border-bottom: 1px solid transparent;
-}
-
-.auth-chip__signout:hover {
-  color: var(--surface-heading);
-  border-bottom-color: color-mix(in srgb, var(--color-zl-steel) 50%, transparent);
-}
+/* (Sign-out moved to /account — the header chip is now just the name.) */
 
 /* ── State text ─────────────────────────────────────────────────────────── */
 .text-pb {
@@ -522,7 +510,7 @@ button {
 }
 
 .ltable tbody tr:hover td {
-  background: color-mix(in srgb, var(--color-zl-cream) 40%, transparent);
+  background: color-mix(in srgb, var(--color-zl-cream) 22%, transparent);
 }
 
 .ltable__num {
@@ -574,7 +562,7 @@ button {
 }
 
 .tab[aria-selected='true'] {
-  color: var(--color-zl-maroon);
+  color: var(--ink-index);
   background: var(--surface-card);
   border-color: var(--surface-border);
   box-shadow: 0 1px 2px var(--surface-shadow);
@@ -670,27 +658,28 @@ button {
   }
 }
 
+/* Broadsheet stat rail: ruled figures, no boxes — the board is the only card. */
 .stat-rail {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.1rem;
+  padding-top: 0.4rem;
 }
 
 .stat-tile {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.8rem 0.95rem;
-  background: var(--surface-card);
-  border: 1px solid var(--surface-border);
-  border-radius: 12px;
+  gap: 0.2rem;
+  padding-top: 0.55rem;
+  border-top: 2px solid var(--rule-strong);
   flex: 1;
 }
 
 .stat-tile__value {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--surface-heading);
+  line-height: 1;
 }
 
 .stat-tile__label {
@@ -758,7 +747,7 @@ button {
 }
 
 .ltable__rank.rank-top {
-  color: var(--color-zl-maroon);
+  color: var(--ink-index);
   font-weight: 700;
 }
 
@@ -842,29 +831,40 @@ button {
   font-size: 0.85rem;
 }
 
+/* PB tiles as ruled broadsheet figures (CO-3 §2): maroon index, huge numeral. */
 .pb-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 1rem;
+  gap: 1.4rem;
 }
 
 .pb-card {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.3rem;
+  padding-top: 0.65rem;
+  border-top: 2px solid var(--rule-strong);
 }
 
 .pb-card__dur {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-index);
+  line-height: 1;
+}
+
+.pb-card__unit {
+  font-size: 0.7rem;
   font-weight: 500;
-  color: var(--color-zl-steel);
+  margin-left: 0.05rem;
 }
 
 .pb-card__score {
-  font-size: 2.4rem;
+  font-size: clamp(2.6rem, 6vw, 3.4rem);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1;
   color: var(--surface-heading);
+  letter-spacing: -0.02em;
 }
 
 .badge-card {
@@ -873,6 +873,214 @@ button {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+.badge-card__id {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.badge-card__name {
+  margin: 0 0 0.15rem;
+  font-weight: 600;
+  color: var(--surface-heading);
+}
+
+/* ── /me identity chip (links the workbook to /account) ────────────────── */
+.identity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background: var(--surface-card);
+  transition: border-color 0.15s ease;
+}
+
+.identity-chip:hover {
+  border-color: color-mix(in srgb, var(--color-zl-steel) 55%, transparent);
+}
+
+.identity-chip__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--surface-heading);
+}
+
+.identity-chip__arrow {
+  color: var(--meta-text);
+  font-size: 0.85rem;
+}
+
+/* ── /me analysis: operation breakdown bars ────────────────────────────── */
+.opbars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.opbars__row {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(7.5rem, auto) 1fr 3.6rem;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.opbars__row:last-child {
+  border-bottom: none;
+}
+
+.opbars__symbol {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink-index);
+  text-align: center;
+}
+
+.opbars__name {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--surface-heading);
+  line-height: 1.25;
+}
+
+.opbars__count {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.opbars__track {
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
+  overflow: hidden;
+}
+
+.opbars__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chart-stroke);
+  opacity: var(--chart-stroke-opacity);
+}
+
+/* The slowest operation is inked maroon — the examiner's underline. */
+.opbars__fill--slowest {
+  background: var(--color-zl-maroon);
+  opacity: 0.85;
+}
+
+.opbars__median {
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+.analysis-note {
+  margin: 0.7rem 0 0;
+  font-size: 0.8rem;
+}
+
+/* ── /me analysis: times-table ledger ──────────────────────────────────── */
+.facts th,
+.facts td {
+  text-align: center;
+  padding: 0.5rem 0.35rem;
+}
+
+.facts__head {
+  text-align: center;
+}
+
+.facts__op {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink-index);
+  border-bottom: 1px solid var(--surface-hairline);
+  width: 2.2rem;
+}
+
+.facts__cell {
+  font-size: 0.82rem;
+  font-weight: 500;
+  min-width: 2.4rem;
+}
+
+.facts__cell--empty {
+  color: color-mix(in srgb, var(--meta-text) 55%, transparent);
+}
+
+.facts__cell--slowest {
+  color: var(--color-zl-maroon);
+  font-weight: 700;
+}
+
+/* ── /me analysis: weak-spot callouts ──────────────────────────────────── */
+.weakspot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.weakspot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  border-left: 3px solid color-mix(in srgb, var(--color-zl-maroon) 45%, transparent);
+}
+
+.weakspot__label {
+  font-weight: 600;
+  color: var(--surface-heading);
+}
+
+.weakspot__figures {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.weakspot__median {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--color-zl-maroon);
+  line-height: 1;
+}
+
+.tough__text {
+  font-size: 1.02rem;
+  font-weight: 500;
+  color: var(--surface-heading);
+}
+
+.tough__time {
+  font-weight: 700;
+}
+
+/* ── Leaderboard games column (quiet; dropped on narrow viewports) ─────── */
+.ltable__games-h {
+  text-align: right;
+}
+
+.ltable__games {
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 560px) {
+  .ltable__games-h,
+  .ltable__games {
+    display: none;
+  }
 }
 
 .history-reasons {

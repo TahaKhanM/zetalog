@@ -1,7 +1,7 @@
 import { ZETAMAC_DEFAULT_SETTINGS, fingerprint } from '@zetalog/shared';
 import { describe, expect, it } from 'vitest';
 
-import { configLabel, formatRelativeTime, parseDurationSeconds } from './format';
+import { configLabel, formatRelativeTime, formatSolveMs, parseDurationSeconds } from './format';
 
 const NOW = Date.parse('2026-07-20T12:00:00.000Z');
 const ago = (ms: number): string => new Date(NOW - ms).toISOString();
@@ -36,6 +36,18 @@ describe('formatRelativeTime', () => {
 
   it('treats future timestamps as "just now" (clock skew safety)', () => {
     expect(formatRelativeTime(ago(-5 * MINUTE), NOW)).toBe('just now');
+  });
+});
+
+describe('formatSolveMs', () => {
+  it('renders solve times as seconds with one decimal', () => {
+    expect(formatSolveMs(900)).toBe('0.9s');
+    expect(formatSolveMs(2450)).toBe('2.5s');
+  });
+
+  it('drops the decimal at ten seconds and above', () => {
+    expect(formatSolveMs(10_000)).toBe('10s');
+    expect(formatSolveMs(12_800)).toBe('13s');
   });
 });
 
