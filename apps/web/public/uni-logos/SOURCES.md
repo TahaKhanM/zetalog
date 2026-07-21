@@ -44,3 +44,5 @@ All assets fetched 2026-07-21.
 > Post-collection note (2026-07-21): `university-of-birmingham.png` and
 > `university-of-st-andrews.png` were resized to <=256px / optimised for page
 > weight; the byte-identical originals remain in git history at commit 87d4936.
+
+> Warwick removed (2026-07-21): their own icon assets publish only the monochrome coat-of-arms crest (black/light, white/dark), illegible at 20px and off-brand. Reverted to the aubergine 'W' monogram — sharper and on-brand. The removed original remains in git history.

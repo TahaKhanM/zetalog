@@ -102,7 +102,10 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
   'university-of-oxford': '/uni-logos/university-of-oxford.svg',
   'university-of-cambridge': '/uni-logos/university-of-cambridge.png',
   'imperial-college-london': '/uni-logos/imperial-college-london.svg',
-  'university-of-warwick': '/uni-logos/university-of-warwick.png',
+  // Warwick intentionally omitted: their own icon assets are only the
+  // monochrome coat-of-arms crest (black light / white dark, viewBox 463x655),
+  // illegible at 20px and off-brand. The aubergine 'W' monogram (#3c1053, their
+  // brand colour) is sharper and more recognisable — see CURATED_BRANDS above.
   'university-college-london-university-of-london':
     '/uni-logos/university-college-london-university-of-london.png',
   'london-school-of-economics-and-political-science-university-of-london':
