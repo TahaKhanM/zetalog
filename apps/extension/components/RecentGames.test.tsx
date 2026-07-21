@@ -22,6 +22,7 @@ function game(over: Partial<StoredGame> & { score?: number } = {}): StoredGame {
       events: [],
       claimedScore: score ?? 50,
     },
+    verifiedScore: score ?? 50,
     fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
     rankableDuration: 120,
     status: 'kept',
@@ -85,6 +86,21 @@ describe('RecentGames', () => {
     );
     expect(screen.queryByText('Remove')).toBeNull();
     expect(screen.getByText('Restore')).toBeTruthy();
+  });
+
+  it('shows the verified score for a kept row, not the scraped claimed score', () => {
+    // `score` sets claimedScore 51; verifiedScore 52 overrides the verified truth.
+    render(
+      <RecentGames
+        games={[game({ status: 'kept', score: 51, verifiedScore: 52 })]}
+        nowMs={NOW}
+        onRestore={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    );
+    // The verified 52 renders; the claimed 51 never reaches the DOM.
+    expect(within(row('kept')).getByText('52')).toBeTruthy();
+    expect(within(row('kept')).queryByText('51')).toBeNull();
   });
 
   it('shows an em dash and a flag for a capture_failed row', () => {

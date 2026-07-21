@@ -50,6 +50,7 @@ function record(id: string): GameRecord {
 function game(id: string, over: Partial<StoredGame> = {}): StoredGame {
   return {
     record: record(id),
+    verifiedScore: 30,
     fingerprint: 'fp',
     rankableDuration: 120,
     status: 'kept',
