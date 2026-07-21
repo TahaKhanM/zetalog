@@ -42,6 +42,7 @@ function gameRecord(
     score?: number;
     playedMs?: number;
     settings?: ZetamacSettings;
+    events?: GameRecord['events'];
   } = {},
 ): GameRecord {
   return {
@@ -49,9 +50,30 @@ function gameRecord(
     startedAtMs: 1_700_000_000_000,
     playedMs: opts.playedMs ?? 120_000,
     settings: opts.settings ?? ZETAMAC_DEFAULT_SETTINGS,
-    events: [],
+    events: opts.events ?? [],
     claimedScore: opts.score ?? 50,
   };
+}
+
+/**
+ * An event stream of `count` cleanly-verified problems — recomputeScore returns
+ * `count`. Used to prove the store persists the VERIFIED score, independent of
+ * whatever claimedScore the record carries.
+ */
+function verifiedEvents(count: number): GameRecord['events'] {
+  const events: GameRecord['events'] = [];
+  let at = 0;
+  for (let i = 0; i < count; i += 1) {
+    const left = 10 + i;
+    const answer = left + 5;
+    events.push({ kind: 'problem', at, text: `${String(left)} + 5` });
+    at += 800;
+    events.push({ kind: 'input', at, value: String(answer) });
+    at += 200;
+    events.push({ kind: 'accepted', at, answer });
+    at += 1000;
+  }
+  return events;
 }
 
 /** A rankable-but-not-default config (custom duration) → rankableDuration null. */
@@ -90,6 +112,18 @@ describe('createStore.saveGame — a normal game', () => {
     if (!games.ok) return;
     expect(games.value).toHaveLength(2);
   });
+
+  it('persists the recomputed verifiedScore, not the claimed score', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    // Claimed 51 undercounts; the events cleanly verify 52.
+    const result = await store.saveGame(gameRecord({ score: 51, events: verifiedEvents(52) }));
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.verifiedScore).toBe(52);
+    // The claimed score is retained for the server's cross-check.
+    expect(result.value.record.claimedScore).toBe(51);
+  });
 });
 
 describe('createStore.saveGame — quarantine', () => {
@@ -126,13 +160,14 @@ describe('createStore.saveGame — quarantine', () => {
 });
 
 describe('createStore.saveCaptureFailed', () => {
-  it('stores a capture_failed row', async () => {
+  it('stores a capture_failed row with a zero verifiedScore (no events)', async () => {
     const store = createStore(fakeArea(), tickingClock());
     const result = await store.saveCaptureFailed(gameRecord({ score: 0 }));
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.value.status).toBe('capture_failed');
+    expect(result.value.verifiedScore).toBe(0);
   });
 
   it('surfaces corruption instead of clobbering it', async () => {
@@ -306,6 +341,45 @@ describe('createStore — remove/restore provenance', () => {
   });
 });
 
+describe('createStore — verifiedScore backfill for legacy rows', () => {
+  it('recomputes verifiedScore from events when the stored row lacks it', async () => {
+    // A row written before the field existed: no verifiedScore, but real events.
+    const legacy = {
+      record: gameRecord({ score: 2, events: verifiedEvents(3) }),
+      fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
+      rankableDuration: 120,
+      status: 'kept',
+      savedAtMs: 1,
+    };
+    const store = createStore(fakeArea({ [GAMES_KEY]: [legacy] }), tickingClock());
+
+    const games = await store.listGames();
+    expect(games.ok).toBe(true);
+    if (!games.ok) return;
+    expect(games.value[0]?.verifiedScore).toBe(3);
+  });
+
+  it('falls back to claimedScore for a legacy PRUNED row (events stripped)', async () => {
+    // pruneStoredGames strips event streams from old non-rankable rows while
+    // preserving scores. A pruned row written before verifiedScore existed has
+    // NO events to recompute from — recomputing would clobber its score to 0,
+    // so the stored claimed score is the best remaining truth.
+    const pruned = {
+      record: gameRecord({ score: 42, settings: customSettings }), // events: []
+      fingerprint: fingerprint(customSettings),
+      rankableDuration: null,
+      status: 'kept',
+      savedAtMs: 1,
+    };
+    const store = createStore(fakeArea({ [GAMES_KEY]: [pruned] }), tickingClock());
+
+    const games = await store.listGames();
+    expect(games.ok).toBe(true);
+    if (!games.ok) return;
+    expect(games.value[0]?.verifiedScore).toBe(42);
+  });
+});
+
 describe('createStore prefs', () => {
   it('returns defaults when no prefs are stored', async () => {
     const store = createStore(fakeArea(), tickingClock());
@@ -358,6 +432,7 @@ describe('pruneStoredGames', () => {
   function storedGame(over: Partial<StoredGame> & { savedAtMs: number }): StoredGame {
     return {
       record: gameRecord(),
+      verifiedScore: 0,
       fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
       rankableDuration: 120,
       status: 'kept',
