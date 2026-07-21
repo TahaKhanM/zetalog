@@ -23,3 +23,13 @@ export function parseHtml(html: string): Document {
 export function gamePageDocument(): Document {
   return parseHtml(gamePageHtml());
 }
+
+/**
+ * Render the live game page into a document (the global jsdom document by
+ * default) so wiring tests can attach real MutationObservers and dispatch
+ * real `input` events. The inline module script is inert but its text — the
+ * `init({...})` settings — is preserved for the parser to read.
+ */
+export function mountGamePage(doc: Document = document): void {
+  doc.documentElement.innerHTML = parseHtml(gamePageHtml()).documentElement.innerHTML;
+}
