@@ -1,0 +1,504 @@
+/*
+ * ZetaLog popup design system. The five palette hexes and the font families
+ * come from @zetalog/shared tokens, injected as --zl-* custom properties by
+ * main.tsx. This sheet only *composes* them — every colour below is either a
+ * palette var or a color-mix over one; no raw hexes, no font families
+ * (invariant 7). Colour application follows CO-2: neutrals carry the layout,
+ * brand colour does accent work only (text / border / tint / stroke), and no
+ * solid brand-colour region is larger than a chip except the wordmark.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Light: near-white surfaces, softened navy text, brand colour as accent. */
+  --zl-bg: color-mix(in srgb, var(--zl-cream) 30%, white);
+  --zl-surface: white;
+  --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 50%, white);
+  --zl-border: color-mix(in srgb, var(--zl-cream) 60%, white);
+  --zl-divider: color-mix(in srgb, var(--zl-navy) 10%, transparent);
+  --zl-text: color-mix(in srgb, var(--zl-navy) 85%, white);
+  --zl-heading: var(--zl-navy);
+  --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+  --zl-faint: color-mix(in srgb, var(--zl-navy) 42%, white);
+  --zl-display: var(--zl-maroon);
+  --zl-accent: var(--zl-red);
+  --zl-chart: color-mix(in srgb, var(--zl-steel-blue) 85%, transparent);
+  --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 13%, transparent);
+  --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 12%, transparent);
+  --zl-chip-text: color-mix(in srgb, var(--zl-steel-blue) 72%, var(--zl-navy));
+  --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 8%, transparent);
+  --zl-warn-text: var(--zl-maroon);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --zl-bg: color-mix(in srgb, var(--zl-navy) 72%, black);
+    --zl-surface: color-mix(in srgb, var(--zl-navy) 88%, black);
+    --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 80%, black);
+    --zl-border: color-mix(in srgb, var(--zl-cream) 14%, transparent);
+    --zl-divider: color-mix(in srgb, var(--zl-cream) 12%, transparent);
+    --zl-text: color-mix(in srgb, var(--zl-cream) 90%, transparent);
+    --zl-heading: var(--zl-cream);
+    --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+    --zl-faint: color-mix(in srgb, var(--zl-cream) 45%, transparent);
+    --zl-display: var(--zl-cream);
+    --zl-chart: var(--zl-steel-blue);
+    --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 20%, transparent);
+    --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 18%, transparent);
+    --zl-chip-text: color-mix(in srgb, var(--zl-steel-blue) 82%, var(--zl-cream));
+    --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 8%, transparent);
+    --zl-warn-text: color-mix(in srgb, var(--zl-maroon) 42%, var(--zl-cream));
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.zl-popup {
+  width: 360px;
+  background: var(--zl-bg);
+  color: var(--zl-text);
+  font-family: var(--zl-font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Numerals are the hero of every screen — always mono + tabular (Azeret Mono). */
+.zl-num {
+  font-family: var(--zl-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.zl-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--zl-muted);
+}
+
+/* Staggered load reveal — one calm, orchestrated entrance. */
+@keyframes zl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.zl-section {
+  animation: zl-rise 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  padding: 14px 18px;
+  border-top: 1px solid var(--zl-divider);
+}
+
+.zl-section:nth-of-type(1) {
+  animation-delay: 0.02s;
+}
+.zl-section:nth-of-type(2) {
+  animation-delay: 0.06s;
+}
+.zl-section:nth-of-type(3) {
+  animation-delay: 0.1s;
+}
+.zl-section:nth-of-type(4) {
+  animation-delay: 0.14s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zl-section {
+    animation: none;
+  }
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.zl-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 18px 13px;
+  border-top: none;
+}
+
+.zl-header__mark {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex: none;
+}
+
+/* The wordmark is the one place a solid brand colour is allowed (CO-2). */
+.zl-wordmark {
+  font-family: var(--zl-font-display);
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--zl-display);
+  margin: 0;
+}
+
+.zl-header__tag {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--zl-faint);
+}
+
+/* ── Hero ───────────────────────────────────────────────── */
+.zl-hero__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.zl-hero__score {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--zl-heading);
+  display: block;
+}
+
+/* New PB: red text only (CO-2 — never a red fill). */
+.zl-hero__score--pb {
+  color: var(--zl-accent);
+}
+
+.zl-hero__meta {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--zl-muted);
+}
+
+.zl-hero__meta .zl-num {
+  color: var(--zl-text);
+}
+
+.zl-hero__empty {
+  font-size: 13px;
+  color: var(--zl-muted);
+}
+
+/* PB chip: red text + red border, no fill (CO-2). */
+.zl-chip {
+  font-family: var(--zl-font-display);
+  font-weight: 800;
+  font-stretch: 110%;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 9px;
+  color: var(--zl-accent);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--zl-accent) 55%, transparent);
+  padding: 2px 6px 1px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+/* Personal-best row: three duration columns on white, hairline-separated. */
+.zl-pbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 14px;
+  background: var(--zl-border);
+  border: 1px solid var(--zl-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.zl-pb {
+  background: var(--zl-surface);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zl-pb__dur {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--zl-faint);
+}
+
+.zl-pb__val {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--zl-heading);
+}
+
+.zl-pb__val--empty {
+  color: var(--zl-faint);
+  font-weight: 400;
+}
+
+/* ── Trend ──────────────────────────────────────────────── */
+.zl-trend__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.zl-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.zl-select {
+  font-family: var(--zl-font-body);
+  font-size: 10px;
+  color: var(--zl-text);
+  background: var(--zl-surface-strong);
+  border: 1px solid var(--zl-border);
+  border-radius: 3px;
+  padding: 3px 5px;
+  max-width: 128px;
+}
+
+.zl-trend__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zl-trend__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 5px 9px;
+  background: var(--zl-surface);
+  border: 1px solid var(--zl-border);
+  border-radius: 3px;
+}
+
+.zl-trend__row-score {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--zl-heading);
+}
+
+.zl-trend__row-time {
+  font-size: 10px;
+  color: var(--zl-muted);
+}
+
+.zl-trend__empty {
+  font-size: 12px;
+  color: var(--zl-muted);
+  padding: 10px 0;
+  text-align: center;
+}
+
+.zl-spark,
+.zl-chart {
+  display: block;
+  width: 100%;
+}
+
+/* Steel-blue strokes are an allowed brand accent (CO-2). */
+.zl-spark__line,
+.zl-chart__line {
+  fill: none;
+  stroke: var(--zl-chart);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zl-chart__area {
+  fill: var(--zl-chart-fill);
+  stroke: none;
+}
+
+.zl-chart__dot {
+  fill: var(--zl-chart);
+}
+
+.zl-chart__axis {
+  font-family: var(--zl-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 9px;
+  fill: var(--zl-faint);
+}
+
+.zl-spark__caps {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--zl-muted);
+}
+
+/* ── Recent games list ──────────────────────────────────── */
+.zl-recent {
+  display: flex;
+  flex-direction: column;
+}
+
+.zl-game {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--zl-divider);
+}
+
+.zl-game:last-child {
+  border-bottom: none;
+}
+
+.zl-game__score {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--zl-heading);
+  min-width: 34px;
+}
+
+.zl-game--inactive .zl-game__score {
+  color: var(--zl-faint);
+  text-decoration: line-through;
+}
+
+.zl-game__body {
+  min-width: 0;
+}
+
+.zl-game__config {
+  font-size: 12px;
+  color: var(--zl-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zl-game__sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--zl-muted);
+  margin-top: 1px;
+}
+
+/* Status flag: steel-blue tint chip + steel text (CO-2 badge rule). */
+.zl-flag {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--zl-chip-text);
+  background: var(--zl-chip-bg);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.zl-game__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.zl-btn {
+  font-family: var(--zl-font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--zl-text);
+  background: transparent;
+  border: 1px solid var(--zl-border);
+  border-radius: 3px;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.zl-btn:hover {
+  background: var(--zl-surface-strong);
+  border-color: var(--zl-muted);
+}
+
+/* Destructive: red text + red border on hover, never a red fill (CO-2). */
+.zl-btn--danger {
+  color: var(--zl-accent);
+}
+
+.zl-btn--danger:hover {
+  background: var(--zl-surface-strong);
+  border-color: var(--zl-accent);
+}
+
+/* ── Capture-failed banner: maroon 8% tint + maroon text (CO-2) ── */
+.zl-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: var(--zl-warn-bg);
+  color: var(--zl-warn-text);
+  font-size: 11px;
+  line-height: 1.35;
+  border-top: 1px solid var(--zl-divider);
+}
+
+.zl-banner__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zl-warn-text);
+  flex: none;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+.zl-footer {
+  padding: 12px 18px 15px;
+  border-top: 1px solid var(--zl-divider);
+}
+
+/* Ghost button: maroon (or cream, dark) text + tinted border; hover is an 8%
+   tint, never a solid maroon fill (CO-2). */
+.zl-sync {
+  width: 100%;
+  font-family: var(--zl-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--zl-display);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--zl-display) 38%, transparent);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.zl-sync:hover {
+  background: color-mix(in srgb, var(--zl-display) 8%, transparent);
+}
+
+.zl-footer__note {
+  margin-top: 7px;
+  font-size: 10px;
+  color: var(--zl-faint);
+  text-align: center;
+}
