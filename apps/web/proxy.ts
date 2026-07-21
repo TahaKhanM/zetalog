@@ -44,6 +44,10 @@ export const config = {
    *
    *   /me, /admin        — auth-gated dashboards (the redirect above)
    *   /link, /verify     — session-dependent flows (handoff / OTP)
+   *   /signin            — reads the session (skips already-signed-in users);
+   *                        that getUser can rotate an expired session's refresh
+   *                        token, and lib/supabase/server.ts drops cookie writes
+   *                        by design, so the proxy must own the refresh here too
    *   /auth/:path*       — the OAuth callback + signout write session cookies
    *   /api/:path*        — cookie/bearer routes that read the session
    *
@@ -54,6 +58,7 @@ export const config = {
     '/admin/:path*',
     '/link/:path*',
     '/verify/:path*',
+    '/signin/:path*',
     '/auth/:path*',
     '/api/:path*',
   ],
