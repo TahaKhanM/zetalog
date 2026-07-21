@@ -284,7 +284,7 @@ button {
   align-items: center;
 }
 
-.nav > a {
+.nav__link {
   display: inline-flex;
   align-items: baseline;
   gap: 0.4rem;
@@ -305,18 +305,80 @@ button {
   letter-spacing: 0.04em;
 }
 
-.nav > a:hover,
-.nav > a[aria-current='page'] {
+.nav__link:hover,
+.nav__link[aria-current='page'] {
   color: var(--surface-heading);
   border-bottom-color: var(--accent-strong);
 }
 
-.nav > a[aria-current='page'] .nav__index {
+.nav__link[aria-current='page'] .nav__index {
   color: var(--ink-index);
 }
 
-.nav__signin {
+/* The one standing solid-accent element (CO-3 allows fills up to button
+ * size): the header's call to action must not whisper. The doubled class
+ * outranks .btn--primary's outline treatment further down the sheet. */
+.btn.nav__signin {
   margin-left: 0.25rem;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+  padding: 0.5rem 1.1rem;
+}
+
+.btn.nav__signin:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
+  border-color: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
+  color: var(--accent-contrast);
+}
+
+/* ── Avatars (CO-6) ─────────────────────────────────────────────────────── */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  user-select: none;
+  /* Defeat the preflight img { max-width: 100% } — a squashed avatar is worse
+   * than an overflowing one, and every context sizes this explicitly. */
+  max-width: none;
+}
+
+.avatar--img {
+  object-fit: cover;
+  border: 1px solid var(--surface-border);
+  background: white;
+}
+
+.avatar--monogram {
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+}
+
+.avatar-uploader {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.avatar-uploader__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.avatar-uploader__hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem;
 }
 
 .site-footer {
@@ -468,47 +530,38 @@ button {
   cursor: not-allowed;
 }
 
-/* ── Auth chip: monogram avatar + name, a quiet pill into /account ──────── */
+/* ── Auth chip: avatar + name, the account pill (CO-6: prominent) ───────── */
 .auth-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.75rem 0.3rem 0.35rem;
-  border: 1px solid var(--surface-border);
+  gap: 0.55rem;
+  padding: 0.32rem 0.9rem 0.32rem 0.38rem;
+  border: 1.5px solid var(--accent-border);
   border-radius: 999px;
   background: var(--surface-card);
-  transition: border-color 0.15s ease;
+  box-shadow: 0 1px 2px var(--surface-shadow);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .auth-chip:hover,
 .auth-chip--active {
   border-color: var(--accent-strong);
+  background: var(--surface-raised);
 }
 
 .auth-chip--loading {
   width: 5.5rem;
-  height: 1.9rem;
+  height: 2.1rem;
   border: none;
+  box-shadow: none;
   background: var(--surface-raised);
 }
 
-.auth-chip__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-}
-
 .auth-chip__name {
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.88rem;
   color: var(--surface-heading);
   max-width: 10rem;
   overflow: hidden;
@@ -1130,6 +1183,17 @@ button {
 
 .tough__time {
   font-weight: 700;
+}
+
+/* ── Leaderboard avatar column (CO-6) ───────────────────────────────────── */
+.ltable__avatar-h {
+  width: 3rem;
+}
+
+.ltable__avatar-c {
+  width: 3rem;
+  padding-right: 0.35rem;
+  line-height: 0;
 }
 
 /* ── Leaderboard games column (quiet; dropped on narrow viewports) ─────── */
