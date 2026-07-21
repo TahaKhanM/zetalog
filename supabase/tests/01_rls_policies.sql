@@ -11,7 +11,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions, pg_catalog;
 
-select plan(15);
+select plan(20);
 
 -- Fixtures -----------------------------------------------------------------
 -- Two users (profiles are created by the on_auth_user_created trigger).
@@ -149,6 +149,58 @@ select is(
   (select display_name::text from public.profiles
     where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
   'bob', 'Bob''s display_name is unchanged');
+
+-- authenticated: cannot read another user's profile row --------------------
+-- SELECT is granted at the table level but profiles_select_own filters rows,
+-- so Bob's row is simply invisible (0 rows), not an error.
+set local role authenticated;
+set local request.jwt.claims to
+  '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+select is(
+  (select count(*)::int from public.profiles
+    where id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+  0, 'Alice cannot read Bob''s profile row');
+reset role;
+reset request.jwt.claims;
+
+-- authenticated: cannot delete games (no client DELETE privilege) ----------
+-- All game writes go through the service role; there is no client DELETE grant
+-- or policy, so any DELETE is rejected by table privileges.
+select throws_ok(
+  $$ set local role authenticated;
+     set local request.jwt.claims to
+       '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+     delete from public.games
+      where user_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  '42501', null, 'authenticated user cannot delete games');
+
+-- authenticated: uni_verified_at is not client-writable --------------------
+-- The badge timestamp is set by the trigger or the service role only; it is
+-- outside the GRANT UPDATE (display_name) column scope, so the update is denied.
+select throws_ok(
+  $$ set local role authenticated;
+     set local request.jwt.claims to
+       '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+     update public.profiles set uni_verified_at = now()
+      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  '42501', null, 'user cannot update uni_verified_at');
+
+-- authenticated: cannot insert profiles or universities --------------------
+-- Neither table grants INSERT to clients: profiles rows come from the signup
+-- trigger, universities is service-role-seeded reference data.
+select throws_ok(
+  $$ set local role authenticated;
+     set local request.jwt.claims to
+       '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+     insert into public.profiles (id) values (gen_random_uuid()) $$,
+  '42501', null, 'authenticated user cannot insert profiles');
+select throws_ok(
+  $$ set local role authenticated;
+     set local request.jwt.claims to
+       '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+     insert into public.universities (name, slug, domains)
+     values ('Hack University', 'hack-university-rls', array['hack.rls.example']) $$,
+  '42501', null, 'authenticated user cannot insert universities');
 
 select * from finish();
 rollback;
