@@ -18,3 +18,7 @@ playwright-report/
 .claude/worktrees/
 *.tsbuildinfo
 .vercel
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+.seed-session.json
