@@ -1,7 +1,7 @@
 import { err, ok } from '@zetalog/shared';
 import { Resend } from 'resend';
 
-import { serverEnv } from '../env';
+import { serverEnv } from '../env.server';
 import type { EmailSender } from './types';
 
 /**

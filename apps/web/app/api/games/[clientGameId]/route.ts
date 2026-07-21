@@ -3,7 +3,7 @@ import { readBearerToken } from '@/lib/http';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
-import { handleGameDelete } from './handler';
+import { REVOCABLE_STATUSES, handleGameDelete } from './handler';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +30,7 @@ export async function DELETE(
         .update({ status: 'user_removed' })
         .eq('user_id', userId)
         .eq('client_game_id', gameId)
-        .neq('status', 'user_removed')
+        .in('status', [...REVOCABLE_STATUSES])
         .select('id');
       if (error !== null) throw new Error(`removeGame: ${error.message}`);
       return data.length > 0;
