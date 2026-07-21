@@ -45,10 +45,11 @@ describe('accessibility of the whole badge system', () => {
 });
 
 describe('badgeFor', () => {
-  it('returns the curated brand for a colour-curated slug without a logo', () => {
+  it('returns curated colours plus the mapped logo for a fully-curated slug', () => {
     const badge = badgeFor('university-of-manchester', 'The University of Manchester');
-    expect(badge).toEqual(CURATED_BRANDS['university-of-manchester']);
-    expect(badge.logo).toBeUndefined();
+    expect(badge.bg).toBe(CURATED_BRANDS['university-of-manchester']?.bg);
+    expect(badge.monogram).toBe('M');
+    expect(badge.logo).toBe(CURATED_LOGOS['university-of-manchester']);
   });
 
   it('falls back deterministically for unknown slugs', () => {
@@ -113,25 +114,23 @@ describe('curated logos', () => {
     expect(badge.bg).toBe(CURATED_BRANDS['university-of-oxford']?.bg);
   });
 
-  it('carries the round-2 official marks (Edinburgh, KCL)', () => {
+  it('carries the round-2 collected mark (Edinburgh, vector kept over raster)', () => {
     expect(CURATED_LOGOS['university-of-edinburgh']).toBe('/uni-logos/university-of-edinburgh.svg');
-    expect(CURATED_LOGOS['king-s-college-london-university-of-london']).toBe(
-      '/uni-logos/king-s-college-london-university-of-london.svg',
-    );
   });
 
-  it('keeps Nottingham unmapped: its square mark is labelled internal-use', () => {
-    expect(CURATED_LOGOS['university-of-nottingham']).toBeUndefined();
-  });
-
-  it('keeps the round-2 skips (no usable self-published mark) on monogram chips', () => {
-    for (const slug of [
-      'university-of-manchester',
-      'queen-mary-university-of-london',
-      'university-of-southampton',
-      'cardiff-university',
-    ]) {
-      expect(CURATED_LOGOS[slug], `${slug} must stay on its monogram`).toBeUndefined();
+  it('carries the six owner-supplied marks (incl. the Nottingham owner override)', () => {
+    for (const [slug, file] of [
+      ['university-of-manchester', 'university-of-manchester.png'],
+      [
+        'king-s-college-london-university-of-london',
+        'king-s-college-london-university-of-london.png',
+      ],
+      ['queen-mary-university-of-london', 'queen-mary-university-of-london.png'],
+      ['university-of-nottingham', 'university-of-nottingham.png'],
+      ['university-of-southampton', 'university-of-southampton.png'],
+      ['cardiff-university', 'cardiff-university.png'],
+    ] as const) {
+      expect(CURATED_LOGOS[slug], slug).toBe(`/uni-logos/${file}`);
     }
   });
 
@@ -146,8 +145,5 @@ describe('curated logos', () => {
 
   it('badgeFor returns no logo for unmapped slugs', () => {
     expect(badgeFor('unknown-college', 'Unknown College').logo).toBeUndefined();
-    expect(
-      badgeFor('university-of-manchester', 'The University of Manchester').logo,
-    ).toBeUndefined();
   });
 });
