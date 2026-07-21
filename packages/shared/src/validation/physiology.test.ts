@@ -1,8 +1,8 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
-import type { ProblemOutcome, RecomputedScore } from '../score.js';
-import { checkPhysiology, coefficientOfVariation } from './physiology.js';
+import type { ProblemOutcome, RecomputedScore } from '../score';
+import { checkPhysiology, coefficientOfVariation } from './physiology';
 
 function outcome(solveMs: number): ProblemOutcome {
   return { text: '3 + 4 = ', shownAt: 0, acceptedAt: solveMs, solveMs, verified: true };
