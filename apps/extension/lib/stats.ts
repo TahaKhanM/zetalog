@@ -2,6 +2,8 @@ import {
   RANKABLE_DURATIONS,
   ZETAMAC_DEFAULT_SETTINGS,
   fingerprint,
+  skillBuckets,
+  solvedProblems,
   type RankableDuration,
   type ZetamacSettings,
 } from '@zetalog/shared';
@@ -116,4 +118,48 @@ export function fingerprintLabel(settings: ZetamacSettings): string {
 /** The `limit` most recently saved games of any status, most recent first (recent list). */
 export function recentGames(games: readonly StoredGame[], limit: number): StoredGame[] {
   return [...games].sort((a, b) => b.savedAtMs - a.savedAtMs).slice(0, limit);
+}
+
+/** A focus verdict needs at least this many solves in a skill area. */
+export const FOCUS_MIN_SOLVED = 8;
+
+/** How many recent kept games the focus verdict considers (current form, not history). */
+export const FOCUS_WINDOW = 20;
+
+/** The skill area the player should drill next, with how far it lags. */
+export interface FocusArea {
+  readonly label: string;
+  readonly medianSolveMs: number;
+  /** How many times slower than the player's fastest well-sampled area. */
+  readonly ratio: number;
+}
+
+/**
+ * The popup's one-line practice hint: the slowest well-sampled skill area
+ * (shared `skillBuckets` over the last {@link FOCUS_WINDOW} kept games'
+ * telemetry). Null when fewer than two areas reach {@link FOCUS_MIN_SOLVED}
+ * solves — a verdict needs both a weak area and a baseline to compare it to.
+ */
+export function focusArea(games: readonly StoredGame[]): FocusArea | null {
+  const recent = [...games]
+    .filter(isKept)
+    .sort((a, b) => b.savedAtMs - a.savedAtMs)
+    .slice(0, FOCUS_WINDOW);
+  const solved = recent.flatMap((game) => solvedProblems(game.record.events));
+  const buckets = skillBuckets(solved);
+  const sampled = buckets.filter((bucket) => bucket.solved >= FOCUS_MIN_SOLVED);
+  if (sampled.length < 2) return null;
+  // Non-empty by the guard above, so the initialiser-free reduce is total.
+  const weakest = sampled.reduce((worst, bucket) =>
+    bucket.medianSolveMs > worst.medianSolveMs ? bucket : worst,
+  );
+  const fastest = sampled.reduce(
+    (best, bucket) => Math.min(best, bucket.medianSolveMs),
+    Number.POSITIVE_INFINITY,
+  );
+  return {
+    label: weakest.label,
+    medianSolveMs: weakest.medianSolveMs,
+    ratio: fastest > 0 ? weakest.medianSolveMs / fastest : 1,
+  };
 }
