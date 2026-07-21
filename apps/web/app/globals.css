@@ -23,17 +23,21 @@
   --font-numeric: 'Azeret Mono', ui-monospace, monospace;
 }
 
-/* ── Semantic surfaces: light default, dark via prefers-color-scheme ─────── */
+/* ── Semantic surfaces: CO-3 "examination paper" ─────────────────────────
+ * The page IS cream paper; maroon is structural ink (ruling, hairlines,
+ * index numerals); navy is the working ink. Dark mode is the blackboard. */
 :root {
-  --surface-page: color-mix(in srgb, var(--color-zl-cream) 30%, white);
-  --surface-card: white;
-  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 12%, white);
-  --surface-border: color-mix(in srgb, var(--color-zl-cream) 60%, white);
-  --surface-hairline: color-mix(in srgb, var(--color-zl-navy) 10%, transparent);
-  --surface-text: color-mix(in srgb, var(--color-zl-navy) 85%, white);
+  --surface-page: color-mix(in srgb, var(--color-zl-cream) 78%, white);
+  --surface-card: color-mix(in srgb, var(--color-zl-cream) 45%, white);
+  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 62%, white);
+  --surface-border: color-mix(in srgb, var(--color-zl-maroon) 18%, transparent);
+  --surface-hairline: color-mix(in srgb, var(--color-zl-maroon) 14%, transparent);
+  --rule-strong: color-mix(in srgb, var(--color-zl-maroon) 42%, transparent);
+  --surface-text: color-mix(in srgb, var(--color-zl-navy) 88%, white);
   --surface-heading: var(--color-zl-navy);
-  --surface-shadow: color-mix(in srgb, var(--color-zl-navy) 10%, transparent);
+  --surface-shadow: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
   --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+  --ink-index: var(--color-zl-maroon);
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
@@ -44,12 +48,14 @@
     --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
     --surface-card: color-mix(in srgb, var(--color-zl-navy) 88%, black);
     --surface-raised: color-mix(in srgb, var(--color-zl-navy) 82%, black);
-    --surface-border: color-mix(in srgb, var(--color-zl-navy) 60%, black);
-    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 14%, transparent);
+    --surface-border: color-mix(in srgb, var(--color-zl-cream) 16%, transparent);
+    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 12%, transparent);
+    --rule-strong: color-mix(in srgb, var(--color-zl-cream) 34%, transparent);
     --surface-text: color-mix(in srgb, var(--color-zl-cream) 90%, transparent);
     --surface-heading: var(--color-zl-cream);
     --surface-shadow: color-mix(in srgb, black 40%, transparent);
     --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+    --ink-index: var(--color-zl-cream);
     --chart-stroke-opacity: 1;
     color-scheme: dark;
   }
@@ -70,6 +76,34 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  position: relative;
+}
+
+/* CO-3 paper grain: a faint woven texture from crossed 1px gradients — no
+ * images, ≤3% presence, fixed so it doesn't swim under scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--surface-heading) 3%, transparent) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--surface-heading) 2%, transparent) 0 1px,
+      transparent 1px 4px
+    );
+  opacity: 0.5;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 h1,
@@ -158,6 +192,33 @@ button {
   color: var(--color-zl-maroon);
   font-size: 1.35rem;
   line-height: 1;
+}
+
+/* CO-3 brand lockup: the actual mark beside the wordmark. */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-mark__img {
+  display: block;
+  border-radius: 6px;
+}
+
+.site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-card__mark {
+  margin-bottom: 0.9rem;
 }
 
 .nav {
@@ -285,15 +346,19 @@ button {
     color 0.15s ease;
 }
 
-/* Primary: maroon TEXT on a whisper-thin maroon tint (never a solid fill). */
+/* Primary, CO-3: maroon outline + maroon ink on paper; fills maroon with
+ * cream ink only on hover/press (small elements only — never banners). */
 .btn--primary {
   color: var(--color-zl-maroon);
-  background: color-mix(in srgb, var(--color-zl-maroon) 9%, var(--surface-card));
-  border-color: color-mix(in srgb, var(--color-zl-maroon) 24%, transparent);
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--color-zl-maroon) 62%, transparent);
 }
 
-.btn--primary:hover {
-  background: color-mix(in srgb, var(--color-zl-maroon) 14%, var(--surface-card));
+.btn--primary:hover:not(:disabled),
+.btn--primary:active:not(:disabled) {
+  background: var(--color-zl-maroon);
+  border-color: var(--color-zl-maroon);
+  color: var(--color-zl-cream);
 }
 
 .btn--ghost {
@@ -399,15 +464,17 @@ button {
   font-size: 0.92rem;
 }
 
+/* CO-3 ledger ruling: horizontal maroon rules only, a strong rule under the
+ * header row — the table reads as ruled exam paper, not an app grid. */
 .ltable th {
   text-align: left;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--meta-text);
+  color: color-mix(in srgb, var(--ink-index) 78%, var(--meta-text));
   padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid var(--surface-border);
+  border-bottom: 1.5px solid var(--rule-strong);
 }
 
 .ltable td {
@@ -421,7 +488,7 @@ button {
 }
 
 .ltable tbody tr:hover td {
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--color-zl-cream) 40%, transparent);
 }
 
 .ltable__num {

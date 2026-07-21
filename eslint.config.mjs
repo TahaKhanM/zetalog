@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/.wxt/',
       '**/.next/',
       '**/coverage/',
+
       'apps/extension/test/fixtures/',
       'apps/extension/test/replica/',
     ],
