@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkHistory } from './history.js';
+import { checkHistory } from './history';
 
 describe('checkHistory', () => {
   const tenGames = { acceptedScores: [50, 55, 60, 52, 58, 61, 49, 57, 62, 54] }; // best 62

@@ -1,8 +1,8 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
-import type { GameEvent } from './schemas.js';
-import { recomputeScore } from './score.js';
+import type { GameEvent } from './schemas';
+import { recomputeScore } from './score';
 
 /** A clean two-problem game: 3 + 4 = 7 (typed "7"), 9 × 2 = 18 (typed "1", "18"). */
 const cleanGame: GameEvent[] = [

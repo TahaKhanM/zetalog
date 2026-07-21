@@ -1,8 +1,8 @@
-import type { GameRecord } from '../schemas.js';
-import { recomputeScore } from '../score.js';
-import { checkConsistency, type ConsistencyViolation } from './consistency.js';
-import { checkHistory, type HistoryContext } from './history.js';
-import { checkPhysiology, type PhysiologyFlag } from './physiology.js';
+import type { GameRecord } from '../schemas';
+import { recomputeScore } from '../score';
+import { checkConsistency, type ConsistencyViolation } from './consistency';
+import { checkHistory, type HistoryContext } from './history';
+import { checkPhysiology, type PhysiologyFlag } from './physiology';
 
 /** The three outcomes a submitted game can be judged to. */
 export type ValidationOutcome = 'accepted' | 'quarantined' | 'rejected';

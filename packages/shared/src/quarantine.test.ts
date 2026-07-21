@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { evaluateQuarantine, median } from './quarantine.js';
+import { evaluateQuarantine, median } from './quarantine';
 
 const base = {
   score: 80,

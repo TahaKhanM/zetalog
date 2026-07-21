@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { GameEvent, GameRecord } from '../schemas.js';
-import { ZETAMAC_DEFAULT_SETTINGS } from '../zetamac.js';
-import { judge } from './verdict.js';
+import type { GameEvent, GameRecord } from '../schemas';
+import { ZETAMAC_DEFAULT_SETTINGS } from '../zetamac';
+import { judge } from './verdict';
 
 /** A clean, human-plausible one-problem game. */
 function cleanRecord(): GameRecord {
