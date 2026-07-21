@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   },
   description:
     'Frictionless Zetamac score tracking with server-validated, per-university leaderboards.',
+  // Wire the tracked public/ icons so the browser tab and iOS home screen use them.
+  icons: {
+    icon: '/icon-512.png',
+    apple: '/icon-180.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }): React.JSX.Element {
