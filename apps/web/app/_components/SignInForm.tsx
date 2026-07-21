@@ -615,7 +615,9 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             }}
           />
         </label>
-        <button type="submit" className="btn btn--primary" disabled={busy || email === ''}>
+        {/* Only busy gates the button: `required` already blocks an empty
+            submit, and a value-dependent `disabled` flickers during hydration. */}
+        <button type="submit" className="btn btn--primary" disabled={busy}>
           {busy ? 'Checking…' : 'Continue'}
         </button>
       </form>
