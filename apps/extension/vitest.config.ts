@@ -19,6 +19,7 @@ export default defineConfig({
         '**/stats.ts': FULL,
         '**/store.ts': FULL,
         '**/format.ts': FULL,
+        '**/auth.ts': FULL,
       },
     },
   },
