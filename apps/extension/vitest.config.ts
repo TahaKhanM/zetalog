@@ -21,6 +21,7 @@ export default defineConfig({
         '**/format.ts': FULL,
         '**/auth.ts': FULL,
         '**/api.ts': FULL,
+        '**/sync.ts': FULL,
       },
     },
   },

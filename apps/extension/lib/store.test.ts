@@ -412,3 +412,74 @@ describe('pruneStoredGames', () => {
     expect(PRUNE_LIMIT).toBe(400);
   });
 });
+
+describe('createStore.markSync / clearAllSync', () => {
+  const GAMES_KEY = 'zl:v1:games';
+
+  it('writes sync state onto an existing game', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const saved = await store.saveGame(gameRecord({ score: 42 }));
+    if (!saved.ok) throw new Error('setup failed');
+
+    const marked = await store.markSync(saved.value.record.id, {
+      state: 'uploaded',
+      outcome: 'accepted',
+      serverScore: 41,
+    });
+
+    expect(marked.ok).toBe(true);
+    if (!marked.ok || marked.value === null) throw new Error('expected a game');
+    expect(marked.value.sync).toEqual({ state: 'uploaded', outcome: 'accepted', serverScore: 41 });
+
+    const listed = await store.listGames();
+    if (!listed.ok) throw new Error('list failed');
+    expect(listed.value[0]?.sync?.state).toBe('uploaded');
+  });
+
+  it('returns null when the id is unknown', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    expect(await store.markSync('missing', { state: 'pending' })).toEqual({
+      ok: true,
+      value: null,
+    });
+  });
+
+  it('surfaces corruption instead of writing', async () => {
+    const store = createStore(fakeArea({ [GAMES_KEY]: 'not-an-array' }), tickingClock());
+    const result = await store.markSync('x', { state: 'pending' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('corrupt-games');
+  });
+
+  it('clears sync bookkeeping from every game without touching game data', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const a = await store.saveGame(gameRecord({ score: 10 }));
+    const b = await store.saveGame(gameRecord({ score: 20 }));
+    if (!a.ok || !b.ok) throw new Error('setup failed');
+    await store.markSync(a.value.record.id, {
+      state: 'uploaded',
+      outcome: 'accepted',
+      serverScore: 10,
+    });
+    await store.markSync(b.value.record.id, { state: 'pending' });
+
+    const cleared = await store.clearAllSync();
+    expect(cleared.ok).toBe(true);
+
+    const listed = await store.listGames();
+    if (!listed.ok) throw new Error('list failed');
+    expect(listed.value.every((g) => g.sync === undefined)).toBe(true);
+    // Scores and status survive.
+    expect(listed.value.map((g) => g.record.claimedScore).sort((x, y) => x - y)).toEqual([10, 20]);
+    expect(listed.value.every((g) => g.status === 'kept')).toBe(true);
+  });
+
+  it('clearAllSync surfaces corruption', async () => {
+    const store = createStore(fakeArea({ [GAMES_KEY]: 5 }), tickingClock());
+    const result = await store.clearAllSync();
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('corrupt-games');
+  });
+});
