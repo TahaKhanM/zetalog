@@ -11,7 +11,7 @@ import { updateSession } from './lib/supabase/middleware';
  */
 
 /** Path prefixes that require an authenticated session. */
-const PROTECTED_PREFIXES = ['/me', '/admin'] as const;
+const PROTECTED_PREFIXES = ['/me', '/account', '/admin'] as const;
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
@@ -55,6 +55,7 @@ export const config = {
    */
   matcher: [
     '/me/:path*',
+    '/account/:path*',
     '/admin/:path*',
     '/link/:path*',
     '/verify/:path*',
