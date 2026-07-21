@@ -10,7 +10,7 @@ afterEach(cleanup);
 
 const NOW = 1_700_000_000_000;
 
-function keptGame(score: number): StoredGame {
+function keptGame(score: number, claimedScore: number = score): StoredGame {
   return {
     record: {
       id: crypto.randomUUID(),
@@ -18,8 +18,9 @@ function keptGame(score: number): StoredGame {
       playedMs: 120_000,
       settings: ZETAMAC_DEFAULT_SETTINGS,
       events: [],
-      claimedScore: score,
+      claimedScore,
     },
+    verifiedScore: score,
     fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
     rankableDuration: 120,
     status: 'kept',
@@ -48,6 +49,19 @@ describe('Hero', () => {
     expect(screen.getByTestId('hero-score').textContent).toBe('58');
     expect(screen.getByText(/Default · 120s/)).toBeTruthy();
     expect(screen.getByText('40')).toBeTruthy();
+  });
+
+  it('shows the verified score, not the scraped claimed score', () => {
+    // Claimed 51 undercounts the game; the verified score is 52.
+    render(
+      <Hero
+        latest={keptGame(52, 51)}
+        isNewPersonalBest={false}
+        bests={{ 30: null, 60: null, 120: 52 }}
+        nowMs={NOW}
+      />,
+    );
+    expect(screen.getByTestId('hero-score').textContent).toBe('52');
   });
 
   it('does not flag a new PB when the score is not one', () => {
