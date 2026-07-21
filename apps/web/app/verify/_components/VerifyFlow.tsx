@@ -98,7 +98,7 @@ export function VerifyFlow(): React.JSX.Element {
         <p className="auth-sent__title num">Badge granted</p>
         <p className="meta">
           You&apos;re verified for <strong>{step.university}</strong>. It now shows on your
-          leaderboard rows.
+          leaderboard rows — and you can now sign in with this email too.
         </p>
         <p style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem' }}>
           <Link href="/me" className="btn btn--ghost btn--sm">
