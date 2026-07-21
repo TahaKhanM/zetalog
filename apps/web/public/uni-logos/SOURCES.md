@@ -56,3 +56,9 @@ each remaining university. The four below still publish nothing usable.
 > declared from warwick.ac.uk), composited via luminance mask onto a lavender tile
 > (#b1a4e6) to match the university's avatar-style presentation. Transformation:
 > background fill only; crest ink untouched. 180x180.
+
+> Nottingham unmapped (2026-07-21, controller adjudication): the university's
+> public brand page labels the square castle mark 'internal use'. Using it while
+> documenting that fact would knowingly disregard the owner's stated wishes —
+> unlike the nominative-use posture of every other mark. Asset retained on disk;
+> remap only with permission or a stance change.

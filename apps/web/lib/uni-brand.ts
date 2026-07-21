@@ -103,7 +103,10 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
   'university-of-edinburgh': '/uni-logos/university-of-edinburgh.svg',
   'king-s-college-london-university-of-london':
     '/uni-logos/king-s-college-london-university-of-london.svg',
-  'university-of-nottingham': '/uni-logos/university-of-nottingham.png',
+  // Nottingham intentionally unmapped (kill-switch): their public brand page
+  // labels the square castle mark "internal use" — knowingly using it against
+  // the owner's stated wishes is a different posture from nominative use.
+  // Asset + provenance preserved on disk should that stance ever change.
   'university-of-cambridge': '/uni-logos/university-of-cambridge.png',
   'imperial-college-london': '/uni-logos/imperial-college-london.svg',
   // Owner-directed presentation: Warwick's own crest artwork (from their

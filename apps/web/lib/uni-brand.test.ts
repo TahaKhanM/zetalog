@@ -113,14 +113,15 @@ describe('curated logos', () => {
     expect(badge.bg).toBe(CURATED_BRANDS['university-of-oxford']?.bg);
   });
 
-  it('carries the round-2 official marks (Edinburgh, KCL, Nottingham)', () => {
+  it('carries the round-2 official marks (Edinburgh, KCL)', () => {
     expect(CURATED_LOGOS['university-of-edinburgh']).toBe('/uni-logos/university-of-edinburgh.svg');
     expect(CURATED_LOGOS['king-s-college-london-university-of-london']).toBe(
       '/uni-logos/king-s-college-london-university-of-london.svg',
     );
-    expect(CURATED_LOGOS['university-of-nottingham']).toBe(
-      '/uni-logos/university-of-nottingham.png',
-    );
+  });
+
+  it('keeps Nottingham unmapped: its square mark is labelled internal-use', () => {
+    expect(CURATED_LOGOS['university-of-nottingham']).toBeUndefined();
   });
 
   it('keeps the round-2 skips (no usable self-published mark) on monogram chips', () => {
