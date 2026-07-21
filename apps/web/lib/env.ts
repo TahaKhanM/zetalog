@@ -32,7 +32,7 @@ export type ClientEnv = z.infer<typeof clientSchema>;
 /** Full server configuration (client vars plus server-only secrets), validated. */
 export type ServerEnv = z.infer<typeof fullServerSchema>;
 
-function parse<T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T {
+function parse<T>(schema: z.ZodType<T>, source: Record<string, string | undefined>): T {
   const result = schema.safeParse(source);
   if (result.success) return result.data;
   const detail = result.error.issues
@@ -44,9 +44,17 @@ function parse<T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T {
 /**
  * Client-safe env, validated on access. Safe to call from client or server
  * code (the values it exposes are public).
+ *
+ * The public vars are read by explicit `process.env.NEXT_PUBLIC_*` member
+ * access rather than by passing the whole `process.env`: Next.js only inlines
+ * those exact member expressions into the browser bundle, so a bare
+ * `process.env` would be empty client-side and this would wrongly throw.
  */
 export function clientEnv(): ClientEnv {
-  return parse(clientSchema, process.env);
+  return parse(clientSchema, {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  });
 }
 
 /**
