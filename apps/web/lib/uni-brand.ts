@@ -100,6 +100,10 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
  */
 export const CURATED_LOGOS: Readonly<Record<string, string>> = {
   'university-of-oxford': '/uni-logos/university-of-oxford.svg',
+  'university-of-edinburgh': '/uni-logos/university-of-edinburgh.svg',
+  'king-s-college-london-university-of-london':
+    '/uni-logos/king-s-college-london-university-of-london.svg',
+  'university-of-nottingham': '/uni-logos/university-of-nottingham.png',
   'university-of-cambridge': '/uni-logos/university-of-cambridge.png',
   'imperial-college-london': '/uni-logos/imperial-college-london.svg',
   // Owner-directed presentation: Warwick's own crest artwork (from their
