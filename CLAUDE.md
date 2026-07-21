@@ -41,7 +41,8 @@ trading firms. Quality outranks scope — cut features before cutting rigor.
 ## Product invariants (violating any of these is a bug)
 
 1. **Never trust a claimed score.** The server recomputes every score from the submitted
-   event stream; only `server_score` ranks.
+   event stream; only `server_score` ranks — and the problem stream must be statistically
+   consistent with Zetamac's generator for the claimed settings.
 2. All game writes go through the API with the service role. No client inserts. RLS is
    default-deny; the service-role key never reaches a client bundle.
 3. **Quarantine, never silently delete.** Auto-flagged scores stay visible and restorable.

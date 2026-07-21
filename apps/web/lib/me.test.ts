@@ -9,6 +9,8 @@ const cleanValidation: StoredValidation = {
   violations: [],
   flags: [],
   historyFlag: null,
+  problemViolations: [],
+  problemFlags: [],
 };
 
 function row(over: Partial<GameRow>): GameRow {
@@ -56,11 +58,37 @@ describe('reasonsFor', () => {
         { rule: 'entry-burst', detail: 'y' },
       ],
       historyFlag: 'pb-jump',
+      problemViolations: [],
+      problemFlags: [],
     });
     expect(reasons).toEqual([
       'Superhuman solve times',
       'Pasted answers',
       'Far above your usual range',
+    ]);
+  });
+
+  it('maps problem-stream violations and flags to human phrases', () => {
+    const reasons = reasonsFor({
+      outcome: 'rejected',
+      serverScore: 12,
+      violations: [],
+      flags: [],
+      historyFlag: null,
+      problemViolations: [{ rule: 'range-nonconforming', detail: 'x' }],
+      problemFlags: [
+        { rule: 'operation-mix', detail: 'a' },
+        { rule: 'operand-marginal', detail: 'd' },
+        { rule: 'low-entropy', detail: 'b' },
+        { rule: 'problem-switch', detail: 'c' },
+      ],
+    });
+    expect(reasons).toEqual([
+      'Problem outside the claimed range',
+      'Implausible operation mix',
+      'Operands skew easy',
+      'Problems repeat too often',
+      'Problems re-shown unsolved',
     ]);
   });
 
@@ -74,6 +102,8 @@ describe('reasonsFor', () => {
       ],
       flags: [],
       historyFlag: null,
+      problemViolations: [],
+      problemFlags: [],
     });
     expect(reasons).toEqual(['Timestamps out of order']);
   });
