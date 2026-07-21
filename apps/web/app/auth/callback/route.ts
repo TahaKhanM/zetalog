@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 /**
- * `GET /auth/callback` — exchanges the OAuth/magic-link `?code` for a session
+ * `GET /auth/callback` — exchanges the OAuth `?code` for a session (Google; also honours any legacy email links)
  * (spec §7) and redirects onward. `next` is validated to be an in-app path so
  * the callback can never be turned into an open redirect.
  */

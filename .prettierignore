@@ -11,3 +11,4 @@ Assets/
 apps/extension/test/fixtures/
 apps/extension/test/replica/
 apps/web/next-env.d.ts
+supabase/.temp/

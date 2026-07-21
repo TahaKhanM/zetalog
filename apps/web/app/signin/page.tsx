@@ -16,7 +16,7 @@ function safeNext(value: string | string[] | undefined): string {
   return raw !== undefined && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/me';
 }
 
-/** `/signin` — magic link + Google. Already-signed-in users skip straight on. */
+/** `/signin` — six-digit email code + Google. Already-signed-in users skip straight on. */
 export default async function SignInPage({
   searchParams,
 }: {
