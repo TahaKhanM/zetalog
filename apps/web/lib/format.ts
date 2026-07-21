@@ -37,6 +37,12 @@ export function formatRelativeTime(iso: string, nowMs: number): string {
   return absoluteDate.format(new Date(Date.parse(iso)));
 }
 
+/** A per-problem solve time as seconds: one decimal under 10s ("2.5s"), whole above ("13s"). */
+export function formatSolveMs(ms: number): string {
+  const seconds = ms / 1000;
+  return seconds < 10 ? `${seconds.toFixed(1)}s` : `${String(Math.round(seconds))}s`;
+}
+
 /** The configured duration (seconds) encoded in a fingerprint, or null. */
 export function parseDurationSeconds(fingerprintStr: string): number | null {
   const token = fingerprintStr.split('|').find((part) => part.startsWith('t:'));
