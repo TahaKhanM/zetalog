@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -72,5 +75,14 @@ describe('monogramFor', () => {
 
   it('falls back to the first character for single-word names', () => {
     expect(monogramFor('LSE')).toBe('L');
+  });
+});
+
+describe('curated map integrity', () => {
+  it('every curated slug exists in the university seed', () => {
+    const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+    for (const slug of Object.keys(CURATED_BRANDS)) {
+      expect(seed, `curated slug not in seed: ${slug}`).toContain(`'${slug}'`);
+    }
   });
 });
