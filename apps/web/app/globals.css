@@ -478,3 +478,117 @@ button {
   border-color: var(--surface-border);
   box-shadow: 0 1px 2px var(--surface-shadow);
 }
+
+.field--select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--meta-text) 50%),
+    linear-gradient(135deg, var(--meta-text) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) center,
+    calc(100% - 10px) center;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* ── Leaderboard ────────────────────────────────────────────────────────── */
+.board-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.board-title {
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  line-height: 1;
+}
+
+.board-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.uni-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.uni-filter__label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--meta-text);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.ltable__rank {
+  width: 3rem;
+  text-align: right;
+  color: var(--meta-text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  padding-right: 1rem;
+}
+
+.ltable__rank.rank-top {
+  color: var(--color-zl-maroon);
+  font-weight: 700;
+}
+
+.ltable__score-h {
+  text-align: right;
+}
+
+.ltable__score {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+.player {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.player__name {
+  font-weight: 600;
+  color: var(--surface-heading);
+}
+
+.empty {
+  text-align: center;
+  padding-block: clamp(2rem, 8vw, 4rem);
+}
+
+.empty__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+  margin-bottom: 0.4rem;
+}
+
+.page-404 {
+  text-align: center;
+  padding-block: clamp(3rem, 12vw, 6rem);
+}
+
+.page-404__code {
+  font-size: clamp(3rem, 14vw, 5.5rem);
+  font-weight: 700;
+  color: var(--color-zl-maroon);
+  line-height: 1;
+}
