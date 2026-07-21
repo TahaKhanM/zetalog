@@ -35,11 +35,7 @@ export async function handleProfilePost(
   }
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
-    return apiError(
-      400,
-      'invalid-name',
-      '3–20 characters: letters, digits, underscores, and spaces (no leading/trailing space).',
-    );
+    return apiError(400, 'invalid-name', '3–15 characters: letters, digits, and underscores.');
   }
 
   const result = await deps.setDisplayName(userId, parsed.data.displayName);

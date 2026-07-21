@@ -10,6 +10,7 @@ import { createServiceClient } from '@/lib/supabase/service';
 
 import { UniBadge } from '../_components/UniBadge';
 import { DisplayNameForm } from '../me/_components/DisplayNameForm';
+import { AvatarUploader } from './_components/AvatarUploader';
 import { ChangePasswordForm } from './_components/ChangePasswordForm';
 
 export const dynamic = 'force-dynamic';
@@ -69,8 +70,9 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
         </div>
       </header>
 
-      <section className="card card--pad me__section" aria-label="Display name">
+      <section className="card card--pad me__section" aria-label="Identity">
         <h2 className="me__h2">Identity</h2>
+        <AvatarUploader avatarUrl={profile?.avatar_url ?? null} displayName={displayName} />
         <DisplayNameForm current={displayName} />
         <p className="meta analysis-note">
           3–15 characters: letters, digits, and underscores. This is the name on the boards.
