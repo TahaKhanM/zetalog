@@ -81,7 +81,7 @@ Typography and colour per the fixed design language (§8). Contents:
 
 ### 3.4 Account linking & sync
 
-- The popup button opens `zetalog` website `/link`. After Supabase sign-in there, the page hands the session (access + refresh token) to the extension via Chrome's `externally_connectable` messaging. The extension stores the session and refreshes tokens itself.
+- The popup button opens `zetalog` website `/link`. After Supabase sign-in there, the page hands the session (access + refresh token) to the extension via `window.postMessage` to a content script that runs only on the ZetaLog `/link` origin, on an explicit user click (safer than `externally_connectable`: the browser guarantees which extension receives it, and no extension IDs travel in URLs — see W4 brief). The extension stores the session and refreshes tokens itself.
 - On first link, the extension **backfills** all local rankable history (full event streams) through the validation API. Afterwards, each new rankable game uploads on completion.
 - Uploads are queued in extension storage and retried with exponential backoff — offline play loses nothing.
 
@@ -94,7 +94,7 @@ profiles           id (= auth.users.id), display_name (unique, citext),
                    university_id → universities NULLABLE, uni_verified_at, is_admin
 universities       id, name, slug, domains text[]     -- seeded from open UK uni/domains dataset
 games              id, user_id, client_game_id (uuid, unique per user — idempotent upload),
-                   played_at, received_at, settings_fingerprint jsonb,
+                   played_at, received_at, settings_fingerprint text  -- canonical string from shared fingerprint(),
                    rankable_duration int NULL,        -- 30 | 60 | 120 | NULL
                    claimed_score int, server_score int,
                    status enum: accepted | quarantined | rejected | user_removed,
