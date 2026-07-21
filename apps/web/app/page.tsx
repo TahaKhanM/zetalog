@@ -1,26 +1,28 @@
-import { userIdFromCookies } from '@/lib/auth';
-import { getLeaderboard, getUniversityOptions } from '@/lib/db/queries';
 import { parseDuration } from '@/lib/leaderboard';
-import { createClient } from '@/lib/supabase/server';
+import { getCachedLeaderboard, getCachedUniversityOptions } from '@/lib/public-board';
 
 import { LeaderboardView } from './_components/LeaderboardView';
 
-export const dynamic = 'force-dynamic';
+/**
+ * Cacheable public render, revalidated every 30s (spec §6). The board reads NO
+ * cookies — the viewer's own-row highlight is applied client-side after
+ * hydration (see ViewerRowHighlight) — so this stays a shared, identity-free
+ * server render and signed-out visitors cost zero auth work.
+ */
+export const revalidate = 30;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-/** `/` — the global leaderboard (spec §6). Reads via the RLS-scoped client. */
+/** `/` — the global leaderboard (spec §6). Reads via the anon (public) client. */
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }): Promise<React.JSX.Element> {
   const duration = parseDuration((await searchParams).d);
-  const supabase = await createClient();
-  const [entries, uniOptions, viewerId] = await Promise.all([
-    getLeaderboard(supabase, { duration }),
-    getUniversityOptions(supabase),
-    userIdFromCookies(supabase),
+  const [entries, uniOptions] = await Promise.all([
+    getCachedLeaderboard(duration, null),
+    getCachedUniversityOptions(),
   ]);
 
   return (
@@ -31,7 +33,6 @@ export default async function HomePage({
       duration={duration}
       uniOptions={uniOptions}
       currentSlug={null}
-      viewerId={viewerId}
       showBadges
     />
   );
