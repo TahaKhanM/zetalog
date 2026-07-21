@@ -48,26 +48,50 @@ export function brandedCodeEmail(content: CodeEmailContent): { html: string; tex
   const meta = mixHex(palette.steelBlue, body, 0.7);
   const hairline = mixHex(palette.navy, '#ffffff', 0.1);
 
+  const pageDark = mixHex(palette.navy, '#000000', 0.72);
+  const cardDark = mixHex(palette.navy, '#000000', 0.88);
+  const textDark = mixHex(palette.cream, cardDark, 0.9);
+  const metaDark = mixHex(palette.steelBlue, textDark, 0.7);
+  const borderDark = mixHex(palette.cream, cardDark, 0.14);
+  const chipDark = mixHex(palette.cream, cardDark, 0.12);
+
   const html = `<!doctype html>
 <html>
-<head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:${surface}">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<style>
+@media (prefers-color-scheme: dark){
+.em-page{background:${pageDark}!important}
+.em-card{background:${cardDark}!important;border-color:${borderDark}!important}
+.em-heading{color:${palette.cream}!important}
+.em-body{color:${textDark}!important}
+.em-chip{background:${chipDark}!important;border-color:${borderDark}!important}
+.em-code{color:${palette.cream}!important}
+.em-meta{color:${metaDark}!important}
+.em-wordmark{color:${palette.cream}!important}
+.em-footer{color:${metaDark}!important;border-color:${borderDark}!important}
+}
+</style>
+</head>
+<body class="em-page" style="margin:0;padding:0;background:${surface}">
   <span style="display:none;max-height:0;overflow:hidden">${content.code} &mdash; ${content.expiryLine}</span>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${surface};padding:32px 16px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="em-page" style="background:${surface};padding:32px 16px">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:440px">
-        <tr><td style="padding:0 4px 14px;font-family:${SANS};font-weight:800;font-size:19px;letter-spacing:.04em;text-transform:uppercase;color:${palette.maroon}">ZetaLog</td></tr>
-        <tr><td style="background:#ffffff;border:1px solid ${border};border-radius:14px;padding:28px">
+        <tr><td class="em-wordmark" style="padding:0 4px 14px;font-family:${SANS};font-weight:800;font-size:19px;letter-spacing:.04em;text-transform:uppercase;color:${palette.maroon}">ZetaLog</td></tr>
+        <tr><td class="em-card" style="background:#ffffff;border:1px solid ${border};border-radius:14px;padding:28px">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="font-family:${SANS};font-size:18px;font-weight:600;color:${palette.navy};padding-bottom:8px">${content.heading}</td></tr>
-            <tr><td style="font-family:${SANS};font-size:14px;line-height:1.55;color:${body};padding-bottom:22px">${content.intro}</td></tr>
-            <tr><td align="center" style="background:${chip};border:1px solid ${border};border-radius:10px;padding:18px 12px">
-              <span style="font-family:${MONO};font-size:38px;font-weight:700;letter-spacing:.28em;color:${palette.navy};font-variant-numeric:tabular-nums">${content.code}</span>
+            <tr><td class="em-heading" style="font-family:${SANS};font-size:18px;font-weight:600;color:${palette.navy};padding-bottom:8px">${content.heading}</td></tr>
+            <tr><td class="em-body" style="font-family:${SANS};font-size:14px;line-height:1.55;color:${body};padding-bottom:22px">${content.intro}</td></tr>
+            <tr><td align="center" class="em-chip" style="background:${chip};border:1px solid ${border};border-radius:10px;padding:18px 12px">
+              <span class="em-code" style="font-family:${MONO};font-size:38px;font-weight:700;letter-spacing:.28em;color:${palette.navy};font-variant-numeric:tabular-nums">${content.code}</span>
             </td></tr>
-            <tr><td style="font-family:${SANS};font-size:13px;line-height:1.55;color:${meta};padding-top:18px">${content.expiryLine} If you didn't request it, you can safely ignore this email.</td></tr>
+            <tr><td class="em-meta" style="font-family:${SANS};font-size:13px;line-height:1.55;color:${meta};padding-top:18px">${content.expiryLine} If you didn't request it, you can safely ignore this email.</td></tr>
           </table>
         </td></tr>
-        <tr><td style="padding:16px 4px 0;border-top:1px solid ${hairline};font-family:${SANS};font-size:12px;color:${meta}">
+        <tr><td class="em-footer" style="padding:16px 4px 0;border-top:1px solid ${hairline};font-family:${SANS};font-size:12px;color:${meta}">
           Sent by ZetaLog &middot; www.zetalog.co.uk &middot; Not affiliated with Zetamac.
         </td></tr>
       </table>

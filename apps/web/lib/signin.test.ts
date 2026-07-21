@@ -8,21 +8,25 @@ describe('normaliseCode', () => {
     expect(normaliseCode(' 12-34 56\n')).toBe('123456');
   });
 
-  it('caps input at six digits', () => {
-    expect(normaliseCode('1234567890')).toBe('123456');
+  it('keeps GoTrue-max ten digits and drops the excess', () => {
+    expect(normaliseCode('123456789012')).toBe('1234567890');
   });
 
-  it('passes through a clean code unchanged', () => {
+  it('passes through six- and eight-digit codes unchanged', () => {
     expect(normaliseCode('000000')).toBe('000000');
+    expect(normaliseCode('12345678')).toBe('12345678');
   });
 });
 
 describe('isCompleteCode', () => {
-  it('accepts exactly six digits', () => {
-    expect(isCompleteCode('123456')).toBe(true);
-  });
+  it.each(['123456', '12345678', '1234567890'])(
+    'accepts %j (GoTrue OTP length is 6-10, dashboard-configurable)',
+    (code) => {
+      expect(isCompleteCode(code)).toBe(true);
+    },
+  );
 
-  it.each(['', '12345', '1234567', '12345a'])('rejects %j', (code) => {
+  it.each(['', '12345', '12345678901', '12345a', '1234567b'])('rejects %j', (code) => {
     expect(isCompleteCode(code)).toBe(false);
   });
 });
