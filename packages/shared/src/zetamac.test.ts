@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ZETAMAC_DEFAULT_SETTINGS, fingerprint, rankableDuration } from './zetamac.js';
+import { ZETAMAC_DEFAULT_SETTINGS, fingerprint, rankableDuration } from './zetamac';
 
 describe('fingerprint', () => {
   it('is stable for identical settings', () => {

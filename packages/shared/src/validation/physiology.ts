@@ -1,4 +1,4 @@
-import type { RecomputedScore } from '../score.js';
+import type { RecomputedScore } from '../score';
 
 /** Below this per-problem solve time we consider the answer super-human (spec §5 step 2). */
 export const MIN_HUMAN_SOLVE_MS = 250;

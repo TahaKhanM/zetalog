@@ -1,4 +1,4 @@
-import { err, ok, type Result } from './result.js';
+import { err, ok, type Result } from './result';
 
 /** A canonical arithmetic operation, normalised from whatever glyph Zetamac rendered. */
 export type Operator = '+' | '-' | '*' | '/';

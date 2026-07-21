@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { gameEventSchema, gameRecordSchema, zetamacSettingsSchema } from './schemas.js';
+import { gameEventSchema, gameRecordSchema, zetamacSettingsSchema } from './schemas';
 
 const defaultSettings = {
   addEnabled: true,

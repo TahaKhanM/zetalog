@@ -1,5 +1,5 @@
-import { parseProblem, solve } from './problems.js';
-import type { GameEvent } from './schemas.js';
+import { parseProblem, solve } from './problems';
+import type { GameEvent } from './schemas';
 
 /** One problem the player advanced past, with timing and verification. */
 export interface ProblemOutcome {

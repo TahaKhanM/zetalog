@@ -1,4 +1,4 @@
-import type { OperandRange, ZetamacSettings } from './schemas.js';
+import type { OperandRange, ZetamacSettings } from './schemas';
 
 /** Durations (seconds) whose default-config games rank on leaderboards (spec §1). */
 export const RANKABLE_DURATIONS = [30, 60, 120] as const;

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { GameRecord } from '../schemas.js';
-import type { RecomputedScore } from '../score.js';
-import { ZETAMAC_DEFAULT_SETTINGS } from '../zetamac.js';
-import { checkConsistency } from './consistency.js';
+import type { GameRecord } from '../schemas';
+import type { RecomputedScore } from '../score';
+import { ZETAMAC_DEFAULT_SETTINGS } from '../zetamac';
+import { checkConsistency } from './consistency';
 
 function record(overrides: Partial<GameRecord>): GameRecord {
   return {
