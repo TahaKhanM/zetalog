@@ -412,6 +412,31 @@ body {
   border-radius: 2px;
 }
 
+/* Per-game sync chip: steel tint when synced/pending, maroon tint on failure
+   (CO-2 — tints only, never a solid fill). */
+.zl-synctag {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.zl-synctag--pending {
+  color: var(--zl-muted);
+  background: color-mix(in srgb, var(--zl-muted) 12%, transparent);
+}
+
+.zl-synctag--ok {
+  color: var(--zl-chip-text);
+  background: var(--zl-chip-bg);
+}
+
+.zl-synctag--fail {
+  color: var(--zl-warn-text);
+  background: var(--zl-warn-bg);
+}
+
 .zl-game__actions {
   display: flex;
   gap: 4px;
@@ -501,4 +526,30 @@ body {
   font-size: 10px;
   color: var(--zl-faint);
   text-align: center;
+}
+
+/* Signed-in account row: status label + steel dot on the left, Unlink at right. */
+.zl-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.zl-account__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--zl-muted);
+}
+
+.zl-account__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zl-chart);
+  flex: none;
 }
