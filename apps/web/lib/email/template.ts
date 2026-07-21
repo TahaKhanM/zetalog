@@ -118,17 +118,20 @@ export function brandedCodeEmail(content: CodeEmailContent): { html: string; tex
 
 /** One dashboard-pasteable Supabase auth template. */
 export interface AuthEmailTemplate {
-  readonly name: 'Magic Link' | 'Confirm signup';
+  readonly name: 'Magic Link' | 'Confirm signup' | 'Reset Password';
   readonly subject: string;
   readonly html: string;
 }
 
 /**
- * The two Supabase auth email templates (Dashboard → Authentication → Email
+ * The Supabase auth email templates (Dashboard → Authentication → Email
  * Templates), rendered from the same branded layout with GoTrue's
- * `{{ .Token }}` placeholder as the code. `docs/ops/auth-email-templates.md`
- * is generated from this function and a test keeps them byte-identical —
- * regenerate the doc whenever the layout changes.
+ * `{{ .Token }}` placeholder as the code. Two artifacts are generated from
+ * this function and tests keep them byte-identical — regenerate BOTH whenever
+ * the layout or copy changes:
+ * - `docs/ops/auth-email-templates.md` (the owner's dashboard paste source),
+ * - `supabase/templates/*.html` (the local stack's GoTrue templates, wired in
+ *   `supabase/config.toml`, so the full-stack e2e sees production emails).
  */
 export function authEmailTemplates(): readonly AuthEmailTemplate[] {
   const token = '{{ .Token }}';
@@ -144,12 +147,23 @@ export function authEmailTemplates(): readonly AuthEmailTemplate[] {
     code: token,
     expiryLine: 'The code expires in one hour.',
   });
+  const recovery = brandedCodeEmail({
+    heading: 'Reset your password',
+    intro: 'Enter this code at www.zetalog.co.uk to set a new password.',
+    code: token,
+    expiryLine: 'The code expires in one hour.',
+  });
   return [
     { name: 'Magic Link', subject: 'Your ZetaLog sign-in code: {{ .Token }}', html: signIn.html },
     {
       name: 'Confirm signup',
       subject: 'Your ZetaLog sign-up code: {{ .Token }}',
       html: signUp.html,
+    },
+    {
+      name: 'Reset Password',
+      subject: 'Your ZetaLog password reset code: {{ .Token }}',
+      html: recovery.html,
     },
   ];
 }
