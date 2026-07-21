@@ -1,11 +1,11 @@
 import { badgeFor } from '@/lib/uni-brand';
 
 /**
- * University monogram badge (CO-3 §3): a rounded-square chip in the
- * institution's brand colours — never a crest. Colours come exclusively from
- * `lib/uni-brand.ts` (AA-gated by test) via inline style; the size variants
- * match the ledger-table and profile contexts. Badge precedes the name in
- * tables — it never replaces it.
+ * University badge (CO-3 §3): the institution's official mark when we hold a
+ * documented, officially-published asset (see lib/uni-brand.ts `logo` — with
+ * its per-university monogram kill-switch), otherwise a monogram chip in the
+ * university's brand colours. Colours/assets come exclusively from
+ * `lib/uni-brand.ts`; sizes match the ledger-table and profile contexts.
  */
 export function UniBadge({
   slug,
@@ -17,9 +17,22 @@ export function UniBadge({
   size?: 'table' | 'profile';
 }): React.JSX.Element {
   const brand = badgeFor(slug, name);
+  const className = size === 'profile' ? 'uni-badge uni-badge--profile' : 'uni-badge';
+  if (brand.logo !== undefined) {
+    return (
+      <img
+        src={brand.logo}
+        alt={`${name} badge`}
+        title={name}
+        className={`${className} uni-badge--logo`}
+        width={size === 'profile' ? 28 : 20}
+        height={size === 'profile' ? 28 : 20}
+      />
+    );
+  }
   return (
     <span
-      className={size === 'profile' ? 'uni-badge uni-badge--profile' : 'uni-badge'}
+      className={className}
       style={{ backgroundColor: brand.bg, color: brand.fg }}
       title={name}
       aria-label={`${name} badge`}

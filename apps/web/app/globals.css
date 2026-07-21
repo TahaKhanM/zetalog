@@ -250,6 +250,11 @@ button {
   font-size: 0.82rem;
 }
 
+.uni-badge--logo {
+  object-fit: contain;
+  background: white;
+}
+
 .nav {
   display: flex;
   gap: 1.1rem;

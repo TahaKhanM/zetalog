@@ -40,3 +40,7 @@ All assets fetched 2026-07-21.
 | `university-of-nottingham`                   | nottingham.ac.uk favicon is 16 px; the public brand pages (`/brand/visual/logos.aspx`) publish only wide lockups (login-gated SharePoint for the rest). |
 | `university-of-southampton`                  | southampton.ac.uk serves a 32 px favicon.ico; the only square mark is `shield-white.svg` (white-on-transparent — invisible on the badge chip).          |
 | `cardiff-university`                         | cardiff.ac.uk declares only a 16/32/48 px favicon.ico (on its own CloudFront asset host); no larger square mark is self-served.                         |
+
+> Post-collection note (2026-07-21): `university-of-birmingham.png` and
+> `university-of-st-andrews.png` were resized to <=256px / optimised for page
+> weight; the byte-identical originals remain in git history at commit 87d4936.
