@@ -358,6 +358,26 @@ describe('createStore — verifiedScore backfill for legacy rows', () => {
     if (!games.ok) return;
     expect(games.value[0]?.verifiedScore).toBe(3);
   });
+
+  it('falls back to claimedScore for a legacy PRUNED row (events stripped)', async () => {
+    // pruneStoredGames strips event streams from old non-rankable rows while
+    // preserving scores. A pruned row written before verifiedScore existed has
+    // NO events to recompute from — recomputing would clobber its score to 0,
+    // so the stored claimed score is the best remaining truth.
+    const pruned = {
+      record: gameRecord({ score: 42, settings: customSettings }), // events: []
+      fingerprint: fingerprint(customSettings),
+      rankableDuration: null,
+      status: 'kept',
+      savedAtMs: 1,
+    };
+    const store = createStore(fakeArea({ [GAMES_KEY]: [pruned] }), tickingClock());
+
+    const games = await store.listGames();
+    expect(games.ok).toBe(true);
+    if (!games.ok) return;
+    expect(games.value[0]?.verifiedScore).toBe(42);
+  });
 });
 
 describe('createStore prefs', () => {
