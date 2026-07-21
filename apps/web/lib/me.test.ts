@@ -78,6 +78,7 @@ describe('reasonsFor', () => {
       problemViolations: [{ rule: 'range-nonconforming', detail: 'x' }],
       problemFlags: [
         { rule: 'operation-mix', detail: 'a' },
+        { rule: 'operand-marginal', detail: 'd' },
         { rule: 'low-entropy', detail: 'b' },
         { rule: 'problem-switch', detail: 'c' },
       ],
@@ -85,6 +86,7 @@ describe('reasonsFor', () => {
     expect(reasons).toEqual([
       'Problem outside the claimed range',
       'Implausible operation mix',
+      'Operands skew easy',
       'Problems repeat too often',
       'Problems re-shown unsolved',
     ]);
