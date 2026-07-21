@@ -62,3 +62,16 @@ each remaining university. The four below still publish nothing usable.
 > documenting that fact would knowingly disregard the owner's stated wishes —
 > unlike the nominative-use posture of every other mark. Asset retained on disk;
 > remap only with permission or a stance change.
+
+## Owner-supplied marks (2026-07-21)
+
+> Manchester, KCL (replacing the earlier kcl-logo.svg collect), QMUL,
+> Nottingham, Southampton, and Cardiff were manually collected by the project
+> owner and supplied as 200x200 avatar-style marks of each university's
+> official artwork (JPEG originals in the owner's files; converted to PNG,
+> no other transformation). No source URLs are claimed for these six.
+> Nottingham: wired as an explicit OWNER OVERRIDE of the internal-use
+> adjudication recorded above; recommend seeking written permission first
+> if any brand team is approached. Edinburgh's owner-supplied copy was NOT
+> installed — the repo keeps the vector SVG of the same emblem collected
+> from the university's own site (higher quality, cleaner provenance).

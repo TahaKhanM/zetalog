@@ -102,11 +102,7 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
   'university-of-oxford': '/uni-logos/university-of-oxford.svg',
   'university-of-edinburgh': '/uni-logos/university-of-edinburgh.svg',
   'king-s-college-london-university-of-london':
-    '/uni-logos/king-s-college-london-university-of-london.svg',
-  // Nottingham intentionally unmapped (kill-switch): their public brand page
-  // labels the square castle mark "internal use" — knowingly using it against
-  // the owner's stated wishes is a different posture from nominative use.
-  // Asset + provenance preserved on disk should that stance ever change.
+    '/uni-logos/king-s-college-london-university-of-london.png',
   'university-of-cambridge': '/uni-logos/university-of-cambridge.png',
   'imperial-college-london': '/uni-logos/imperial-college-london.svg',
   // Owner-directed presentation: Warwick's own crest artwork (from their
@@ -116,6 +112,14 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
     '/uni-logos/university-college-london-university-of-london.png',
   'london-school-of-economics-and-political-science-university-of-london':
     '/uni-logos/london-school-of-economics-and-political-science-university-of-london.png',
+  // Owner-supplied avatar marks (manually collected by the project owner,
+  // 2026-07-21) — see SOURCES.md. Nottingham is an explicit owner override of
+  // the earlier internal-use adjudication.
+  'university-of-manchester': '/uni-logos/university-of-manchester.png',
+  'queen-mary-university-of-london': '/uni-logos/queen-mary-university-of-london.png',
+  'university-of-nottingham': '/uni-logos/university-of-nottingham.png',
+  'university-of-southampton': '/uni-logos/university-of-southampton.png',
+  'cardiff-university': '/uni-logos/cardiff-university.png',
   'university-of-durham': '/uni-logos/university-of-durham.png',
   'university-of-bristol': '/uni-logos/university-of-bristol.png',
   'university-of-glasgow': '/uni-logos/university-of-glasgow.png',
