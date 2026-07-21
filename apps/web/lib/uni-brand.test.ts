@@ -113,6 +113,27 @@ describe('curated logos', () => {
     expect(badge.bg).toBe(CURATED_BRANDS['university-of-oxford']?.bg);
   });
 
+  it('carries the round-2 official marks (Edinburgh, KCL, Nottingham)', () => {
+    expect(CURATED_LOGOS['university-of-edinburgh']).toBe('/uni-logos/university-of-edinburgh.svg');
+    expect(CURATED_LOGOS['king-s-college-london-university-of-london']).toBe(
+      '/uni-logos/king-s-college-london-university-of-london.svg',
+    );
+    expect(CURATED_LOGOS['university-of-nottingham']).toBe(
+      '/uni-logos/university-of-nottingham.png',
+    );
+  });
+
+  it('keeps the round-2 skips (no usable self-published mark) on monogram chips', () => {
+    for (const slug of [
+      'university-of-manchester',
+      'queen-mary-university-of-london',
+      'university-of-southampton',
+      'cardiff-university',
+    ]) {
+      expect(CURATED_LOGOS[slug], `${slug} must stay on its monogram`).toBeUndefined();
+    }
+  });
+
   it('badgeFor attaches the logo to a mapped slug without a colour entry', () => {
     const slug = 'university-of-bath';
     expect(CURATED_BRANDS[slug]).toBeUndefined();
