@@ -18,6 +18,19 @@ export {
 } from './zetamac';
 export { err, ok, type Result } from './result';
 export {
+  factStats,
+  operationStats,
+  skillBuckets,
+  slowestSolves,
+  solvedProblems,
+  weakestBuckets,
+  type FactStat,
+  type OperationStat,
+  type SkillBucket,
+  type SlowestSolve,
+  type SolvedProblem,
+} from './analysis';
+export {
   recomputeScore,
   type ProblemOutcome,
   type RecomputedScore,
