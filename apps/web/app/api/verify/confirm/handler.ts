@@ -21,6 +21,14 @@ export interface PendingVerification {
   readonly attempts: number;
 }
 
+/**
+ * Outcome of persisting a verification. `alias-conflict` is the lost race on
+ * the verified-alias unique index (W8): someone else claimed the address
+ * between the request-time ownership check and this confirm.
+ */
+export type ApplyVerificationResult =
+  { readonly ok: true } | { readonly ok: false; readonly reason: 'alias-conflict' };
+
 /** Injected dependencies for the core handler. */
 export interface VerifyConfirmDeps {
   authenticate: () => Promise<string | null>;
@@ -32,7 +40,7 @@ export interface VerifyConfirmDeps {
     universityId: string;
     verificationId: string;
     nowIso: string;
-  }) => Promise<void>;
+  }) => Promise<ApplyVerificationResult>;
   now: () => number;
 }
 
@@ -90,12 +98,15 @@ export async function handleVerifyConfirm(
       if (university === null) {
         return apiError(409, 'unknown-university', 'That university is no longer available.');
       }
-      await deps.applyVerification({
+      const applied = await deps.applyVerification({
         userId,
         universityId: university.id,
         verificationId: pending.id,
         nowIso: new Date(nowMs).toISOString(),
       });
+      if (!applied.ok) {
+        return apiError(409, 'email-taken', 'That email is already attached to another account.');
+      }
       return apiJson(200, {
         ok: true,
         university: { name: university.name, slug: university.slug },
