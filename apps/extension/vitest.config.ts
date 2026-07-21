@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 /** 100% on every metric — the bar for the pure cores (CLAUDE.md quality bar). */
 const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as const;
@@ -6,6 +6,9 @@ const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as c
 export default defineConfig({
   test: {
     environment: 'jsdom',
+    // The Playwright e2e (`e2e/*.spec.ts`) is not a vitest suite — it is run by
+    // `pnpm test:e2e`. Keep vitest from picking it up.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     coverage: {
       provider: 'v8',
       include: ['lib/**/*.ts', 'lib/**/*.tsx', 'components/**/*.tsx'],
@@ -19,6 +22,12 @@ export default defineConfig({
         '**/stats.ts': FULL,
         '**/store.ts': FULL,
         '**/format.ts': FULL,
+        '**/auth.ts': FULL,
+        '**/api.ts': FULL,
+        '**/sync.ts': FULL,
+        '**/link.ts': FULL,
+        '**/messages.ts': FULL,
+        '**/single-flight.ts': FULL,
       },
     },
   },

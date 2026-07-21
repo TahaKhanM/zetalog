@@ -21,6 +21,27 @@ export const PRUNE_LIMIT = 400;
 /** A status a row can hold before Remove — i.e. anywhere Restore may return it to. */
 export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
 
+/**
+ * Where a game stands relative to the leaderboard sync (W4). `revoked` is the
+ * TERMINAL state after a completed server-side removal — it stops the queue
+ * from re-deriving the revoke, and a later restore of the game re-derives a
+ * fresh submit from it.
+ */
+export type SyncState = 'pending' | 'uploaded' | 'failed' | 'revoked';
+
+/**
+ * Per-game sync metadata written back after an upload attempt (brief "Sync queue
+ * + backfill"). `outcome`/`serverScore` mirror the server's verdict once
+ * uploaded so the popup can show it. This is sync bookkeeping, not game data:
+ * Unlink clears it, and it is absent until the account is linked (invariant 4).
+ * The outcome values mirror the API client's `SubmitOutcome`.
+ */
+export interface GameSync {
+  readonly state: SyncState;
+  readonly outcome?: 'accepted' | 'quarantined' | 'rejected' | 'user_removed' | undefined;
+  readonly serverScore?: number | undefined;
+}
+
 /** A stored game: the raw record plus derived, denormalised fields the popup reads directly. */
 export interface StoredGame {
   readonly record: GameRecord;
@@ -38,6 +59,8 @@ export interface StoredGame {
   readonly removedFrom?: RemovableStatus | undefined;
   /** Wall-clock time this row was written. */
   readonly savedAtMs: number;
+  /** Leaderboard sync bookkeeping; absent while signed out (invariant 4). */
+  readonly sync?: GameSync | undefined;
 }
 
 /** Time range for the popup trend graph; persisted so the user's choice sticks. */
@@ -66,6 +89,12 @@ export interface StorageArea {
 
 const rankableDurationSchema = z.union([z.literal(30), z.literal(60), z.literal(120), z.null()]);
 
+const gameSyncSchema = z.object({
+  state: z.enum(['pending', 'uploaded', 'failed', 'revoked']),
+  outcome: z.enum(['accepted', 'quarantined', 'rejected', 'user_removed']).optional(),
+  serverScore: z.number().optional(),
+});
+
 const storedGameSchema = z.object({
   record: gameRecordSchema,
   fingerprint: z.string(),
@@ -74,6 +103,7 @@ const storedGameSchema = z.object({
   quarantineReason: z.enum(['restart', 'outlier']).optional(),
   removedFrom: z.enum(['kept', 'quarantined', 'capture_failed']).optional(),
   savedAtMs: z.number(),
+  sync: gameSyncSchema.optional(),
 });
 
 const prefsSchema = z.object({
@@ -112,6 +142,10 @@ export interface Store {
   saveCaptureFailed(record: GameRecord): Promise<Result<StoredGame, StoreError>>;
   restore(id: string): Promise<Result<StoredGame | null, StoreError>>;
   remove(id: string): Promise<Result<StoredGame | null, StoreError>>;
+  /** Write leaderboard sync state onto a game (`null` if the id is unknown). */
+  markSync(id: string, sync: GameSync): Promise<Result<StoredGame | null, StoreError>>;
+  /** Drop all sync bookkeeping (Unlink). Leaves scores/status/records untouched. */
+  clearAllSync(): Promise<Result<void, StoreError>>;
   listGames(): Promise<Result<StoredGame[], StoreError>>;
   getPrefs(): Promise<Result<Prefs, StoreError>>;
   setPrefs(prefs: Prefs): Promise<Result<Prefs, StoreError>>;
@@ -214,6 +248,11 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
           fingerprint: game.fingerprint,
           rankableDuration: game.rankableDuration,
           savedAtMs: game.savedAtMs,
+          // Sync bookkeeping survives the round trip: a restored game whose
+          // upload was revoked carries `state: 'revoked'`, from which the sync
+          // queue re-derives a fresh submit (and the chip shows Revoked, not
+          // Synced, until it re-uploads).
+          sync: game.sync,
         };
         return target === 'quarantined'
           ? { ...base, status: target, quarantineReason: game.quarantineReason }
@@ -227,6 +266,17 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
         // already-removed row keeps the original provenance.
         game.status === 'removed' ? game : { ...game, status: 'removed', removedFrom: game.status },
       );
+    },
+
+    markSync(id, sync) {
+      return update(id, (game) => ({ ...game, sync }));
+    },
+
+    async clearAllSync() {
+      const games = await readGames();
+      if (!games.ok) return games;
+      await writeGames(games.value.map((game) => ({ ...game, sync: undefined })));
+      return ok(undefined);
     },
 
     listGames() {

@@ -20,6 +20,26 @@ function flagLabel(game: StoredGame): string | null {
   return null;
 }
 
+/** A per-game leaderboard-sync chip, or null when signed out (no sync bookkeeping). */
+export function syncTag(
+  game: StoredGame,
+): { label: string; tone: 'pending' | 'ok' | 'fail' | 'muted' } | null {
+  const sync = game.sync;
+  if (sync === undefined) return null;
+  if (sync.state === 'pending') return { label: 'Syncing…', tone: 'pending' };
+  if (sync.state === 'failed') return { label: 'Sync failed', tone: 'fail' };
+  // Terminal after a completed server-side removal — informational, not an error.
+  if (sync.state === 'revoked') return { label: 'Revoked', tone: 'muted' };
+  switch (sync.outcome) {
+    case 'quarantined':
+      return { label: 'Under review', tone: 'ok' };
+    case 'rejected':
+      return { label: 'Rejected', tone: 'fail' };
+    default:
+      return { label: 'Synced', tone: 'ok' };
+  }
+}
+
 /**
  * The recent-games list (10 most recent, any status; spec §3.3). Non-kept
  * scores are greyed and struck through; each row carries its config, relative
@@ -34,6 +54,7 @@ export function RecentGames(props: RecentGamesProps): JSX.Element {
       {games.map((game) => {
         const inactive = game.status !== 'kept';
         const flag = flagLabel(game);
+        const tag = syncTag(game);
         const showRestore = game.status === 'quarantined' || game.status === 'removed';
         const showRemove = game.status !== 'removed';
         return (
@@ -50,6 +71,9 @@ export function RecentGames(props: RecentGamesProps): JSX.Element {
               <div className="zl-game__sub">
                 <span className="zl-num">{relativeTime(game.savedAtMs, nowMs)}</span>
                 {flag === null ? null : <span className="zl-flag">{flag}</span>}
+                {tag === null ? null : (
+                  <span className={`zl-synctag zl-synctag--${tag.tone}`}>{tag.label}</span>
+                )}
               </div>
             </div>
             <div className="zl-game__actions">

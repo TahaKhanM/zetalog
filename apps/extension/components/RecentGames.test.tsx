@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { StoredGame } from '../lib/store.js';
-import { RecentGames } from './RecentGames.js';
+import { RecentGames, syncTag } from './RecentGames.js';
 
 afterEach(cleanup);
 
@@ -99,5 +99,71 @@ describe('RecentGames', () => {
     const failed = row('capture_failed');
     expect(within(failed).getByText('—')).toBeTruthy();
     expect(within(failed).getByText('Capture failed')).toBeTruthy();
+  });
+
+  it('renders no sync chip when a game has no sync bookkeeping (signed out)', () => {
+    render(<RecentGames games={[game()]} nowMs={NOW} onRestore={vi.fn()} onRemove={vi.fn()} />);
+    expect(screen.queryByText(/Syncing|Synced|Sync failed|Under review/)).toBeNull();
+  });
+
+  it('shows a pending, synced, under-review, and failed chip by sync state', () => {
+    render(
+      <RecentGames
+        games={[
+          game({ sync: { state: 'pending' } }),
+          game({ sync: { state: 'uploaded', outcome: 'accepted', serverScore: 40 } }),
+          game({ sync: { state: 'uploaded', outcome: 'quarantined' } }),
+          game({ sync: { state: 'failed' } }),
+        ]}
+        nowMs={NOW}
+        onRestore={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('Syncing…')).toBeTruthy();
+    expect(screen.getByText('Synced')).toBeTruthy();
+    expect(screen.getByText('Under review')).toBeTruthy();
+    expect(screen.getByText('Sync failed')).toBeTruthy();
+  });
+});
+
+describe('syncTag', () => {
+  it('maps every sync state to a chip, or null when absent', () => {
+    expect(syncTag(game())).toBeNull();
+    expect(syncTag(game({ sync: { state: 'pending' } }))?.tone).toBe('pending');
+    expect(syncTag(game({ sync: { state: 'failed' } }))?.tone).toBe('fail');
+    expect(syncTag(game({ sync: { state: 'uploaded', outcome: 'rejected' } }))).toEqual({
+      label: 'Rejected',
+      tone: 'fail',
+    });
+    expect(syncTag(game({ sync: { state: 'uploaded', outcome: 'user_removed' } }))).toEqual({
+      label: 'Synced',
+      tone: 'ok',
+    });
+    expect(syncTag(game({ sync: { state: 'uploaded' } }))).toEqual({ label: 'Synced', tone: 'ok' });
+  });
+
+  it('shows a muted Revoked chip — never "Synced" — for a revoked upload', () => {
+    expect(syncTag(game({ status: 'removed', sync: { state: 'revoked' } }))).toEqual({
+      label: 'Revoked',
+      tone: 'muted',
+    });
+  });
+});
+
+describe('RecentGames — revoked row', () => {
+  it('renders the Revoked chip as muted meta text, not a failure tone', () => {
+    render(
+      <RecentGames
+        games={[game({ status: 'removed', sync: { state: 'revoked' } })]}
+        nowMs={NOW}
+        onRestore={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    );
+    const chip = screen.getByText('Revoked');
+    expect(chip.className).toContain('zl-synctag--muted');
+    expect(chip.className).not.toContain('zl-synctag--fail');
+    expect(screen.queryByText('Synced')).toBeNull();
   });
 });

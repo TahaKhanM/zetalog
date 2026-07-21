@@ -8,7 +8,9 @@ import { Header } from '../../components/Header.js';
 import { Hero } from '../../components/Hero.js';
 import { RecentGames } from '../../components/RecentGames.js';
 import { TrendControls, type ConfigOption } from '../../components/TrendControls.js';
+import { createAuthController } from '../../lib/auth.js';
 import { WEB_APP_URL } from '../../lib/config.js';
+import { type BgRequest } from '../../lib/messages.js';
 import {
   fingerprintLabel,
   graphMode,
@@ -22,6 +24,16 @@ import {
 import { createStore, type Prefs, type StoredGame } from '../../lib/store.js';
 
 const store = createStore(browser.storage.local);
+// Read-only here (link state + Unlink); the background owns token refresh, so a
+// noop fetch is enough — the popup never refreshes tokens itself.
+const auth = createAuthController(browser.storage.local, {
+  fetch: (url, init) => fetch(url, init),
+});
+
+/** Fire-and-forget message to the background worker (drain / unlink). */
+function tellBackground(request: BgRequest): Promise<unknown> {
+  return browser.runtime.sendMessage(request).catch(() => undefined);
+}
 
 const DEFAULT_PREFS: Prefs = { selectedFingerprint: null, range: 'all' };
 const RECENT_LIMIT = 10;
@@ -44,15 +56,23 @@ function configOptions(games: readonly StoredGame[]): ConfigOption[] {
 export function App(): JSX.Element {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
+  const [linked, setLinked] = useState(false);
 
   const reload = useCallback(async (): Promise<void> => {
-    const [gamesResult, prefsResult] = await Promise.all([store.listGames(), store.getPrefs()]);
+    const [gamesResult, prefsResult, isLinked] = await Promise.all([
+      store.listGames(),
+      store.getPrefs(),
+      auth.isLinked(),
+    ]);
     if (gamesResult.ok) setGames(gamesResult.value);
     if (prefsResult.ok) setPrefs(prefsResult.value);
+    setLinked(isLinked);
   }, []);
 
   useEffect(() => {
     void reload();
+    // Kick a sync on open so pending uploads flush and chips refresh (no-op signed out).
+    void tellBackground({ type: 'zl-drain' });
     const onChanged = (_changes: unknown, areaName: string): void => {
       if (areaName === 'local') void reload();
     };
@@ -90,6 +110,9 @@ export function App(): JSX.Element {
   }
   function sync(): void {
     void browser.tabs.create({ url: `${WEB_APP_URL}/link` });
+  }
+  function unlink(): void {
+    void tellBackground({ type: 'zl-unlink' }).then(reload);
   }
 
   return (
@@ -141,7 +164,7 @@ export function App(): JSX.Element {
 
       {hasCaptureFailure ? <CaptureFailedBanner /> : null}
 
-      <Footer onSync={sync} />
+      <Footer linked={linked} onSync={sync} onUnlink={unlink} />
     </div>
   );
 }

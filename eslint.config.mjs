@@ -12,6 +12,7 @@ export default tseslint.config(
       '**/.next/',
       '**/coverage/',
       'apps/extension/test/fixtures/',
+      'apps/extension/test/replica/',
     ],
   },
   eslint.configs.recommended,
