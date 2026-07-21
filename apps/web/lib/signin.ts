@@ -1,5 +1,5 @@
 /**
- * Pure logic for the two-step email-OTP sign-in (email → 6-digit code).
+ * Pure logic for the two-step email-OTP sign-in (email → emailed digit code).
  *
  * The email carries only a code — no links — so university mail filters have
  * nothing to flag (a sender/link domain mismatch is what quarantined the old
@@ -7,17 +7,22 @@
  * helpers to the browser Supabase client.
  */
 
-/** How many digits a sign-in code has (GoTrue email OTP). */
-export const CODE_LENGTH = 6;
+/**
+ * GoTrue's email OTP length is dashboard-configurable (6-10 digits; newer
+ * Supabase projects default to 8). The form accepts the whole range so a
+ * dashboard change can never lock users out.
+ */
+export const MIN_CODE_LENGTH = 6;
+export const MAX_CODE_LENGTH = 10;
 
-/** Strip everything but digits (users paste "123 456") and cap at code length. */
+/** Strip everything but digits (users paste "123 456") and cap at the max length. */
 export function normaliseCode(input: string): string {
-  return input.replace(/\D/g, '').slice(0, CODE_LENGTH);
+  return input.replace(/\D/g, '').slice(0, MAX_CODE_LENGTH);
 }
 
-/** True once the input holds a full six-digit code. */
+/** True once the input holds a plausible full code (6-10 digits). */
 export function isCompleteCode(code: string): boolean {
-  return code.length === CODE_LENGTH && /^\d+$/.test(code);
+  return code.length >= MIN_CODE_LENGTH && code.length <= MAX_CODE_LENGTH && /^\d+$/.test(code);
 }
 
 /** The shape of a GoTrue error we map to user-facing copy. */
