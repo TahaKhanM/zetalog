@@ -28,7 +28,7 @@ export function personalBests(games: readonly StoredGame[]): PersonalBests {
   for (const duration of RANKABLE_DURATIONS) {
     const scores = games
       .filter((game) => isKept(game) && game.rankableDuration === duration)
-      .map((game) => game.record.claimedScore);
+      .map((game) => game.verifiedScore);
     bests[duration] = scores.length === 0 ? null : Math.max(...scores);
   }
   return bests;
@@ -58,9 +58,9 @@ export function isNewPersonalBest(games: readonly StoredGame[]): boolean {
       (game) =>
         game !== latest && isKept(game) && game.rankableDuration === latest.rankableDuration,
     )
-    .map((game) => game.record.claimedScore);
+    .map((game) => game.verifiedScore);
   if (priorScores.length === 0) return true;
-  return latest.record.claimedScore > Math.max(...priorScores);
+  return latest.verifiedScore > Math.max(...priorScores);
 }
 
 /** Kept scores for one fingerprint, ascending in time, limited to the range (spec §3.3). */
@@ -73,7 +73,7 @@ export function trendSeries(
     .filter((game) => isKept(game) && game.fingerprint === fingerprintKey)
     .sort((a, b) => a.savedAtMs - b.savedAtMs);
   const windowed = range === 'all' ? ordered : ordered.slice(-range);
-  return windowed.map((game) => ({ score: game.record.claimedScore, at: game.record.startedAtMs }));
+  return windowed.map((game) => ({ score: game.verifiedScore, at: game.record.startedAtMs }));
 }
 
 /** Choose the trend rendering for a kept-game count (spec §3.3 thresholds). */

@@ -5,6 +5,7 @@ import type { UniversityOption } from '@/lib/db/queries';
 import type { LeaderboardEntry } from '@/lib/db/rows';
 
 import { UniversityFilter } from './UniversityFilter';
+import { ViewerRowHighlight } from './ViewerRowHighlight';
 
 /** Tab order per spec §6: 120s default, then 60s, 30s. */
 const DURATION_TABS: readonly RankableDuration[] = [120, 60, 30];
@@ -16,7 +17,6 @@ interface LeaderboardViewProps {
   readonly duration: RankableDuration;
   readonly uniOptions: readonly UniversityOption[];
   readonly currentSlug: string | null;
-  readonly viewerId: string | null;
   /** University badges are shown on the global board, redundant on a uni board. */
   readonly showBadges: boolean;
 }
@@ -77,7 +77,6 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
                   key={entry.user_id}
                   entry={entry}
                   rank={index + 1}
-                  isSelf={entry.user_id === props.viewerId}
                   showBadges={props.showBadges}
                 />
               ))}
@@ -85,6 +84,10 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
           </table>
         </div>
       )}
+      {/* The board above is a cached, identity-free server render. This client
+          component highlights the viewer's own row after hydration, so the HTML
+          stays cacheable and signed-out visitors cost zero auth work. */}
+      <ViewerRowHighlight showAddBadge={props.showBadges} />
     </section>
   );
 }
@@ -92,21 +95,21 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
 function LeaderboardRow({
   entry,
   rank,
-  isSelf,
   showBadges,
 }: {
   entry: LeaderboardEntry;
   rank: number;
-  isSelf: boolean;
   showBadges: boolean;
 }): React.JSX.Element {
+  // data-uid lets the client ViewerRowHighlight find and decorate the viewer's
+  // own row after hydration (the cached HTML carries no viewer identity).
   return (
-    <tr className={isSelf ? 'row-self' : undefined}>
+    <tr data-uid={entry.user_id}>
       <td className={`num ltable__rank${rank <= 3 ? ' rank-top' : ''}`}>{rank}</td>
       <td>
         <span className="player">
           <span className="player__name">{entry.display_name}</span>
-          {showBadges ? <Badge entry={entry} isSelf={isSelf} /> : null}
+          {showBadges ? <Badge entry={entry} /> : null}
         </span>
       </td>
       <td className="ltable__num ltable__score">{entry.best_score}</td>
@@ -114,24 +117,14 @@ function LeaderboardRow({
   );
 }
 
-function Badge({
-  entry,
-  isSelf,
-}: {
-  entry: LeaderboardEntry;
-  isSelf: boolean;
-}): React.JSX.Element | null {
+function Badge({ entry }: { entry: LeaderboardEntry }): React.JSX.Element | null {
+  // Only the (server-known) university badge renders here. The viewer's own
+  // "＋ add badge" affordance is added client-side by ViewerRowHighlight, so the
+  // board render stays identity-free and cacheable.
   if (entry.university_slug !== null && entry.university_name !== null) {
     return (
       <Link href={`/uni/${entry.university_slug}`} className="chip chip--badge">
         {entry.university_name}
-      </Link>
-    );
-  }
-  if (isSelf) {
-    return (
-      <Link href="/verify" className="chip chip--add">
-        ＋ add badge
       </Link>
     );
   }
