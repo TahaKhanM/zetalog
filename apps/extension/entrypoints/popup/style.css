@@ -3,25 +3,28 @@
  * come from @zetalog/shared tokens, injected as --zl-* custom properties by
  * main.tsx. This sheet only *composes* them — every colour below is either a
  * palette var or a color-mix over one; no raw hexes, no font families
- * (invariant 7). Colour application follows CO-2: neutrals carry the layout,
- * brand colour does accent work only (text / border / tint / stroke), and no
- * solid brand-colour region is larger than a chip except the wordmark.
+ * (invariant 7). Colour application follows CO-3 "examination paper": the
+ * surface is warm paper, maroon is the structural ink (ruling, hairlines,
+ * index), navy the working ink, steel strictly chart/metadata; no solid
+ * brand-colour region larger than a chip except the wordmark.
  */
 
 :root {
   color-scheme: light dark;
 
-  /* Light: near-white surfaces, softened navy text, brand colour as accent. */
-  --zl-bg: color-mix(in srgb, var(--zl-cream) 30%, white);
-  --zl-surface: white;
-  --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 50%, white);
-  --zl-border: color-mix(in srgb, var(--zl-cream) 60%, white);
-  --zl-divider: color-mix(in srgb, var(--zl-navy) 10%, transparent);
-  --zl-text: color-mix(in srgb, var(--zl-navy) 85%, white);
+  /* Light: warm exam-paper surfaces, maroon ruling, navy working ink. */
+  --zl-bg: color-mix(in srgb, var(--zl-cream) 38%, white);
+  --zl-surface: color-mix(in srgb, var(--zl-cream) 14%, white);
+  --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 26%, white);
+  --zl-border: color-mix(in srgb, var(--zl-maroon) 13%, transparent);
+  --zl-divider: color-mix(in srgb, var(--zl-maroon) 10%, transparent);
+  --zl-rule: color-mix(in srgb, var(--zl-maroon) 36%, transparent);
+  --zl-text: color-mix(in srgb, var(--zl-navy) 86%, white);
   --zl-heading: var(--zl-navy);
-  --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+  --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 44%, var(--zl-text));
   --zl-faint: color-mix(in srgb, var(--zl-navy) 42%, white);
   --zl-display: var(--zl-maroon);
+  --zl-index: var(--zl-maroon);
   --zl-accent: var(--zl-red);
   --zl-chart: color-mix(in srgb, var(--zl-steel-blue) 85%, transparent);
   --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 13%, transparent);
@@ -31,18 +34,21 @@
   --zl-warn-text: var(--zl-maroon);
 }
 
+/* Dark: the blackboard — navy-derived surfaces, cream ruling (CO-3 §1). */
 @media (prefers-color-scheme: dark) {
   :root {
-    --zl-bg: color-mix(in srgb, var(--zl-navy) 72%, black);
-    --zl-surface: color-mix(in srgb, var(--zl-navy) 88%, black);
-    --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 80%, black);
+    --zl-bg: color-mix(in srgb, var(--zl-navy) 58%, black);
+    --zl-surface: color-mix(in srgb, var(--zl-navy) 74%, black);
+    --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 68%, black);
     --zl-border: color-mix(in srgb, var(--zl-cream) 14%, transparent);
-    --zl-divider: color-mix(in srgb, var(--zl-cream) 12%, transparent);
-    --zl-text: color-mix(in srgb, var(--zl-cream) 90%, transparent);
+    --zl-divider: color-mix(in srgb, var(--zl-cream) 10%, transparent);
+    --zl-rule: color-mix(in srgb, var(--zl-cream) 30%, transparent);
+    --zl-text: color-mix(in srgb, var(--zl-cream) 88%, transparent);
     --zl-heading: var(--zl-cream);
-    --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+    --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 52%, var(--zl-text));
     --zl-faint: color-mix(in srgb, var(--zl-cream) 45%, transparent);
     --zl-display: var(--zl-cream);
+    --zl-index: var(--zl-cream);
     --zl-chart: var(--zl-steel-blue);
     --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 20%, transparent);
     --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 18%, transparent);
@@ -123,13 +129,14 @@ body {
   }
 }
 
-/* ── Header ─────────────────────────────────────────────── */
+/* ── Header: the exam-paper masthead, ruled in maroon ───── */
 .zl-header {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 16px 18px 13px;
+  padding: 16px 18px 12px;
   border-top: none;
+  border-bottom: 2px solid var(--zl-rule);
 }
 
 .zl-header__mark {
@@ -213,21 +220,17 @@ body {
   line-height: 1;
 }
 
-/* Personal-best row: three duration columns on white, hairline-separated. */
+/* Personal-best row: ruled broadsheet tiles — maroon index, big numeral. */
 .zl-pbs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
+  gap: 12px;
   margin-top: 14px;
-  background: var(--zl-border);
-  border: 1px solid var(--zl-border);
-  border-radius: 4px;
-  overflow: hidden;
 }
 
 .zl-pb {
-  background: var(--zl-surface);
-  padding: 8px 10px;
+  padding-top: 6px;
+  border-top: 2px solid var(--zl-rule);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -236,7 +239,8 @@ body {
 .zl-pb__dur {
   font-size: 10px;
   letter-spacing: 0.06em;
-  color: var(--zl-faint);
+  font-weight: 600;
+  color: var(--zl-index);
 }
 
 .zl-pb__val {
@@ -347,6 +351,18 @@ body {
   margin-top: 4px;
   font-size: 10px;
   color: var(--zl-muted);
+}
+
+/* ── Focus hint: the one-line practice verdict from local telemetry ── */
+.zl-focus {
+  margin: 0;
+  font-size: 12px;
+  color: var(--zl-text);
+}
+
+.zl-focus__label {
+  font-weight: 600;
+  color: var(--zl-display);
 }
 
 /* ── Recent games list ──────────────────────────────────── */

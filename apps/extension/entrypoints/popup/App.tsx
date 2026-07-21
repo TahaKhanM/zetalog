@@ -13,6 +13,7 @@ import { WEB_APP_URL } from '../../lib/config.js';
 import { type BgRequest } from '../../lib/messages.js';
 import {
   fingerprintLabel,
+  focusArea,
   graphMode,
   isNewPersonalBest,
   latestGame,
@@ -96,6 +97,7 @@ export function App(): JSX.Element {
       : fullSeries;
 
   const hasCaptureFailure = games.some((game) => game.status === 'capture_failed');
+  const focus = useMemo(() => focusArea(games), [games]);
 
   function persistPrefs(next: Prefs): void {
     setPrefs(next);
@@ -147,6 +149,19 @@ export function App(): JSX.Element {
         </div>
         <AdaptiveTrend mode={mode} series={series} nowMs={now} />
       </section>
+
+      {focus !== null ? (
+        <section className="zl-section">
+          <div className="zl-trend__head">
+            <span className="zl-eyebrow">Focus</span>
+          </div>
+          <p className="zl-focus">
+            <span className="zl-focus__label">{focus.label}</span> —{' '}
+            <span className="zl-num">{(focus.medianSolveMs / 1000).toFixed(1)}s</span> median,{' '}
+            <span className="zl-num">{focus.ratio.toFixed(1)}×</span> your fastest area
+          </p>
+        </section>
+      ) : null}
 
       {games.length > 0 ? (
         <section className="zl-section">
