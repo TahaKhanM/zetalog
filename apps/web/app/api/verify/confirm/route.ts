@@ -73,6 +73,17 @@ export async function POST(request: Request): Promise<Response> {
       if (updateError !== null) throw new Error(`incrementAttempts: ${updateError.message}`);
     },
     applyVerification: async ({ userId, universityId, verificationId, nowIso }) => {
+      // Stamp the verification FIRST: the partial unique index on verified
+      // aliases (W8) makes this the statement that can lose a claim race —
+      // losing must not leave a half-applied profile.
+      const verification = await service
+        .from('uni_verifications')
+        .update({ verified_at: nowIso })
+        .eq('id', verificationId);
+      if (verification.error !== null) {
+        if (verification.error.code === '23505') return { ok: false, reason: 'alias-conflict' };
+        throw new Error(`applyVerification(verification): ${verification.error.message}`);
+      }
       const profile = await service
         .from('profiles')
         .update({ university_id: universityId, uni_verified_at: nowIso })
@@ -80,13 +91,7 @@ export async function POST(request: Request): Promise<Response> {
       if (profile.error !== null) {
         throw new Error(`applyVerification(profile): ${profile.error.message}`);
       }
-      const verification = await service
-        .from('uni_verifications')
-        .update({ verified_at: nowIso })
-        .eq('id', verificationId);
-      if (verification.error !== null) {
-        throw new Error(`applyVerification(verification): ${verification.error.message}`);
-      }
+      return { ok: true };
     },
     now: () => Date.now(),
   });

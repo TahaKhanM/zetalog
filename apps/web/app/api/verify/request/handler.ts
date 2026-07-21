@@ -1,14 +1,17 @@
 import { z } from 'zod';
 
+import { adjudicateAliasClaim, type IdentifierMatch } from '@/lib/auth-modes';
 import type { SendResult } from '@/lib/email/types';
 import { apiError, apiJson } from '@/lib/http';
 import { findUniversityForEmail } from '@/lib/uni';
 import { expiresAtMs, generateCode, hashCode, type RandomInt } from '@/lib/verification';
 
 /**
- * The testable core of `POST /api/verify/request` (spec §7): domain check,
- * per-address hourly limit, global daily cap, code generation, send, and
- * persistence — all over injected ports.
+ * The testable core of `POST /api/verify/request` (spec §7, W8 alias
+ * integrity): domain check, ownership check (a verified uni email becomes a
+ * LOGIN alias, so an address claimed by any other account is refused before a
+ * code is ever sent), per-address hourly limit, global daily cap, code
+ * generation, send, and persistence — all over injected ports.
  */
 
 /** Max verification emails to one address per rolling hour (CLAUDE.md #6). */
@@ -24,6 +27,8 @@ const bodySchema = z.object({ email: z.email() });
 export interface VerifyRequestDeps {
   authenticate: () => Promise<string | null>;
   listUniversities: () => Promise<{ id: string; domains: string[] }[]>;
+  /** Resolve who (if anyone) already owns this address as email or alias. */
+  resolveIdentifier: (email: string) => Promise<IdentifierMatch | null>;
   countRequestsForEmail: (email: string, sinceMs: number) => Promise<number>;
   countEmailsSince: (sinceMs: number) => Promise<number>;
   createVerification: (input: {
@@ -62,6 +67,24 @@ export async function handleVerifyRequest(
   const university = findUniversityForEmail(email, await deps.listUniversities());
   if (university === null) {
     return apiError(404, 'unknown-university', 'That email domain is not a known UK university.');
+  }
+
+  // W8 alias integrity: a verified uni email doubles as a login alias, so an
+  // address can only belong to one account. Refuse before spending any email
+  // budget. (The partial unique index closes the confirm-time race.)
+  const verdict = adjudicateAliasClaim({
+    requesterId: userId,
+    match: await deps.resolveIdentifier(email),
+  });
+  if (verdict === 'taken') {
+    return apiError(409, 'email-taken', 'That email is already attached to another account.');
+  }
+  if (verdict === 'already-verified') {
+    return apiError(
+      409,
+      'already-verified',
+      'You have already verified this email — you can sign in with it.',
+    );
   }
 
   if ((await deps.countRequestsForEmail(email, nowMs - HOUR_MS)) >= MAX_REQUESTS_PER_HOUR) {

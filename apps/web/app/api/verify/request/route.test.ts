@@ -1,6 +1,7 @@
 import { err, ok } from '@zetalog/shared';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { IdentifierMatch } from '@/lib/auth-modes';
 import { sha256Hex } from '@/lib/hash';
 import {
   EMAIL_DAILY_CAP,
@@ -19,10 +20,22 @@ function request(body: unknown): Request {
   });
 }
 
+function match(partial: Partial<IdentifierMatch> = {}): IdentifierMatch {
+  return {
+    userId: 'user-1',
+    primaryEmail: 'me@ox.ac.uk',
+    hasPassword: true,
+    providers: ['email'],
+    matchedBy: 'primary',
+    ...partial,
+  };
+}
+
 function deps(over: Partial<VerifyRequestDeps> = {}): VerifyRequestDeps {
   return {
     authenticate: vi.fn(async () => Promise.resolve('user-1')),
     listUniversities: vi.fn(async () => Promise.resolve([{ id: 'ox', domains: ['ox.ac.uk'] }])),
+    resolveIdentifier: vi.fn(async () => Promise.resolve<IdentifierMatch | null>(null)),
     countRequestsForEmail: vi.fn(async () => Promise.resolve(0)),
     countEmailsSince: vi.fn(async () => Promise.resolve(0)),
     createVerification: vi.fn(async () => Promise.resolve()),
@@ -83,6 +96,61 @@ describe('POST /api/verify/request', () => {
     );
     expect(response.status).toBe(502);
     expect(createVerification).not.toHaveBeenCalled();
+  });
+
+  it("returns 409 when the address is another account's primary email", async () => {
+    const sendCode = vi.fn(async () => Promise.resolve(ok({ id: 'email-1' })));
+    const response = await handleVerifyRequest(
+      request({ email: 'taken@ox.ac.uk' }),
+      deps({
+        sendCode,
+        resolveIdentifier: vi.fn(async () => Promise.resolve(match({ userId: 'user-2' }))),
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: 'email-taken' } });
+    expect(sendCode).not.toHaveBeenCalled();
+  });
+
+  it("returns 409 when the address is another user's verified alias", async () => {
+    const response = await handleVerifyRequest(
+      request({ email: 'claimed@ox.ac.uk' }),
+      deps({
+        resolveIdentifier: vi.fn(async () =>
+          Promise.resolve(match({ userId: 'user-2', matchedBy: 'alias' })),
+        ),
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: 'email-taken' } });
+  });
+
+  it("returns 409 already-verified for the requester's own verified alias, sending nothing", async () => {
+    const sendCode = vi.fn(async () => Promise.resolve(ok({ id: 'email-1' })));
+    const response = await handleVerifyRequest(
+      request({ email: 'mine@ox.ac.uk' }),
+      deps({
+        sendCode,
+        resolveIdentifier: vi.fn(async () => Promise.resolve(match({ matchedBy: 'alias' }))),
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: 'already-verified' } });
+    expect(sendCode).not.toHaveBeenCalled();
+  });
+
+  it("allows verifying the requester's own primary email (badge only)", async () => {
+    const response = await handleVerifyRequest(
+      request({ email: 'me@ox.ac.uk' }),
+      deps({ resolveIdentifier: vi.fn(async () => Promise.resolve(match())) }),
+    );
+    expect(response.status).toBe(200);
+  });
+
+  it('never resolves ownership for an unknown-university domain', async () => {
+    const resolveIdentifier = vi.fn(async () => Promise.resolve(null));
+    await handleVerifyRequest(request({ email: 'a@gmail.com' }), deps({ resolveIdentifier }));
+    expect(resolveIdentifier).not.toHaveBeenCalled();
   });
 
   it('sends the code and stores only its hash on success', async () => {

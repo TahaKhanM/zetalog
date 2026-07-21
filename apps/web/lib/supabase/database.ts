@@ -25,11 +25,21 @@ interface LooseView {
   Relationships: [];
 }
 
+/**
+ * Same philosophy for `rpc()`: args type-check as object literals, returns
+ * stay `unknown` on purpose — every rpc result is zod-validated before use
+ * (see `lib/auth-identifier.ts`).
+ */
+interface LooseFunction {
+  Args: LooseRow;
+  Returns: unknown;
+}
+
 export interface Database {
   public: {
     Tables: Record<string, LooseTable>;
     Views: Record<string, LooseView>;
-    Functions: Record<string, never>;
+    Functions: Record<string, LooseFunction>;
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
