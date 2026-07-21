@@ -3,9 +3,17 @@ import { readBearerToken } from '@/lib/http';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
-import { REVOCABLE_STATUSES, handleGameDelete } from './handler';
+import { CORS_HEADERS, REVOCABLE_STATUSES, handleGameDelete } from './handler';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * CORS preflight for the extension's background DELETE (no host_permissions ⇒
+ * the browser preflights the cross-origin request).
+ */
+export function OPTIONS(): Response {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
 
 /**
  * `DELETE /api/games/[clientGameId]` — remove one of the user's own games.

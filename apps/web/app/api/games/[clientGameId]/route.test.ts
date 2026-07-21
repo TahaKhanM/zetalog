@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { REVOCABLE_STATUSES, handleGameDelete, type GameDeleteDeps } from './handler';
+import { CORS_HEADERS, REVOCABLE_STATUSES, handleGameDelete, type GameDeleteDeps } from './handler';
+import { OPTIONS } from './route';
 
 function request(): Request {
   return new Request('http://localhost/api/games/abc', { method: 'DELETE' });
@@ -33,6 +34,7 @@ describe('DELETE /api/games/[clientGameId]', () => {
       deps({ authenticate: vi.fn(async () => Promise.resolve(null)) }),
     );
     expect(response.status).toBe(401);
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
   });
 
   it('returns 404 when no owned game matched', async () => {
@@ -42,6 +44,7 @@ describe('DELETE /api/games/[clientGameId]', () => {
       deps({ removeGame: vi.fn(async () => Promise.resolve(false)) }),
     );
     expect(response.status).toBe(404);
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
   });
 
   it('soft-deletes an owned game and returns 200', async () => {
@@ -50,5 +53,43 @@ describe('DELETE /api/games/[clientGameId]', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
     expect(removeGame).toHaveBeenCalledWith('user-1', 'game-1');
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
+  });
+
+  it('attaches CORS headers to every DELETE response', async () => {
+    for (const response of [
+      await handleGameDelete(
+        request(),
+        'game-1',
+        deps({ authenticate: vi.fn(async () => Promise.resolve(null)) }),
+      ),
+      await handleGameDelete(
+        request(),
+        'game-1',
+        deps({ removeGame: vi.fn(async () => Promise.resolve(false)) }),
+      ),
+      await handleGameDelete(request(), 'game-1', deps()),
+    ]) {
+      expect(response.headers.get('access-control-allow-origin')).toBe('*');
+      expect(response.headers.get('access-control-allow-methods')).toBe(
+        CORS_HEADERS['Access-Control-Allow-Methods'],
+      );
+      expect(response.headers.get('access-control-allow-headers')).toBe(
+        'Authorization, Content-Type',
+      );
+    }
+  });
+});
+
+describe('OPTIONS /api/games/[clientGameId]', () => {
+  it('answers the CORS preflight with 204 and permissive headers', () => {
+    const response = OPTIONS();
+    expect(response.status).toBe(204);
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
+    expect(response.headers.get('access-control-allow-methods')).toContain('DELETE');
+    expect(response.headers.get('access-control-allow-methods')).toContain('OPTIONS');
+    expect(response.headers.get('access-control-allow-headers')).toBe(
+      'Authorization, Content-Type',
+    );
   });
 });
