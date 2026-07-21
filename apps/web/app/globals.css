@@ -39,25 +39,39 @@
   --meta-text: color-mix(in srgb, var(--color-zl-steel) 44%, var(--surface-text));
   --ink-index: var(--color-zl-maroon);
   --ink-display: var(--color-zl-maroon);
+  /* Accent ink: maroon is the ink of authority on paper, but unreadable on the
+   * blackboard — dark mode swaps every accent role to steel (see below). */
+  --accent: var(--color-zl-maroon);
+  --accent-strong: color-mix(in srgb, var(--color-zl-maroon) 62%, transparent);
+  --accent-soft: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
+  --accent-border: color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
+  --accent-contrast: var(--color-zl-cream);
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
 }
 
+/* The blackboard (CO-5): a true deep navy — no maroon anywhere; steel takes
+ * over every accent role and cream stays the chalk. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-page: color-mix(in srgb, var(--color-zl-navy) 58%, black);
-    --surface-card: color-mix(in srgb, var(--color-zl-navy) 74%, black);
-    --surface-raised: color-mix(in srgb, var(--color-zl-navy) 68%, black);
-    --surface-border: color-mix(in srgb, var(--color-zl-cream) 14%, transparent);
-    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 10%, transparent);
-    --rule-strong: color-mix(in srgb, var(--color-zl-cream) 30%, transparent);
+    --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
+    --surface-card: color-mix(in srgb, var(--color-zl-navy) 84%, black);
+    --surface-raised: color-mix(in srgb, var(--color-zl-navy) 78%, black);
+    --surface-border: color-mix(in srgb, var(--color-zl-steel) 22%, transparent);
+    --surface-hairline: color-mix(in srgb, var(--color-zl-steel) 16%, transparent);
+    --rule-strong: color-mix(in srgb, var(--color-zl-steel) 55%, transparent);
     --surface-text: color-mix(in srgb, var(--color-zl-cream) 88%, transparent);
     --surface-heading: var(--color-zl-cream);
     --surface-shadow: color-mix(in srgb, black 40%, transparent);
     --meta-text: color-mix(in srgb, var(--color-zl-steel) 52%, var(--surface-text));
-    --ink-index: var(--color-zl-cream);
+    --ink-index: var(--color-zl-steel);
     --ink-display: var(--color-zl-cream);
+    --accent: var(--color-zl-steel);
+    --accent-strong: color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
+    --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
+    --accent-border: color-mix(in srgb, var(--color-zl-steel) 32%, transparent);
+    --accent-contrast: var(--color-zl-navy);
     --chart-stroke-opacity: 1;
     color-scheme: dark;
   }
@@ -170,20 +184,21 @@ button {
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
+/* CO-5: the header carries the exam-paper's strong top rule. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 20;
   backdrop-filter: saturate(1.1) blur(8px);
   background: color-mix(in srgb, var(--surface-page) 86%, transparent);
-  border-bottom: 1px solid var(--surface-hairline);
+  border-bottom: 2px solid var(--rule-strong);
 }
 
 .site-header__row {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  height: 4rem;
+  height: 4.1rem;
 }
 
 .wordmark {
@@ -209,9 +224,15 @@ button {
   align-items: center;
 }
 
+/* The mark sits on a small white tile so it never sinks into the paper (or
+ * the blackboard) — white is the one neutral both schemes share with the art. */
 .brand-mark__img {
   display: block;
-  border-radius: 6px;
+  border-radius: 7px;
+  background: white;
+  padding: 2px;
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 1px 2px var(--surface-shadow);
 }
 
 .site-footer__brand {
@@ -255,14 +276,18 @@ button {
   background: white;
 }
 
+/* Nav as an exam index: small accent numerals before quiet titles. */
 .nav {
   display: flex;
-  gap: 1.1rem;
+  gap: 1.5rem;
   margin-left: auto;
   align-items: center;
 }
 
-.nav a {
+.nav > a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
   color: var(--meta-text);
   font-size: 0.9rem;
   font-weight: 500;
@@ -273,10 +298,25 @@ button {
     border-color 0.15s ease;
 }
 
-.nav a:hover,
-.nav a[aria-current='page'] {
+.nav__index {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--ink-index) 55%, var(--meta-text));
+  letter-spacing: 0.04em;
+}
+
+.nav > a:hover,
+.nav > a[aria-current='page'] {
   color: var(--surface-heading);
-  border-bottom-color: color-mix(in srgb, var(--color-zl-steel) 60%, transparent);
+  border-bottom-color: var(--accent-strong);
+}
+
+.nav > a[aria-current='page'] .nav__index {
+  color: var(--ink-index);
+}
+
+.nav__signin {
+  margin-left: 0.25rem;
 }
 
 .site-footer {
@@ -352,9 +392,9 @@ button {
 }
 
 .chip--quarantined {
-  color: var(--color-zl-maroon);
-  background: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
 }
 
 .chip--rejected,
@@ -380,19 +420,19 @@ button {
     color 0.15s ease;
 }
 
-/* Primary, CO-3: maroon outline + maroon ink on paper; fills maroon with
- * cream ink only on hover/press (small elements only — never banners). */
+/* Primary, CO-3/CO-5: accent outline + accent ink (maroon on paper, steel on
+ * the blackboard); fills only on hover/press (small elements — never banners). */
 .btn--primary {
-  color: var(--color-zl-maroon);
+  color: var(--accent);
   background: transparent;
-  border: 1.5px solid color-mix(in srgb, var(--color-zl-maroon) 62%, transparent);
+  border: 1.5px solid var(--accent-strong);
 }
 
 .btn--primary:hover:not(:disabled),
 .btn--primary:active:not(:disabled) {
-  background: var(--color-zl-maroon);
-  border-color: var(--color-zl-maroon);
-  color: var(--color-zl-cream);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 
 .btn--ghost {
@@ -428,32 +468,52 @@ button {
   cursor: not-allowed;
 }
 
-/* ── Auth chip ──────────────────────────────────────────────────────────── */
+/* ── Auth chip: monogram avatar + name, a quiet pill into /account ──────── */
 .auth-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.35rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background: var(--surface-card);
+  transition: border-color 0.15s ease;
+}
+
+.auth-chip:hover,
+.auth-chip--active {
+  border-color: var(--accent-strong);
 }
 
 .auth-chip--loading {
   width: 5.5rem;
-  height: 1.75rem;
-  border-radius: 999px;
+  height: 1.9rem;
+  border: none;
   background: var(--surface-raised);
+}
+
+.auth-chip__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
 }
 
 .auth-chip__name {
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--surface-heading);
   max-width: 10rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.auth-chip__name:hover {
-  color: var(--color-zl-maroon);
 }
 
 /* (Sign-out moved to /account — the header chip is now just the name.) */
@@ -463,20 +523,20 @@ button {
   color: var(--color-zl-red);
 }
 .text-maroon {
-  color: var(--color-zl-maroon);
+  color: var(--accent);
 }
 .text-danger {
   color: var(--color-zl-red);
 }
 
-/* Warning/notice surface: maroon 8% tint with maroon text (no solid banner). */
+/* Warning/notice surface: accent 8% tint with accent text (no solid banner). */
 .notice {
   border-radius: 12px;
   padding: 0.9rem 1.1rem;
   font-size: 0.9rem;
-  background: color-mix(in srgb, var(--color-zl-maroon) 8%, var(--surface-card));
-  border: 1px solid color-mix(in srgb, var(--color-zl-maroon) 20%, transparent);
-  color: var(--color-zl-maroon);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-card));
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
 }
 
 /* ── Tables ─────────────────────────────────────────────────────────────── */
@@ -737,13 +797,16 @@ button {
   overflow-x: auto;
 }
 
+/* Numeral columns share one grid discipline: tabular digits, right-aligned,
+ * one type size per column, generous fixed gutters — no floating numbers. */
 .ltable__rank {
-  width: 3rem;
+  width: 2.75rem;
   text-align: right;
   color: var(--meta-text);
+  font-size: 0.9rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-  padding-right: 1rem;
+  padding-right: 1.1rem;
 }
 
 .ltable__rank.rank-top {
@@ -751,14 +814,17 @@ button {
   font-weight: 700;
 }
 
-.ltable__score-h {
+.ltable__score-h,
+.ltable__games-h {
   text-align: right;
+  width: 5.5rem;
 }
 
 .ltable__score {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--surface-heading);
+  letter-spacing: -0.01em;
 }
 
 .player {
@@ -793,7 +859,7 @@ button {
 .page-404__code {
   font-size: clamp(3rem, 14vw, 5.5rem);
   font-weight: 700;
-  color: var(--color-zl-maroon);
+  color: var(--ink-display);
   line-height: 1;
 }
 
@@ -972,9 +1038,9 @@ button {
   opacity: var(--chart-stroke-opacity);
 }
 
-/* The slowest operation is inked maroon — the examiner's underline. */
+/* The slowest operation is inked in the accent — the examiner's underline. */
 .opbars__fill--slowest {
-  background: var(--color-zl-maroon);
+  background: var(--accent);
   opacity: 0.85;
 }
 
@@ -1019,7 +1085,7 @@ button {
 }
 
 .facts__cell--slowest {
-  color: var(--color-zl-maroon);
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -1034,7 +1100,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-  border-left: 3px solid color-mix(in srgb, var(--color-zl-maroon) 45%, transparent);
+  border-left: 3px solid var(--accent-strong);
 }
 
 .weakspot__label {
@@ -1052,7 +1118,7 @@ button {
 .weakspot__median {
   font-size: 1.7rem;
   font-weight: 700;
-  color: var(--color-zl-maroon);
+  color: var(--accent);
   line-height: 1;
 }
 
@@ -1067,13 +1133,10 @@ button {
 }
 
 /* ── Leaderboard games column (quiet; dropped on narrow viewports) ─────── */
-.ltable__games-h {
-  text-align: right;
-}
-
 .ltable__games {
   text-align: right;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 400;
 }
 
 @media (max-width: 560px) {
@@ -1081,6 +1144,62 @@ button {
   .ltable__games {
     display: none;
   }
+}
+
+/* ── Auth step labels + /account connections ────────────────────────────── */
+.auth-step {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.1rem;
+}
+
+.conn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.conn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.conn:first-child {
+  padding-top: 0;
+}
+
+.conn__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.conn__name {
+  font-weight: 600;
+  color: var(--surface-heading);
+  overflow-wrap: anywhere;
+}
+
+.conn__body .meta {
+  font-size: 0.8rem;
+}
+
+.conn__chips {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.conn__actions {
+  padding-top: 0.9rem;
 }
 
 .history-reasons {
@@ -1206,7 +1325,7 @@ button {
 }
 
 .auth-card__title {
-  font-size: 1.9rem;
+  font-size: 1.55rem;
   margin-bottom: 0.4rem;
 }
 
@@ -1322,7 +1441,7 @@ button {
 }
 
 .solve-bar--fast {
-  fill: var(--color-zl-maroon);
+  fill: var(--accent);
 }
 
 .admin-actions {
@@ -1377,7 +1496,7 @@ button {
 
 .strength[data-score='0'] .strength__fill {
   width: 12%;
-  background: var(--color-zl-maroon);
+  background: var(--accent);
 }
 
 .strength[data-score='1'] .strength__fill {

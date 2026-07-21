@@ -9,8 +9,9 @@ import { createClient } from '@/lib/supabase/browser';
 /**
  * Header nav + auth chip. Client-side on purpose: it reads the session in an
  * effect (never during render), so the root layout stays static-safe and the
- * zero-env build never touches `clientEnv`. The chip shows a sign-in link when
- * signed out, or the display name + sign-out when signed in.
+ * zero-env build never touches `clientEnv`. Links are set as an exam-paper
+ * index — small maroon numerals before quiet titles; the account chip carries
+ * a monogram avatar and links to `/account`.
  */
 
 type AuthState =
@@ -73,32 +74,45 @@ export function HeaderNav(): React.JSX.Element {
   return (
     <nav className="nav">
       <Link href="/" aria-current={isActive('/') ? 'page' : undefined}>
+        <span className="nav__index num" aria-hidden="true">
+          01
+        </span>
         Leaderboard
       </Link>
       <Link href="/me" aria-current={isActive('/me') ? 'page' : undefined}>
+        <span className="nav__index num" aria-hidden="true">
+          02
+        </span>
         My progress
       </Link>
-      <AuthChip auth={auth} />
+      <AuthChip auth={auth} active={isActive('/account')} />
     </nav>
   );
 }
 
-function AuthChip({ auth }: { auth: AuthState }): React.JSX.Element {
+function AuthChip({ auth, active }: { auth: AuthState; active: boolean }): React.JSX.Element {
   if (auth.status === 'loading') {
     return <span className="auth-chip auth-chip--loading" aria-hidden="true" />;
   }
   if (auth.status === 'signed-out') {
     return (
-      <Link href="/signin" className="btn btn--ghost btn--sm">
+      <Link href="/signin" className="btn btn--primary btn--sm nav__signin">
         Sign in
       </Link>
     );
   }
+  const name = auth.displayName ?? 'Set a name';
+  const initial = (auth.displayName ?? '?').charAt(0).toUpperCase();
   return (
-    <span className="auth-chip">
-      <Link href="/account" className="auth-chip__name" title="Account settings">
-        {auth.displayName ?? 'Set a name'}
-      </Link>
-    </span>
+    <Link
+      href="/account"
+      className={`auth-chip${active ? ' auth-chip--active' : ''}`}
+      title="Account settings"
+    >
+      <span className="auth-chip__avatar num" aria-hidden="true">
+        {initial}
+      </span>
+      <span className="auth-chip__name">{name}</span>
+    </Link>
   );
 }
