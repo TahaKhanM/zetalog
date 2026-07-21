@@ -62,8 +62,10 @@ noisy diff means the source dataset changed. Review the diff before committing.
    (Dashboard → SQL Editor, or `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`).
    It is idempotent (`on conflict (slug) do nothing`), so re-running is safe.
 5. **Auth providers** (Dashboard → Authentication → Providers): enable **Email**
-   (magic link) and **Google** OAuth. Set the display-name-on-first-sign-in flow
-   in the app, not here.
+   (passwords, confirm-email ON, minimum length 10), **Google**, and **GitHub**
+   OAuth — the full W8 checklist, including the GitHub OAuth app and the email
+   template pastes, is `docs/ops/github-oauth-setup.md`. Set the
+   display-name-on-first-sign-in flow in the app, not here.
 6. **Custom SMTP — required** (Dashboard → Authentication → SMTP settings):
    configure **Resend** as the custom SMTP sender. **Never** use Supabase's
    built-in email sender: it is rate-limited to a handful of messages per hour
