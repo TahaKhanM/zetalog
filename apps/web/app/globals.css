@@ -38,6 +38,7 @@
   --surface-shadow: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
   --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
   --ink-index: var(--color-zl-maroon);
+  --ink-display: var(--color-zl-maroon);
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
@@ -56,6 +57,7 @@
     --surface-shadow: color-mix(in srgb, black 40%, transparent);
     --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
     --ink-index: var(--color-zl-cream);
+    --ink-display: var(--color-zl-cream);
     --chart-stroke-opacity: 1;
     color-scheme: dark;
   }
@@ -145,14 +147,15 @@ button {
   letter-spacing: -0.01em;
 }
 
-/* Archivo display — wordmark, page titles, PB callouts ONLY (maroon, text-only). */
+/* Archivo display — wordmark, page titles, PB callouts ONLY (ink, text-only:
+ * maroon on paper, cream on the blackboard for contrast). */
 .display {
   font-family: var(--font-display);
   font-stretch: 125%;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--color-zl-maroon);
+  color: var(--ink-display);
 }
 
 .meta {
@@ -189,7 +192,7 @@ button {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-zl-maroon);
+  color: var(--ink-display);
   font-size: 1.35rem;
   line-height: 1;
 }
