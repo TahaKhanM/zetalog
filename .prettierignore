@@ -15,3 +15,5 @@ supabase/.temp/
 docs/ops/auth-email-templates.md
 supabase/templates/
 .playwright-mcp/
+# Google site-verification files must stay byte-exact
+**/google84bf42294324e46b.html

@@ -8,6 +8,7 @@ import { getOwnGames, getProfile, getUniversityById } from '@/lib/db/queries';
 import { personalBests, projectGame } from '@/lib/me';
 import { createClient } from '@/lib/supabase/server';
 
+import { Avatar } from '../_components/Avatar';
 import { UniBadge } from '../_components/UniBadge';
 import { AnalysisSections } from './_components/AnalysisSections';
 import { HistoryTable } from './_components/HistoryTable';
@@ -52,6 +53,7 @@ export default async function MePage(): Promise<React.JSX.Element> {
             <p className="meta">Every figure recomputed server-side from your recorded games.</p>
           </div>
           <Link href="/account" className="identity-chip" aria-label="Account settings">
+            <Avatar url={profile?.avatar_url ?? null} name={displayName ?? '?'} size={24} />
             {university !== null ? (
               <UniBadge slug={university.slug} name={university.name} />
             ) : null}
