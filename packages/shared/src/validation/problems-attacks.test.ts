@@ -65,6 +65,30 @@ describe('attack battery — never accepted', () => {
     );
   });
 
+  it('(a3) "2 + 2" nineteen times — a plausible 30-second game — is quarantined', () => {
+    const record = attackRecord(Array.from({ length: 19 }, () => '2 + 2'));
+    const verdict = judge(record, noHistory);
+    expect(verdict.outcome).toBe('quarantined');
+    expect(verdict.problemFlags.map((f) => f.rule)).toContain('low-entropy');
+  });
+
+  it('(e) all-easy operands with a uniform op mix are quarantined, never accepted', () => {
+    // The reviewer's bypass: 60 distinct in-range problems, 15 per op, every
+    // operand pinned to the low end of its range. Range, mix, and entropy all
+    // pass; only the operand-marginal rule can catch it.
+    const texts: string[] = [];
+    for (let k = 2; k <= 16; k += 1) texts.push(`2 + ${String(k)}`);
+    for (let k = 4; k <= 18; k += 1) texts.push(`${String(k)} – 2`);
+    for (let k = 2; k <= 16; k += 1) texts.push(`2 × ${String(k)}`);
+    for (let k = 2; k <= 16; k += 1) texts.push(`${String(2 * k)} ÷ 2`);
+    const record = attackRecord(texts);
+    const verdict = judge(record, noHistory);
+    expect(verdict.serverScore).toBe(60);
+    expect(verdict.problemViolations).toEqual([]);
+    expect(verdict.outcome).toBe('quarantined');
+    expect(verdict.problemFlags.map((f) => f.rule)).toContain('operand-marginal');
+  });
+
   it('(a2) trivial-swap to in-range small mul products is quarantined, never accepted', () => {
     // The brief\'s "all 2×2..3×3, default settings claimed": in range, so caught
     // statistically (heavy repetition + only mul appears), never accepted.
@@ -188,6 +212,7 @@ describe('property: legitimate simulated games are never rejected', () => {
     let hardRejectedByNewRules = 0;
     let rejectedOverall = 0;
     let statisticallyFlagged = 0;
+    let marginalFlagged = 0;
 
     fc.assert(
       fc.property(fc.integer({ min: 0, max: 2_000_000_000 }), (seed) => {
@@ -221,6 +246,7 @@ describe('property: legitimate simulated games are never rejected', () => {
         const problem = checkProblems(record, recomputed);
         if (problem.violations.length > 0) hardRejectedByNewRules += 1;
         if (problem.flags.length > 0) statisticallyFlagged += 1;
+        if (problem.flags.some((f) => f.rule === 'operand-marginal')) marginalFlagged += 1;
         if (judge(record, noHistory).outcome === 'rejected') rejectedOverall += 1;
 
         // The hard invariant: legitimate generator output is never impossible,
@@ -235,5 +261,7 @@ describe('property: legitimate simulated games are never rejected', () => {
     expect(rejectedOverall).toBe(0);
     // The statistical flags must also be rare on legitimate play (α = 1e-4).
     expect(statisticallyFlagged).toBeLessThan(10);
+    // The operand-marginal rule specifically must stay clean on real play.
+    expect(marginalFlagged).toBeLessThan(10);
   });
 });

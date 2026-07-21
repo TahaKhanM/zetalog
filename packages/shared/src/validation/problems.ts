@@ -24,7 +24,7 @@ export interface ProblemViolation {
 
 /** A statistical implausibility: legitimate under the generator only with vanishing probability. */
 export interface ProblemFlag {
-  readonly rule: 'operation-mix' | 'low-entropy' | 'problem-switch';
+  readonly rule: 'operation-mix' | 'operand-marginal' | 'low-entropy' | 'problem-switch';
   readonly detail: string;
 }
 
@@ -140,8 +140,21 @@ export const MIX_MIN_PROBLEMS = 30;
 /** Family-wise false-positive budget for the operation-mix test on legitimate play. */
 export const MIX_FALSE_POSITIVE_RATE = 1e-4;
 
-/** Below this many solved problems the repetition/entropy test is underpowered. */
-export const ENTROPY_MIN_PROBLEMS = 20;
+/** Below this many solved problems the operand-marginal test is underpowered. */
+export const MARGINAL_MIN_PROBLEMS = 30;
+
+/** Family-wise false-positive budget for the operand-marginal test on legitimate play. */
+export const MARGINAL_FALSE_POSITIVE_RATE = 1e-4;
+
+/**
+ * Below this many solved problems the repetition/entropy test does not run.
+ * The birthday bound self-regulates at small n — on the default space the
+ * flag threshold is multiplicity 3 at n = 8 (family FP ≤ 2.3e-5) and 4 at
+ * n = 19 (FP ≤ 3.3e-7) — so the gate only excludes degenerate handfuls of
+ * problems; 8 is low enough to catch a trivial-swap 30-second game
+ * ("2 + 2" × 19), which a gate of 20 would have waved through.
+ */
+export const ENTROPY_MIN_PROBLEMS = 8;
 
 /** Family-wise false-positive budget for the repetition/entropy test on legitimate play. */
 export const ENTROPY_FALSE_POSITIVE_RATE = 1e-4;
@@ -154,6 +167,16 @@ function enabledOperators(settings: ZetamacSettings): readonly Operator[] {
   if (settings.mulEnabled) ops.push('*');
   if (settings.divEnabled) ops.push('/');
   return ops;
+}
+
+/**
+ * True when division is enabled and its divisor range spans zero, i.e. the
+ * generator can draw `first = 0` and re-roll (fixture L56 returns undefined
+ * and problemGen re-draws, L79–85). Re-rolls skew the uniform-draw
+ * assumptions the statistical rules rest on, so they all abstain here.
+ */
+function divisorSpansZero(settings: ZetamacSettings): boolean {
+  return settings.divEnabled && settings.mulLeft.min <= 0 && settings.mulLeft.max >= 0;
 }
 
 /**
@@ -184,9 +207,7 @@ function checkOperationMix(
 ): readonly ProblemFlag[] {
   const n = problems.length;
   if (n < MIX_MIN_PROBLEMS) return [];
-  const divisorSpansZero =
-    settings.divEnabled && settings.mulLeft.min <= 0 && settings.mulLeft.max >= 0;
-  if (divisorSpansZero) return [];
+  if (divisorSpansZero(settings)) return [];
 
   const enabled = enabledOperators(settings);
   const k = enabled.length;
@@ -218,6 +239,161 @@ function checkOperationMix(
 /** Inclusive integer range cardinality, always ≥ 1 since `min ≤ max`. */
 function rangeSize(range: OperandRange): number {
   return range.max - range.min + 1;
+}
+
+/** One uniform observable of one operation: where to read it and its exact null law. */
+interface MarginalSlot {
+  /** Human-readable slot name for flag details, e.g. `"* left"`. */
+  readonly label: string;
+  /** The midpoint ⌊(min+max)/2⌋ of the slot's configured range. */
+  readonly mid: number;
+  /** Exact P(value ≤ mid) for a uniform draw on the integer range. */
+  readonly p0: number;
+  /** Extract the slot's value from a parsed problem; null when unobservable. */
+  readonly observe: (problem: Problem) => number | null;
+}
+
+/** Build one slot: exact `p0 = (mid − min + 1)/M` from the integer range (never assumed ½). */
+function slotFor(
+  label: string,
+  range: OperandRange,
+  observe: (problem: Problem) => number | null,
+): MarginalSlot {
+  const mid = Math.floor((range.min + range.max) / 2);
+  return { label, mid, p0: (mid - range.min + 1) / rangeSize(range), observe };
+}
+
+/**
+ * The uniform observables of each enabled operation (fixture L14–23: every
+ * operand is drawn by `randGen`, uniform on its inclusive range):
+ * - `+` (L24–32): left ~ U[add_left], right ~ U[add_right].
+ * - `-` (L33–43): subtrahend (shown right) ~ U[add_left]; answer (left−right)
+ *   ~ U[add_right]. The shown minuend is a SUM of two uniforms — not uniform —
+ *   so it is deliberately not tested.
+ * - `*` (L44–52): left ~ U[mul_left], right ~ U[mul_right].
+ * - `/` (L53–65): divisor (shown right) ~ U[mul_left]; quotient (left/right)
+ *   ~ U[mul_right]. The shown dividend is a product — not uniform. A zero
+ *   divisor (only possible in an already-nonconforming problem) is skipped
+ *   rather than observed as an infinite quotient.
+ */
+function marginalSlots(settings: ZetamacSettings): ReadonlyMap<Operator, readonly MarginalSlot[]> {
+  const slots = new Map<Operator, readonly MarginalSlot[]>();
+  if (settings.addEnabled) {
+    slots.set('+', [
+      slotFor('+ left', settings.addLeft, (p) => p.left),
+      slotFor('+ right', settings.addRight, (p) => p.right),
+    ]);
+  }
+  if (settings.subEnabled) {
+    slots.set('-', [
+      slotFor('- subtrahend', settings.addLeft, (p) => p.right),
+      slotFor('- answer', settings.addRight, (p) => p.left - p.right),
+    ]);
+  }
+  if (settings.mulEnabled) {
+    slots.set('*', [
+      slotFor('* left', settings.mulLeft, (p) => p.left),
+      slotFor('* right', settings.mulRight, (p) => p.right),
+    ]);
+  }
+  if (settings.divEnabled) {
+    slots.set('/', [
+      slotFor('/ divisor', settings.mulLeft, (p) => p.right),
+      slotFor('/ quotient', settings.mulRight, (p) => (p.right === 0 ? null : p.left / p.right)),
+    ]);
+  }
+  return slots;
+}
+
+/**
+ * Operand-marginal plausibility.
+ *
+ * A tamperer who keeps the operation mix uniform and every problem in range
+ * can still trivialise the game by drawing operands only from the easy (low)
+ * end — e.g. 60 distinct problems of the form "2 + k", "k − 2", "2 × k",
+ * "2k ÷ 2" with small k. Under the real generator each observable slot is
+ * uniform on its range (see {@link marginalSlots}), so the count of a slot's
+ * values at or below its midpoint over that op's n_j problems is
+ * Binomial(n_j, p₀ⱼ) with p₀ⱼ computed exactly from the integer range.
+ *
+ * Statistics: K = (#slots) + 1 two-sided Hoeffding tests under one union
+ * bound — one per slot, plus one POOLED test over all N = Σ n_j slot
+ * observations (independent Bernoullis with non-identical means, which
+ * Hoeffding permits; the pooled expectation is Σ n_j·p₀ⱼ). Each test uses
+ * threshold `t_j = sqrt(ln(2K/α) / (2 n_j))` with its own sample size, so the
+ * family false-positive rate on legitimate play is below
+ * α = {@link MARGINAL_FALSE_POSITIVE_RATE} (property-tested).
+ *
+ * The pooled test carries the power at realistic lengths: a per-slot test
+ * cannot fire below n_j ≈ ln(2K/α)/2 ≈ 24 even for a maximal deviation, so a
+ * balanced four-op 60-problem attack (n_j ≈ 15) would evade per-slot tests
+ * entirely; pooling its ~120 observations catches it, while the per-slot
+ * tests catch a single pinned operand in longer games.
+ *
+ * Abstentions mirror the mix rule: fewer than {@link MARGINAL_MIN_PROBLEMS}
+ * problems, or a zero-spanning divisor range (generator re-rolls, L56).
+ */
+function checkOperandMarginals(
+  problems: readonly Problem[],
+  settings: ZetamacSettings,
+): readonly ProblemFlag[] {
+  const n = problems.length;
+  if (n < MARGINAL_MIN_PROBLEMS) return [];
+  if (divisorSpansZero(settings)) return [];
+  const slotsByOp = marginalSlots(settings);
+  if (slotsByOp.size === 0) return [];
+
+  const tallies = new Map<Operator, { slot: MarginalSlot; count: number; low: number }[]>();
+  for (const [op, slots] of slotsByOp) {
+    tallies.set(
+      op,
+      slots.map((slot) => ({ slot, count: 0, low: 0 })),
+    );
+  }
+  for (const problem of problems) {
+    const opTallies = tallies.get(problem.op);
+    if (opTallies === undefined) continue; // op disabled: already a hard violation
+    for (const tally of opTallies) {
+      const value = tally.slot.observe(problem);
+      if (value === null) continue;
+      tally.count += 1;
+      if (value <= tally.slot.mid) tally.low += 1;
+    }
+  }
+
+  const all = [...tallies.values()].flat();
+  const familySize = all.length + 1;
+  const logTerm = Math.log((2 * familySize) / MARGINAL_FALSE_POSITIVE_RATE);
+  const deviating: string[] = [];
+  let total = 0;
+  let totalLow = 0;
+  let expectedLow = 0;
+  for (const { slot, count, low } of all) {
+    total += count;
+    totalLow += low;
+    expectedLow += count * slot.p0;
+    if (count === 0) continue;
+    const threshold = Math.sqrt(logTerm / (2 * count));
+    if (Math.abs(low / count - slot.p0) > threshold) {
+      deviating.push(`${slot.label} at ${((low / count) * 100).toFixed(0)}% low`);
+    }
+  }
+  if (total > 0) {
+    const threshold = Math.sqrt(logTerm / (2 * total));
+    if (Math.abs(totalLow / total - expectedLow / total) > threshold) {
+      deviating.push(`all slots at ${((totalLow / total) * 100).toFixed(0)}% low`);
+    }
+  }
+  if (deviating.length === 0) return [];
+
+  return [
+    {
+      rule: 'operand-marginal',
+      detail:
+        `operand distributions implausible for uniform draws over ${String(n)} problems ` +
+        `(${deviating.join('; ')})`,
+    },
+  ];
 }
 
 /** Range cardinality excluding zero, since a zero divisor is re-rolled (fixture L56). */
@@ -294,8 +470,16 @@ function checkEntropy(
 
   const sizes = enabledSpaceSizes(settings);
   if (sizes.length === 0) return [];
-  const totalSpace = sizes.reduce((sum, size) => sum + size, 0);
   const minSpace = Math.min(...sizes);
+  // A zero-only divisor range makes div's producible set empty (the real
+  // generator would re-roll forever): pMax would be infinite and the bound
+  // NaN. Checked before the broader re-roll abstention so it stays reachable.
+  if (minSpace === 0) return [];
+  // pMax assumes every enabled op is drawn with probability exactly 1/k; a
+  // re-rolling divisor (fixture L56) inflates the other ops' probabilities,
+  // so — like the mix rule — the test abstains rather than mis-bound.
+  if (divisorSpansZero(settings)) return [];
+  const totalSpace = sizes.reduce((sum, size) => sum + size, 0);
   const maxProbability = 1 / (sizes.length * minSpace);
 
   const threshold = birthdayThreshold(n, totalSpace, maxProbability, ENTROPY_FALSE_POSITIVE_RATE);
@@ -358,6 +542,7 @@ export function checkProblems(record: GameRecord, recomputed: RecomputedScore): 
   const violations = checkRangeConformity(problems, record.settings);
   const flags = [
     ...checkOperationMix(problems, record.settings),
+    ...checkOperandMarginals(problems, record.settings),
     ...checkEntropy(problems, record.settings),
     ...checkProblemSwitches(record.events),
   ];
