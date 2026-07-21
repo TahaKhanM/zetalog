@@ -135,7 +135,7 @@ export function VerifyFlow(): React.JSX.Element {
         </button>
         <button
           type="button"
-          className="auth-chip__signout"
+          className="auth-form__forgot"
           onClick={() => {
             setError(null);
             setStep({ name: 'email' });
