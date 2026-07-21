@@ -11,10 +11,10 @@ import { applyOwnRowHighlight } from './own-row';
  * portals a next/link `Link` there, so navigation stays client-side).
  */
 
-function board(rows: { uid: string; badge?: boolean }[]): HTMLElement {
+function board(rows: { uid: string; badge?: boolean; monogram?: boolean }[]): HTMLElement {
   const table = document.createElement('table');
   const tbody = document.createElement('tbody');
-  for (const { uid, badge } of rows) {
+  for (const { uid, badge, monogram } of rows) {
     const tr = document.createElement('tr');
     tr.dataset.uid = uid;
     const nameCell = document.createElement('td');
@@ -29,6 +29,12 @@ function board(rows: { uid: string; badge?: boolean }[]): HTMLElement {
       chip.className = 'chip chip--badge';
       chip.textContent = 'Some Uni';
       player.append(chip);
+    }
+    if (monogram === true) {
+      const uniBadge = document.createElement('span');
+      uniBadge.className = 'uni-badge';
+      uniBadge.textContent = 'W';
+      player.append(uniBadge);
     }
     nameCell.append(player);
     tr.append(nameCell);
@@ -74,6 +80,12 @@ describe('applyOwnRowHighlight', () => {
 
   it('reports no mount when the viewer already has a badge', () => {
     const root = board([{ uid: 'a', badge: true }]);
+    const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
+    expect(badgeMount).toBeNull();
+  });
+
+  it('reports no mount when the viewer already has a CO-3 monogram/logo badge', () => {
+    const root = board([{ uid: 'a', monogram: true }]);
     const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
     expect(badgeMount).toBeNull();
   });
