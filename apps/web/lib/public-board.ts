@@ -2,9 +2,11 @@ import type { RankableDuration } from '@zetalog/shared';
 import { unstable_cache } from 'next/cache';
 
 import {
+  getBoardStats,
   getLeaderboard,
   getUniversityBySlug,
   getUniversityOptions,
+  type BoardStats,
   type UniversityOption,
 } from './db/queries';
 import type { LeaderboardEntry, UniversityRow } from './db/rows';
@@ -46,5 +48,12 @@ export const getCachedUniversityOptions = unstable_cache(
 export const getCachedUniversityBySlug = unstable_cache(
   (slug: string): Promise<UniversityRow | null> => getUniversityBySlug(createPublicClient(), slug),
   ['public-university-by-slug'],
+  { revalidate: REVALIDATE_SECONDS, tags: ['leaderboard'] },
+);
+
+/** Masthead stat-rail figures (players, universities, games validated). */
+export const getCachedBoardStats = unstable_cache(
+  (): Promise<BoardStats> => getBoardStats(createPublicClient()),
+  ['public-board-stats'],
   { revalidate: REVALIDATE_SECONDS, tags: ['leaderboard'] },
 );
