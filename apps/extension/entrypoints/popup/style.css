@@ -47,7 +47,7 @@
     --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 20%, transparent);
     --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 18%, transparent);
     --zl-chip-text: color-mix(in srgb, var(--zl-steel-blue) 82%, var(--zl-cream));
-    --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 20%, transparent);
+    --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 8%, transparent);
     --zl-warn-text: color-mix(in srgb, var(--zl-maroon) 42%, var(--zl-cream));
   }
 }

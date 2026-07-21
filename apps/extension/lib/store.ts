@@ -18,6 +18,9 @@ const PREFS_KEY = 'zl:v1:prefs';
 /** Above this many stored games, oldest non-rankable event streams are pruned (spec §9). */
 export const PRUNE_LIMIT = 400;
 
+/** A status a row can hold before Remove — i.e. anywhere Restore may return it to. */
+export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
+
 /** A stored game: the raw record plus derived, denormalised fields the popup reads directly. */
 export interface StoredGame {
   readonly record: GameRecord;
@@ -25,8 +28,14 @@ export interface StoredGame {
   readonly fingerprint: string;
   /** Leaderboard duration this game qualifies for, or null (mirrors shared `rankableDuration`). */
   readonly rankableDuration: 30 | 60 | 120 | null;
-  readonly status: 'kept' | 'quarantined' | 'removed' | 'capture_failed';
+  readonly status: RemovableStatus | 'removed';
   readonly quarantineReason?: QuarantineReason | undefined;
+  /**
+   * Status before Remove, so Restore returns the row where it came from — a
+   * removed capture_failed row must never resurface as a kept score. Absent on
+   * rows written before this field existed (restore then defaults to 'kept').
+   */
+  readonly removedFrom?: RemovableStatus | undefined;
   /** Wall-clock time this row was written. */
   readonly savedAtMs: number;
 }
@@ -63,6 +72,7 @@ const storedGameSchema = z.object({
   rankableDuration: rankableDurationSchema,
   status: z.enum(['kept', 'quarantined', 'removed', 'capture_failed']),
   quarantineReason: z.enum(['restart', 'outlier']).optional(),
+  removedFrom: z.enum(['kept', 'quarantined', 'capture_failed']).optional(),
   savedAtMs: z.number(),
 });
 
@@ -188,17 +198,35 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     },
 
     restore(id) {
-      return update(id, (game) => ({
-        record: game.record,
-        fingerprint: game.fingerprint,
-        rankableDuration: game.rankableDuration,
-        status: 'kept',
-        savedAtMs: game.savedAtMs,
-      }));
+      return update(id, (game) => {
+        // Quarantined → kept (the user overrides the auto-flag). Removed →
+        // wherever it came from (legacy rows without provenance → kept). A
+        // capture_failed row keeps its status: it has no real score and must
+        // never enter stats as a kept game.
+        const target: RemovableStatus =
+          game.status === 'quarantined'
+            ? 'kept'
+            : game.status === 'removed'
+              ? (game.removedFrom ?? 'kept')
+              : game.status;
+        const base = {
+          record: game.record,
+          fingerprint: game.fingerprint,
+          rankableDuration: game.rankableDuration,
+          savedAtMs: game.savedAtMs,
+        };
+        return target === 'quarantined'
+          ? { ...base, status: target, quarantineReason: game.quarantineReason }
+          : { ...base, status: target };
+      });
     },
 
     remove(id) {
-      return update(id, (game) => ({ ...game, status: 'removed' }));
+      return update(id, (game) =>
+        // Record provenance so restore can undo this exactly; removing an
+        // already-removed row keeps the original provenance.
+        game.status === 'removed' ? game : { ...game, status: 'removed', removedFrom: game.status },
+      );
     },
 
     listGames() {
