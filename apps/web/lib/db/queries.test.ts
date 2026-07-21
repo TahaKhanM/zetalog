@@ -81,6 +81,7 @@ const entry = (over: Record<string, unknown>): Record<string, unknown> => ({
   games_counted: 3,
   university_name: null,
   university_slug: null,
+  avatar_url: null,
   ...over,
 });
 
