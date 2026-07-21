@@ -6,21 +6,63 @@
  *
  * Policy: at least {@link MIN_PASSWORD_LENGTH} characters and not in the small
  * embedded common-password list. The list only carries entries the length gate
- * cannot already reject (≥ 10 chars), which keeps it tiny with zero loss of
+ * cannot already reject (≥ 8 chars), which keeps it tiny with zero loss of
  * coverage — a deliberate no-new-dependencies trade-off versus shipping a
  * full breach corpus.
  */
 
-/** Minimum password length (also enforce server-side in the GoTrue dashboard). */
-export const MIN_PASSWORD_LENGTH = 10;
+/** Minimum password length — MUST match the GoTrue dashboard setting (8). */
+export const MIN_PASSWORD_LENGTH = 8;
 
 /**
- * Frequently-used passwords of ≥ 10 characters (top entries of public breach
+ * Frequently-used passwords of ≥ 8 characters (top entries of public breach
  * corpora, keyboard walks, and pop-culture staples), stored lowercase for
- * case-insensitive lookup. Shorter favourites ("password", "123456") are
+ * case-insensitive lookup. Shorter favourites ("123456", "qwerty") are
  * already unrepresentable under the length gate.
  */
 export const COMMON_PASSWORDS: ReadonlySet<string> = new Set([
+  // 8–9 characters — representable since the minimum dropped to 8.
+  'password',
+  'password1',
+  'password!',
+  'passw0rd',
+  'p@ssw0rd',
+  '12345678',
+  '123456789',
+  '87654321',
+  '11111111',
+  '00000000',
+  'qwerty12',
+  'qwerty123',
+  'qwertyui',
+  'asdfghjk',
+  'zxcvbnm1',
+  '1q2w3e4r',
+  'iloveyou',
+  'iloveyou1',
+  'sunshine',
+  'princess',
+  'football',
+  'baseball',
+  'superman',
+  'batman123',
+  'trustno1',
+  'letmein1',
+  'welcome1',
+  'monkey12',
+  'dragon12',
+  'starwars',
+  'pokemon1',
+  'liverpool',
+  'chelsea1',
+  'arsenal1',
+  'computer',
+  'internet',
+  'whatever',
+  'chocolate',
+  'abcd1234',
+  'abc12345',
+  'a1b2c3d4',
   '1234567890',
   '12345678910',
   '123456789012',
