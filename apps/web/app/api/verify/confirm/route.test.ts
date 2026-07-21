@@ -37,7 +37,7 @@ function deps(over: Partial<VerifyConfirmDeps> = {}): VerifyConfirmDeps {
       ]),
     ),
     incrementAttempts: vi.fn(async () => Promise.resolve()),
-    applyVerification: vi.fn(async () => Promise.resolve()),
+    applyVerification: vi.fn(async () => Promise.resolve({ ok: true as const })),
     now: () => NOW,
     ...over,
   };
@@ -65,7 +65,7 @@ describe('POST /api/verify/confirm', () => {
   });
 
   it('grants the badge and stamps the profile on the correct code', async () => {
-    const applyVerification = vi.fn(async () => Promise.resolve());
+    const applyVerification = vi.fn(async () => Promise.resolve({ ok: true as const }));
     const response = await handleVerifyConfirm(
       request({ code: CODE }),
       deps({ applyVerification }),
@@ -111,5 +111,18 @@ describe('POST /api/verify/confirm', () => {
       deps({ getLatestPending: vi.fn(async () => Promise.resolve({ ...pending, attempts: 5 })) }),
     );
     expect(response.status).toBe(429);
+  });
+
+  it('maps a lost verified-alias race to 409 email-taken (W8 integrity)', async () => {
+    const response = await handleVerifyConfirm(
+      request({ code: CODE }),
+      deps({
+        applyVerification: vi.fn(async () =>
+          Promise.resolve({ ok: false as const, reason: 'alias-conflict' as const }),
+        ),
+      }),
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: 'email-taken' } });
   });
 });
