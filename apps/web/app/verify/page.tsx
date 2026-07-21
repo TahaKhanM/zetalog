@@ -5,6 +5,7 @@ import { userIdFromCookies } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 
 import { VerifyFlow } from './_components/VerifyFlow';
+import { BrandMark } from '@/app/_components/BrandMark';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,9 @@ export default async function VerifyPage(): Promise<React.JSX.Element> {
   return (
     <div className="auth-page">
       <div className="card card--pad auth-card">
+        <div className="auth-card__mark">
+          <BrandMark variant="mark" size={32} />
+        </div>
         <h1 className="display auth-card__title">University badge</h1>
         <VerifyFlow />
       </div>
