@@ -123,14 +123,14 @@ Outcomes: `accepted` (ranks) · `quarantined` (appears in `/admin` review queue 
 
 ## 6. Website (Next.js on Vercel)
 
-| Route         | Purpose                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`           | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Spline Sans Mono `tabular-nums`, the visual hero |
-| `/uni/[slug]` | Per-university board, same duration tabs                                                                                                                                                                          |
-| `/me`         | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change              |
-| `/link`       | Extension linking page (sign-in + token handoff)                                                                                                                                                                  |
-| `/verify`     | Uni email verification (OTP entry)                                                                                                                                                                                |
-| `/admin`      | Review queue for quarantined submissions — `is_admin` gated                                                                                                                                                       |
+| Route         | Purpose                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Azeret Mono (CO-2) `tabular-nums`, the visual hero |
+| `/uni/[slug]` | Per-university board, same duration tabs                                                                                                                                                                            |
+| `/me`         | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change                |
+| `/link`       | Extension linking page (sign-in + token handoff)                                                                                                                                                                    |
+| `/verify`     | Uni email verification (OTP entry)                                                                                                                                                                                  |
+| `/admin`      | Review queue for quarantined submissions — `is_admin` gated                                                                                                                                                         |
 
 Public profiles expose **only** display name, badge, and PBs. Full history and graphs are private. Account deletion purges all rows.
 
