@@ -27,6 +27,7 @@ export default defineConfig({
         '**/sync.ts': FULL,
         '**/link.ts': FULL,
         '**/messages.ts': FULL,
+        '**/single-flight.ts': FULL,
       },
     },
   },

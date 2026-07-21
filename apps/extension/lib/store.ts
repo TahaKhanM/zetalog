@@ -21,8 +21,13 @@ export const PRUNE_LIMIT = 400;
 /** A status a row can hold before Remove — i.e. anywhere Restore may return it to. */
 export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
 
-/** Where a game stands relative to the leaderboard sync (W4). */
-export type SyncState = 'pending' | 'uploaded' | 'failed';
+/**
+ * Where a game stands relative to the leaderboard sync (W4). `revoked` is the
+ * TERMINAL state after a completed server-side removal — it stops the queue
+ * from re-deriving the revoke, and a later restore of the game re-derives a
+ * fresh submit from it.
+ */
+export type SyncState = 'pending' | 'uploaded' | 'failed' | 'revoked';
 
 /**
  * Per-game sync metadata written back after an upload attempt (brief "Sync queue
@@ -85,7 +90,7 @@ export interface StorageArea {
 const rankableDurationSchema = z.union([z.literal(30), z.literal(60), z.literal(120), z.null()]);
 
 const gameSyncSchema = z.object({
-  state: z.enum(['pending', 'uploaded', 'failed']),
+  state: z.enum(['pending', 'uploaded', 'failed', 'revoked']),
   outcome: z.enum(['accepted', 'quarantined', 'rejected', 'user_removed']).optional(),
   serverScore: z.number().optional(),
 });
@@ -243,6 +248,11 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
           fingerprint: game.fingerprint,
           rankableDuration: game.rankableDuration,
           savedAtMs: game.savedAtMs,
+          // Sync bookkeeping survives the round trip: a restored game whose
+          // upload was revoked carries `state: 'revoked'`, from which the sync
+          // queue re-derives a fresh submit (and the chip shows Revoked, not
+          // Synced, until it re-uploads).
+          sync: game.sync,
         };
         return target === 'quarantined'
           ? { ...base, status: target, quarantineReason: game.quarantineReason }

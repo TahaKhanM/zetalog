@@ -52,7 +52,15 @@ export function backoffDelayMs(attempts: number): number {
   return Math.min(raw, BACKOFF_CAP_MS);
 }
 
-/** The sync operation a game currently warrants, or null if none. */
+/**
+ * The sync operation a game currently warrants, or null if none.
+ *
+ * Submit: a kept rankable game that is neither uploaded nor permanently failed —
+ * including one whose earlier upload was `revoked` and has since been restored
+ * (it must go back through server validation). Revoke: an `uploaded` game the
+ * user removed. `revoked` itself is TERMINAL for a removed game: the completed
+ * server-side removal must never re-derive another revoke on later drains.
+ */
 function desiredKind(game: StoredGame): SyncKind | null {
   const state = game.sync?.state;
   if (
@@ -194,9 +202,11 @@ export async function drainSync(deps: SyncDeps): Promise<DrainSummary> {
   const now = deps.now();
   const jobs = reconcileJobs(listed.value, await deps.queue.read(), now);
 
-  // Show a "pending" chip the moment a game is queued for its first upload.
+  // Show a "pending" chip the moment a game is queued for its first upload —
+  // or for a re-upload after its previous submission was revoked and the game
+  // restored (the stale "Revoked" chip flips to "Syncing…").
   for (const { entry, game } of jobs) {
-    if (entry.kind === 'submit' && game.sync === undefined) {
+    if (entry.kind === 'submit' && (game.sync === undefined || game.sync.state === 'revoked')) {
       await deps.store.markSync(entry.clientGameId, { state: 'pending' });
     }
   }
@@ -239,6 +249,11 @@ export async function drainSync(deps: SyncDeps): Promise<DrainSummary> {
     } else {
       const result = await deps.api.revokeGame(entry.clientGameId);
       if (result.ok || result.error.kind === 'not-found') {
+        // Terminalize: without this the game would stay 'uploaded' and every
+        // later drain (the 1-minute alarm included) would re-derive the revoke
+        // and re-fire the DELETE forever. A 404 means the server already has
+        // nothing to remove — equally final.
+        await deps.store.markSync(entry.clientGameId, { state: 'revoked' });
         revoked += 1;
         action = 'done';
       } else if (result.error.kind === 'auth') {

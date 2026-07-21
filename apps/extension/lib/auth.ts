@@ -2,6 +2,7 @@ import { err, ok, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './config.js';
+import { singleFlight } from './single-flight.js';
 
 /**
  * Extension account session and Supabase token refresh (brief "Extension session
@@ -192,6 +193,18 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
     return ok(parsed.data);
   }
 
+  // Single-flight: refresh tokens are single-use, so two concurrent 401
+  // handlers racing two exchanges would invalidate the session — concurrent
+  // callers share one exchange and receive the same new access token.
+  const refreshShared = singleFlight(async (): Promise<string | null> => {
+    const current = await read();
+    if (!current.ok || current.value === null) return null;
+    const refreshed = await requestRefresh(current.value.refreshToken, deps.fetch, config);
+    if (!refreshed.ok) return null;
+    await area.set({ [SESSION_KEY]: refreshed.value });
+    return refreshed.value.accessToken;
+  });
+
   return {
     read,
 
@@ -220,13 +233,6 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
       await area.remove(SESSION_KEY);
     },
 
-    async refresh() {
-      const current = await read();
-      if (!current.ok || current.value === null) return null;
-      const refreshed = await requestRefresh(current.value.refreshToken, deps.fetch, config);
-      if (!refreshed.ok) return null;
-      await area.set({ [SESSION_KEY]: refreshed.value });
-      return refreshed.value.accessToken;
-    },
+    refresh: refreshShared,
   };
 }

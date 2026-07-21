@@ -16,6 +16,10 @@ import { type BgRequest, type BgResponse } from '../lib/messages.js';
  * tokens to the background, and — only once the background confirms it stored
  * the session — posts `zl-link-ack` back to the validated origin so the page can
  * show "Linked". It adds no new permissions: content-script matches only.
+ *
+ * The localhost match exists for local development ONLY — the wxt.config.ts
+ * `build:manifest:generated` hook strips it from every non-development build,
+ * so the published extension ships the production origin alone.
  */
 export default defineContentScript({
   matches: ['https://zetalog.vercel.app/link*', 'http://localhost:3000/link*'],
