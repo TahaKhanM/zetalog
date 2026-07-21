@@ -12,3 +12,5 @@ dist/
 coverage/
 *.log
 .superpowers/
+.claude/worktrees/
+*.tsbuildinfo

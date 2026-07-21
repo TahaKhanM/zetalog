@@ -155,9 +155,11 @@ Public profiles expose **only** display name, badge, and PBs. Full history and g
 
 Palette: `#780000` maroon · `#c1121f` red · `#fdf0d5` cream · `#003049` navy · `#669bbc` steel blue.
 
+**CO-2 (2026-07-21) — desaturated application:** the hexes are brand anchors, not surface paint. Neutrals carry layouts; brand color is confined to identity and state accents; no solid brand-color region larger than a badge chip except the wordmark and chart strokes. Full rules: `docs/superpowers/plans/2026-07-21-co2-design-desaturation.md`.
+
 - **Display:** Archivo variable, width 125%, weight 800–900, all-caps, tracking +2%. Used **only** for wordmark, page titles, PB callouts. Maroon on cream.
 - **UI/body:** Spline Sans. Navy on cream (light mode); cream on navy (dark mode).
-- **All numerals** (scores, timers, leaderboard, chart axes): Spline Sans Mono with `font-variant-numeric: tabular-nums`. Numerals are the visual hero of every screen.
+- **All numerals** (scores, timers, leaderboard, chart axes): Azeret Mono with `font-variant-numeric: tabular-nums` (CO-2: replaced Spline Sans Mono, whose slashed zero was rejected; plain-zero verified by specimen). Numerals are the visual hero of every screen.
 - **Red `#c1121f`** only for new personal bests and destructive actions. **Steel blue `#669bbc`** for chart strokes and secondary data.
 - Fonts **self-hosted as WOFF2** in the extension bundle and site (no external font requests).
 - No crests, no serif display faces, no Inter/system-ui fallback as primary.
