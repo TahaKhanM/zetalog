@@ -1,0 +1,903 @@
+@import 'tailwindcss';
+
+/*
+ * ZetaLog design system — spec §8 as amended by CO-2 (desaturation).
+ *
+ * The FIVE brand hexes below are the only 6-digit hex literals allowed in this
+ * file; they mirror packages/shared/src/tokens.ts and are enforced by
+ * lib/tokens-sync.test.ts. Every other colour is a color-mix over these
+ * variables (tints) or a white/black/transparent keyword, so no saturated
+ * region is ever hard-coded. Brand colour does accent work only: neutrals
+ * (white cards over a barely-cream page) carry the layout.
+ */
+
+@theme {
+  --color-zl-maroon: #780000;
+  --color-zl-red: #c1121f;
+  --color-zl-cream: #fdf0d5;
+  --color-zl-navy: #003049;
+  --color-zl-steel: #669bbc;
+
+  --font-display: 'Archivo Variable', ui-sans-serif, sans-serif;
+  --font-body: 'Spline Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-numeric: 'Azeret Mono', ui-monospace, monospace;
+}
+
+/* ── Semantic surfaces: light default, dark via prefers-color-scheme ─────── */
+:root {
+  --surface-page: color-mix(in srgb, var(--color-zl-cream) 30%, white);
+  --surface-card: white;
+  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 12%, white);
+  --surface-border: color-mix(in srgb, var(--color-zl-cream) 60%, white);
+  --surface-hairline: color-mix(in srgb, var(--color-zl-navy) 10%, transparent);
+  --surface-text: color-mix(in srgb, var(--color-zl-navy) 85%, white);
+  --surface-heading: var(--color-zl-navy);
+  --surface-shadow: color-mix(in srgb, var(--color-zl-navy) 10%, transparent);
+  --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+  --chart-stroke: var(--color-zl-steel);
+  --chart-stroke-opacity: 0.85;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
+    --surface-card: color-mix(in srgb, var(--color-zl-navy) 88%, black);
+    --surface-raised: color-mix(in srgb, var(--color-zl-navy) 82%, black);
+    --surface-border: color-mix(in srgb, var(--color-zl-navy) 60%, black);
+    --surface-hairline: color-mix(in srgb, var(--color-zl-cream) 14%, transparent);
+    --surface-text: color-mix(in srgb, var(--color-zl-cream) 90%, transparent);
+    --surface-heading: var(--color-zl-cream);
+    --surface-shadow: color-mix(in srgb, black 40%, transparent);
+    --meta-text: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-text));
+    --chart-stroke-opacity: 1;
+    color-scheme: dark;
+  }
+}
+
+/* ── Base elements ──────────────────────────────────────────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--surface-page);
+  color: var(--surface-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--surface-heading);
+  line-height: 1.15;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-zl-steel) 26%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-zl-steel);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ── Typography utilities ───────────────────────────────────────────────── */
+
+/* Numerals are the visual hero: Azeret Mono, always tabular. */
+.num {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.01em;
+}
+
+/* Archivo display — wordmark, page titles, PB callouts ONLY (maroon, text-only). */
+.display {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--color-zl-maroon);
+}
+
+.meta {
+  color: var(--meta-text);
+}
+
+/* ── Layout shell ───────────────────────────────────────────────────────── */
+.shell {
+  width: 100%;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: saturate(1.1) blur(8px);
+  background: color-mix(in srgb, var(--surface-page) 86%, transparent);
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.site-header__row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  height: 4rem;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-zl-maroon);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.nav {
+  display: flex;
+  gap: 1.1rem;
+  margin-left: auto;
+  align-items: center;
+}
+
+.nav a {
+  color: var(--meta-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nav a:hover,
+.nav a[aria-current='page'] {
+  color: var(--surface-heading);
+  border-bottom-color: color-mix(in srgb, var(--color-zl-steel) 60%, transparent);
+}
+
+.site-footer {
+  margin-top: 4rem;
+  border-top: 1px solid var(--surface-hairline);
+  padding-block: 1.5rem;
+  color: var(--meta-text);
+  font-size: 0.82rem;
+}
+
+.site-footer__row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.site-footer a {
+  color: var(--meta-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-zl-steel) 40%, transparent);
+}
+
+.site-footer a:hover {
+  color: var(--surface-heading);
+}
+
+/* ── Cards & surfaces ───────────────────────────────────────────────────── */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px var(--surface-shadow);
+}
+
+.card--pad {
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+/* ── Chips & badges (the largest a solid-ish brand region may be) ───────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.chip--badge {
+  color: var(--color-zl-steel);
+  background: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-zl-steel) 26%, transparent);
+}
+
+.chip--add {
+  color: var(--meta-text);
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--color-zl-steel) 45%, transparent);
+}
+
+.chip--add:hover {
+  color: var(--color-zl-steel);
+  border-color: color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
+}
+
+.chip--accepted {
+  color: color-mix(in srgb, var(--color-zl-steel) 55%, var(--surface-heading));
+  background: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
+}
+
+.chip--quarantined {
+  color: var(--color-zl-maroon);
+  background: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
+}
+
+.chip--rejected,
+.chip--removed {
+  color: var(--meta-text);
+  background: color-mix(in srgb, var(--color-zl-navy) 6%, transparent);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Primary: maroon TEXT on a whisper-thin maroon tint (never a solid fill). */
+.btn--primary {
+  color: var(--color-zl-maroon);
+  background: color-mix(in srgb, var(--color-zl-maroon) 9%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--color-zl-maroon) 24%, transparent);
+}
+
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--color-zl-maroon) 14%, var(--surface-card));
+}
+
+.btn--ghost {
+  color: var(--surface-heading);
+  border-color: var(--surface-border);
+  background: var(--surface-card);
+}
+
+.btn--ghost:hover {
+  border-color: color-mix(in srgb, var(--color-zl-steel) 50%, transparent);
+}
+
+/* Destructive: red TEXT/BORDER only, never a red fill. */
+.btn--danger {
+  color: var(--color-zl-red);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-zl-red) 32%, transparent);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+}
+
+.btn--danger:hover {
+  background: color-mix(in srgb, var(--color-zl-red) 8%, transparent);
+}
+
+.btn--sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Auth chip ──────────────────────────────────────────────────────────── */
+.auth-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-chip--loading {
+  width: 5.5rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--surface-raised);
+}
+
+.auth-chip__name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--surface-heading);
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-chip__name:hover {
+  color: var(--color-zl-maroon);
+}
+
+.auth-chip__signout {
+  background: transparent;
+  border: none;
+  color: var(--meta-text);
+  font-size: 0.8rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.auth-chip__signout:hover {
+  color: var(--surface-heading);
+  border-bottom-color: color-mix(in srgb, var(--color-zl-steel) 50%, transparent);
+}
+
+/* ── State text ─────────────────────────────────────────────────────────── */
+.text-pb {
+  color: var(--color-zl-red);
+}
+.text-maroon {
+  color: var(--color-zl-maroon);
+}
+.text-danger {
+  color: var(--color-zl-red);
+}
+
+/* Warning/notice surface: maroon 8% tint with maroon text (no solid banner). */
+.notice {
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--color-zl-maroon) 8%, var(--surface-card));
+  border: 1px solid color-mix(in srgb, var(--color-zl-maroon) 20%, transparent);
+  color: var(--color-zl-maroon);
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+.ltable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.ltable th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--meta-text);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.ltable td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--surface-hairline);
+  vertical-align: middle;
+}
+
+.ltable tr:last-child td {
+  border-bottom: none;
+}
+
+.ltable tbody tr:hover td {
+  background: var(--surface-raised);
+}
+
+.ltable__num {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  text-align: right;
+}
+
+.row-self {
+  background: color-mix(in srgb, var(--color-zl-steel) 7%, transparent);
+}
+
+/* Inputs */
+.field {
+  width: 100%;
+  font: inherit;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--surface-heading);
+}
+
+.field:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-border);
+}
+
+.tab {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9px;
+  color: var(--meta-text);
+  border: 1px solid transparent;
+}
+
+.tab[aria-selected='true'] {
+  color: var(--color-zl-maroon);
+  background: var(--surface-card);
+  border-color: var(--surface-border);
+  box-shadow: 0 1px 2px var(--surface-shadow);
+}
+
+.field--select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--meta-text) 50%),
+    linear-gradient(135deg, var(--meta-text) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) center,
+    calc(100% - 10px) center;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* ── Leaderboard ────────────────────────────────────────────────────────── */
+.board-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.board-title {
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  line-height: 1;
+}
+
+.board-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.uni-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.uni-filter__label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--meta-text);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.ltable__rank {
+  width: 3rem;
+  text-align: right;
+  color: var(--meta-text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  padding-right: 1rem;
+}
+
+.ltable__rank.rank-top {
+  color: var(--color-zl-maroon);
+  font-weight: 700;
+}
+
+.ltable__score-h {
+  text-align: right;
+}
+
+.ltable__score {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+.player {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.player__name {
+  font-weight: 600;
+  color: var(--surface-heading);
+}
+
+.empty {
+  text-align: center;
+  padding-block: clamp(2rem, 8vw, 4rem);
+}
+
+.empty__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+  margin-bottom: 0.4rem;
+}
+
+.page-404 {
+  text-align: center;
+  padding-block: clamp(3rem, 12vw, 6rem);
+}
+
+.page-404__code {
+  font-size: clamp(3rem, 14vw, 5.5rem);
+  font-weight: 700;
+  color: var(--color-zl-maroon);
+  line-height: 1;
+}
+
+/* ── /me dashboard ──────────────────────────────────────────────────────── */
+.me__head {
+  margin-bottom: 1.25rem;
+}
+
+.me__section {
+  margin-bottom: 2rem;
+}
+
+.me__h2 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--meta-text);
+  margin-bottom: 0.85rem;
+}
+
+.me__signout {
+  margin-top: 1rem;
+}
+
+.name-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.name-form__msg {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.pb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1rem;
+}
+
+.pb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.pb-card__dur {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-zl-steel);
+}
+
+.pb-card__score {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--surface-heading);
+}
+
+.badge-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.history-reasons {
+  display: block;
+  font-size: 0.76rem;
+  margin-top: 0.25rem;
+}
+
+/* ── Charts (single steel series, stroke only per CO-2) ─────────────────── */
+.chart-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.chart {
+  margin: 0;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+}
+
+.chart-line {
+  stroke: var(--chart-stroke);
+  stroke-opacity: var(--chart-stroke-opacity);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-grid {
+  stroke: var(--surface-hairline);
+  stroke-width: 1;
+}
+
+.chart-axis {
+  fill: var(--meta-text);
+  font-size: 11px;
+}
+
+.chart-dot {
+  fill: var(--surface-card);
+  stroke: var(--chart-stroke);
+  stroke-width: 1.5;
+}
+
+.chart-dot-pb {
+  fill: var(--color-zl-maroon);
+}
+
+.chart-crosshair {
+  stroke: color-mix(in srgb, var(--color-zl-steel) 55%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.chart-tip {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  min-height: 1.5rem;
+}
+
+.chart-tip__score {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+.chart-tip--idle {
+  font-size: 0.85rem;
+}
+
+.sparkline {
+  width: 100%;
+  max-width: 320px;
+  height: 44px;
+  overflow: visible;
+}
+
+.recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.recent-list__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.recent-list__score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+/* ── Auth & verify pages ────────────────────────────────────────────────── */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding-block: clamp(1rem, 6vw, 3rem);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.auth-card__title {
+  font-size: 1.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.auth-card__lede {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.auth-form__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.1rem 0;
+  color: var(--meta-text);
+  font-size: 0.78rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--surface-border);
+}
+
+.auth-form__google {
+  width: 100%;
+}
+
+.auth-sent__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+  margin-bottom: 0.5rem;
+}
+
+.code-input {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding-block: 0.75rem;
+}
+
+/* ── Admin review queue ─────────────────────────────────────────────────── */
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-card__scores {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.admin-score {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.admin-score__value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+  line-height: 1;
+}
+
+.admin-card__flags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.solve-bars {
+  width: 100%;
+  height: 56px;
+  margin-top: 0.4rem;
+  display: block;
+}
+
+.solve-bar {
+  fill: var(--chart-stroke);
+  fill-opacity: var(--chart-stroke-opacity);
+}
+
+.solve-bar--fast {
+  fill: var(--color-zl-maroon);
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}

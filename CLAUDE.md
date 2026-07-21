@@ -55,7 +55,7 @@ trading firms. Quality outranks scope — cut features before cutting rigor.
    font families elsewhere. Red `#c1121f` only for new PBs and destructive actions. All
    numerals in Spline Sans Mono `tabular-nums`. Fonts self-hosted WOFF2; zero external font
    requests. No Inter/system-ui as primary; no serif display faces; no crests.
-8. The content script runs only on `arithmetic.zetamac.com` and never touches other pages.
+8. Content scripts run only on `arithmetic.zetamac.com` (recorder) and the ZetaLog `/link` pages (session handoff) — never anywhere else.
    All Zetamac selectors live in the versioned selectors module; capture failure surfaces a
    popup banner, never silent data loss.
 

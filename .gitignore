@@ -9,4 +9,11 @@ dist/
 .next/
 .vercel/
 .turbo/
+coverage/
+test-results/
+playwright-report/
+.last-run.json
 *.log
+.superpowers/
+.claude/worktrees/
+*.tsbuildinfo

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { color, palette, typography } from './tokens.js';
+import { color, palette, typography } from './tokens';
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/;
 

@@ -54,7 +54,7 @@ pnpm workspaces. `packages/shared` is the single source of truth for: `GameRecor
 ### 3.1 Capture (content script on `arithmetic.zetamac.com`)
 
 - **Game start:** detected from the DOM transition into play mode. At start, the settings fingerprint is captured from the pre-game form (operations enabled, operand ranges, duration) plus the URL `?key=` parameter. A game is **rankable** iff ranges/operations equal Zetamac defaults and duration ∈ {30, 60, 120}. ("Defaults" = the exact values Zetamac's settings form ships with, all four operations enabled; the canonical constants are captured verbatim from the live page during implementation and frozen in `packages/shared`.)
-- **During play:** records a per-problem event stream — problem text shown, each keystroke timestamp, answer-accepted timestamp, running score. Timestamps come from `performance.now()` (monotonic, immune to clock changes).
+- **During play:** records a per-problem event stream — problem text shown, each answer-box input as a full value snapshot (what the DOM exposes; see CO-1 in `docs/superpowers/plans/`), answer-accepted timestamp, running score. Timestamps come from `performance.now()` (monotonic, immune to clock changes).
 - **Game end:** on the game-over state (or page exit mid-game), a complete `GameRecord` is persisted to extension storage: `{ id, startedAt, settingsFingerprint, rankableDuration | null, events[], finalScore, playedMs, status }`.
 - Telemetry is captured for **every** game, signed-in or not, so pre-account history can later backfill through server validation.
 
@@ -81,7 +81,7 @@ Typography and colour per the fixed design language (§8). Contents:
 
 ### 3.4 Account linking & sync
 
-- The popup button opens `zetalog` website `/link`. After Supabase sign-in there, the page hands the session (access + refresh token) to the extension via Chrome's `externally_connectable` messaging. The extension stores the session and refreshes tokens itself.
+- The popup button opens `zetalog` website `/link`. After Supabase sign-in there, the page hands the session (access + refresh token) to the extension via `window.postMessage` to a content script that runs only on the ZetaLog `/link` origin, on an explicit user click (safer than `externally_connectable`: the browser guarantees which extension receives it, and no extension IDs travel in URLs — see W4 brief). The extension stores the session and refreshes tokens itself.
 - On first link, the extension **backfills** all local rankable history (full event streams) through the validation API. Afterwards, each new rankable game uploads on completion.
 - Uploads are queued in extension storage and retried with exponential backoff — offline play loses nothing.
 
@@ -94,7 +94,7 @@ profiles           id (= auth.users.id), display_name (unique, citext),
                    university_id → universities NULLABLE, uni_verified_at, is_admin
 universities       id, name, slug, domains text[]     -- seeded from open UK uni/domains dataset
 games              id, user_id, client_game_id (uuid, unique per user — idempotent upload),
-                   played_at, received_at, settings_fingerprint jsonb,
+                   played_at, received_at, settings_fingerprint text  -- canonical string from shared fingerprint(),
                    rankable_duration int NULL,        -- 30 | 60 | 120 | NULL
                    claimed_score int, server_score int,
                    status enum: accepted | quarantined | rejected | user_removed,
@@ -123,14 +123,14 @@ Outcomes: `accepted` (ranks) · `quarantined` (appears in `/admin` review queue 
 
 ## 6. Website (Next.js on Vercel)
 
-| Route         | Purpose                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`           | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Spline Sans Mono `tabular-nums`, the visual hero |
-| `/uni/[slug]` | Per-university board, same duration tabs                                                                                                                                                                          |
-| `/me`         | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change              |
-| `/link`       | Extension linking page (sign-in + token handoff)                                                                                                                                                                  |
-| `/verify`     | Uni email verification (OTP entry)                                                                                                                                                                                |
-| `/admin`      | Review queue for quarantined submissions — `is_admin` gated                                                                                                                                                       |
+| Route         | Purpose                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Landing + **global leaderboard** with 120s / 60s / 30s tabs (120s default). Rank, display name, uni badge (or "+" placeholder on your own row), PB — numerals in Azeret Mono (CO-2) `tabular-nums`, the visual hero |
+| `/uni/[slug]` | Per-university board, same duration tabs                                                                                                                                                                            |
+| `/me`         | Private dashboard: score-over-time graph (steel-blue strokes, adaptive like the popup, config filter + custom range), full history with quarantine management, account settings, display-name change                |
+| `/link`       | Extension linking page (sign-in + token handoff)                                                                                                                                                                    |
+| `/verify`     | Uni email verification (OTP entry)                                                                                                                                                                                  |
+| `/admin`      | Review queue for quarantined submissions — `is_admin` gated                                                                                                                                                         |
 
 Public profiles expose **only** display name, badge, and PBs. Full history and graphs are private. Account deletion purges all rows.
 
@@ -155,9 +155,11 @@ Public profiles expose **only** display name, badge, and PBs. Full history and g
 
 Palette: `#780000` maroon · `#c1121f` red · `#fdf0d5` cream · `#003049` navy · `#669bbc` steel blue.
 
+**CO-2 (2026-07-21) — desaturated application:** the hexes are brand anchors, not surface paint. Neutrals carry layouts; brand color is confined to identity and state accents; no solid brand-color region larger than a badge chip except the wordmark and chart strokes. Full rules: `docs/superpowers/plans/2026-07-21-co2-design-desaturation.md`.
+
 - **Display:** Archivo variable, width 125%, weight 800–900, all-caps, tracking +2%. Used **only** for wordmark, page titles, PB callouts. Maroon on cream.
 - **UI/body:** Spline Sans. Navy on cream (light mode); cream on navy (dark mode).
-- **All numerals** (scores, timers, leaderboard, chart axes): Spline Sans Mono with `font-variant-numeric: tabular-nums`. Numerals are the visual hero of every screen.
+- **All numerals** (scores, timers, leaderboard, chart axes): Azeret Mono with `font-variant-numeric: tabular-nums` (CO-2: replaced Spline Sans Mono, whose slashed zero was rejected; plain-zero verified by specimen). Numerals are the visual hero of every screen.
 - **Red `#c1121f`** only for new personal bests and destructive actions. **Steel blue `#669bbc`** for chart strokes and secondary data.
 - Fonts **self-hosted as WOFF2** in the extension bundle and site (no external font requests).
 - No crests, no serif display faces, no Inter/system-ui fallback as primary.
