@@ -76,6 +76,18 @@ Copy `.env.example` and fill in Supabase + Resend credentials for the web app
 
 ## Status
 
-In active development. The design spec is complete
-(`docs/superpowers/specs/2026-07-20-zetalog-design.md`); implementation follows the phased
-plan in `docs/superpowers/plans/`.
+Feature-complete and reviewed against the design spec
+(`docs/superpowers/specs/2026-07-20-zetalog-design.md`). All four subsystems are built and
+whole-branch reviewed — the domain core (`packages/shared`), the extension (`apps/extension`),
+the database (`supabase/`), and the web app (`apps/web`) — along with the account
+linking, background sync, and end-to-end flows that tie them together. The suite is 449 unit
+tests plus a Playwright end-to-end run.
+
+What remains is deployment: provisioning the hosted Supabase project, deploying the web app to
+Vercel, and submitting the extension to the Chrome Web Store — following the runbooks in
+`supabase/README.md` and `docs/store/`.
+
+## Licenses
+
+The bundled fonts are licensed under the SIL Open Font License 1.1; see
+[`THIRD-PARTY-LICENSES.md`](THIRD-PARTY-LICENSES.md).

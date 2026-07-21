@@ -1,0 +1,15 @@
+/* Minimal styling for the offline Zetamac replica (extension e2e). Layout is
+   irrelevant to the test — the recorder reads text content, not geometry. */
+body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+
+#game {
+  font-size: 1.25rem;
+}
+
+.answer {
+  font-size: 1.25rem;
+  width: 6rem;
+}

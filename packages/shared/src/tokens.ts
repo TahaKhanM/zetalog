@@ -52,9 +52,10 @@ export const typography = {
   /**
    * Every numeral on every screen: scores, timers, leaderboards, chart axes.
    * Numerals are the visual hero — always tabular so columns of scores align.
+   * Azeret Mono (plain zero, tabular by construction) per CO-2.
    */
   numeric: {
-    family: 'Spline Sans Mono',
+    family: 'Azeret Mono',
     fontVariantNumeric: 'tabular-nums',
   },
 } as const;
