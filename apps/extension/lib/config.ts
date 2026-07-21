@@ -5,7 +5,7 @@
  * entire sync seam (W4); the product stays fully functional signed out
  * (invariant 4) — nothing here runs until the user links an account.
  */
-export const WEB_APP_URL = 'https://zetalog.vercel.app';
+export const WEB_APP_URL = 'https://www.zetalog.co.uk';
 
 /**
  * The Supabase project URL. Public and client-safe (RLS is the security
@@ -17,7 +17,7 @@ export const WEB_APP_URL = 'https://zetalog.vercel.app';
  * (docs/store — "Fill extension Supabase constants"). Must be the origin the
  * account session was minted for; tokens are only ever sent here (never logged).
  */
-export const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+export const SUPABASE_URL = 'https://jnhalsnndqqowyoinbrz.supabase.co';
 
 /**
  * The Supabase anonymous (publishable) key. Public by design — it authorizes
@@ -25,7 +25,7 @@ export const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
  * header on the token-refresh call. RUNBOOK: fill before publishing (same step
  * as {@link SUPABASE_URL}).
  */
-export const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+export const SUPABASE_ANON_KEY = 'sb_publishable_oB9siDNO9u8Vo9HPUEXXdA_pZlr7MxE';
 
 /**
  * Origins the account-link handoff is accepted from and tokens may be sent to.
@@ -33,4 +33,4 @@ export const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
  * to {@link SUPABASE_URL} — no token ever reaches any other recipient (brief
  * "Constraints"). localhost is included for the full-stack e2e / local dev.
  */
-export const LINK_ORIGINS = ['https://zetalog.vercel.app', 'http://localhost:3000'] as const;
+export const LINK_ORIGINS = ['https://www.zetalog.co.uk', 'http://localhost:3000'] as const;

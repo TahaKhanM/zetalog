@@ -46,7 +46,7 @@ PERMISSIONS
 • Storage — saves your recorded games, preferences, and (if you link an account) your session on your device.
 • Alarms — schedules background retries so that, when leaderboard sync is enabled, a score that failed to upload is retried later.
 • Access to arithmetic.zetamac.com — reads the running game (problems, answers, score, timer) to record your result. This is the core feature and the only site ZetaLog reads.
-• Access to the ZetaLog link page (zetalog.vercel.app/link) — receives the sign-in handoff after you explicitly click "Link the ZetaLog extension". Used only to connect your account.
+• Access to the ZetaLog link page (www.zetalog.co.uk/link) — receives the sign-in handoff after you explicitly click "Link the ZetaLog extension". Used only to connect your account.
 
 SUPPORT
 Questions or bugs: contact.mtaha@gmail.com
@@ -65,7 +65,7 @@ work" is rejected.
 - **storage** — Persists the user's recorded games, popup preferences (selected configuration and trend range), and, when an account is linked, the session and the pending-upload queue. All of this lives in `chrome.storage.local` on the user's device.
 - **alarms** — When leaderboard sync is enabled, uploads run in the background service worker. `alarms` schedules the retry drain (exponential backoff, capped at two hours) so a score that could not be uploaded — e.g. the device was offline — is retried without keeping a page open.
 - **Host access — `*://arithmetic.zetamac.com/*`** — The content script reads the live game (the current problem, the answer field, the running score, and the countdown) to record each finished game. This is ZetaLog's core function; it reads no other site through this permission.
-- **Host access — `https://zetalog.vercel.app/link*` (and `http://localhost:3000/link*` for local development)** — A content script on the ZetaLog link page receives the account session the page hands off after the user clicks "Link the ZetaLog extension". It reads nothing else on the page and runs on no other URL. Localhost is included only so contributors can test the flow locally; it can be removed from the published build.
+- **Host access — `https://www.zetalog.co.uk/link*` (and `http://localhost:3000/link*` for local development)** — A content script on the ZetaLog link page receives the account session the page hands off after the user clicks "Link the ZetaLog extension". It reads nothing else on the page and runs on no other URL. Localhost is included only so contributors can test the flow locally; it can be removed from the published build.
 
 ## Screenshots to capture (1280×800 or 640×400, no placeholders)
 

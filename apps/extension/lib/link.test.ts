@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { LINK_ACK, parseLinkMessage } from './link.js';
 
-const ORIGINS = ['https://zetalog.vercel.app', 'http://localhost:3000'];
+const ORIGINS = ['https://www.zetalog.co.uk', 'http://localhost:3000'];
 const SOURCE = { id: 'window' };
 
 const validData = {
@@ -13,7 +13,7 @@ const validData = {
 describe('parseLinkMessage', () => {
   it('extracts tokens from a valid same-window message on an allowed origin', () => {
     const result = parseLinkMessage(
-      { origin: 'https://zetalog.vercel.app', source: SOURCE, data: validData },
+      { origin: 'https://www.zetalog.co.uk', source: SOURCE, data: validData },
       SOURCE,
       ORIGINS,
     );
@@ -34,7 +34,7 @@ describe('parseLinkMessage', () => {
 
   it('rejects a message from a different source (e.g. an embedded frame)', () => {
     const result = parseLinkMessage(
-      { origin: 'https://zetalog.vercel.app', source: { other: true }, data: validData },
+      { origin: 'https://www.zetalog.co.uk', source: { other: true }, data: validData },
       SOURCE,
       ORIGINS,
     );
