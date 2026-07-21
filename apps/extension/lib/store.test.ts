@@ -214,6 +214,98 @@ describe('createStore.remove and restore', () => {
   });
 });
 
+describe('createStore — remove/restore provenance', () => {
+  it('records where a removed row came from', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ score: 42 }));
+    if (!saved.ok) throw new Error('save failed');
+
+    const removed = await store.remove(saved.value.record.id);
+    expect(removed.ok).toBe(true);
+    if (!removed.ok) return;
+    expect(removed.value?.removedFrom).toBe('kept');
+  });
+
+  it('never lets a capture_failed record become kept via remove then restore', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveCaptureFailed(gameRecord({ score: 0 }));
+    if (!saved.ok) throw new Error('save failed');
+
+    await store.remove(saved.value.record.id);
+    const restored = await store.restore(saved.value.record.id);
+    expect(restored.ok).toBe(true);
+    if (!restored.ok) return;
+    expect(restored.value?.status).toBe('capture_failed');
+  });
+
+  it('returns a removed quarantined game to quarantined with its reason intact', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ score: 30, playedMs: 50_000 }));
+    if (!saved.ok) throw new Error('save failed');
+    expect(saved.value.status).toBe('quarantined');
+
+    await store.remove(saved.value.record.id);
+    const restored = await store.restore(saved.value.record.id);
+    expect(restored.ok).toBe(true);
+    if (!restored.ok) return;
+    expect(restored.value?.status).toBe('quarantined');
+    expect(restored.value?.quarantineReason).toBe('restart');
+  });
+
+  it('returns a removed kept game to kept', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ score: 42 }));
+    if (!saved.ok) throw new Error('save failed');
+
+    await store.remove(saved.value.record.id);
+    const restored = await store.restore(saved.value.record.id);
+    expect(restored.ok).toBe(true);
+    if (!restored.ok) return;
+    expect(restored.value?.status).toBe('kept');
+  });
+
+  it('defaults a legacy removed row without provenance to kept on restore', async () => {
+    const legacy = {
+      record: gameRecord({ score: 42 }),
+      fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
+      rankableDuration: 120,
+      status: 'removed',
+      savedAtMs: 1,
+    };
+    const store = createStore(fakeArea({ [GAMES_KEY]: [legacy] }), tickingClock());
+
+    const restored = await store.restore(legacy.record.id);
+    expect(restored.ok).toBe(true);
+    if (!restored.ok) return;
+    expect(restored.value?.status).toBe('kept');
+  });
+
+  it('keeps the original provenance when remove is called twice', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveCaptureFailed(gameRecord({ score: 0 }));
+    if (!saved.ok) throw new Error('save failed');
+
+    await store.remove(saved.value.record.id);
+    const again = await store.remove(saved.value.record.id);
+    expect(again.ok).toBe(true);
+    if (!again.ok) return;
+    expect(again.value?.removedFrom).toBe('capture_failed');
+  });
+
+  it('leaves a kept or capture_failed row unchanged when restore targets it directly', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const kept = await store.saveGame(gameRecord({ score: 42 }));
+    const failed = await store.saveCaptureFailed(gameRecord({ score: 0 }));
+    if (!kept.ok || !failed.ok) throw new Error('save failed');
+
+    const restoredKept = await store.restore(kept.value.record.id);
+    const restoredFailed = await store.restore(failed.value.record.id);
+    if (!restoredKept.ok || !restoredFailed.ok) return;
+    expect(restoredKept.value?.status).toBe('kept');
+    expect(restoredFailed.value?.status).toBe('capture_failed');
+  });
+});
+
 describe('createStore prefs', () => {
   it('returns defaults when no prefs are stored', async () => {
     const store = createStore(fakeArea(), tickingClock());
