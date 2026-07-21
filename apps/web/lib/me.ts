@@ -34,6 +34,22 @@ const FLAG_LABELS: Record<StoredValidation['flags'][number]['rule'], string> = {
   'entry-burst': 'Pasted answers',
 };
 
+/** Human phrase for each hard problem-stream impossibility (W6). */
+const PROBLEM_VIOLATION_LABELS: Record<
+  StoredValidation['problemViolations'][number]['rule'],
+  string
+> = {
+  'range-nonconforming': 'Problem outside the claimed range',
+};
+
+/** Human phrase for each statistical problem-stream flag (W6). */
+const PROBLEM_FLAG_LABELS: Record<StoredValidation['problemFlags'][number]['rule'], string> = {
+  'operation-mix': 'Implausible operation mix',
+  'operand-marginal': 'Operands skew easy',
+  'low-entropy': 'Problems repeat too often',
+  'problem-switch': 'Problems re-shown unsolved',
+};
+
 /** Human phrases explaining why a game was quarantined or rejected. */
 export function reasonsFor(validation: StoredValidation): string[] {
   const reasons: string[] = [];
@@ -41,8 +57,14 @@ export function reasonsFor(validation: StoredValidation): string[] {
     const label = VIOLATION_LABELS[violation.rule];
     if (label !== undefined) reasons.push(label);
   }
+  for (const violation of validation.problemViolations) {
+    reasons.push(PROBLEM_VIOLATION_LABELS[violation.rule]);
+  }
   for (const flag of validation.flags) {
     reasons.push(FLAG_LABELS[flag.rule]);
+  }
+  for (const flag of validation.problemFlags) {
+    reasons.push(PROBLEM_FLAG_LABELS[flag.rule]);
   }
   if (validation.historyFlag === 'pb-jump') {
     reasons.push('Far above your usual range');
