@@ -55,9 +55,9 @@ export function DisplayNameForm({ current }: { current: string | null }): React.
         <input
           className="field"
           value={value}
-          maxLength={20}
+          maxLength={15}
           autoComplete="off"
-          placeholder="3–20 chars: letters, digits, _ and spaces"
+          placeholder="3–15 chars: letters, digits, _"
           onChange={(event) => {
             setValue(event.target.value);
             setSaved(false);
