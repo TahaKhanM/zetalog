@@ -17,7 +17,11 @@ function safeNext(value: string | string[] | undefined): string {
   return raw !== undefined && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/me';
 }
 
-/** `/signin` — six-digit email code + Google. Already-signed-in users skip straight on. */
+/**
+ * `/signin` — email-first auth (W8): password sign-in (uni aliases welcome),
+ * sign-up with a one-time emailed code, Google/GitHub OAuth, and password
+ * recovery. Already-signed-in users skip straight on.
+ */
 export default async function SignInPage({
   searchParams,
 }: {
@@ -36,7 +40,7 @@ export default async function SignInPage({
         </div>
         <h1 className="display auth-card__title">Sign in</h1>
         <p className="meta auth-card__lede">
-          Sync your Zetamac scores to the leaderboard. No password required.
+          Sync your Zetamac scores to the leaderboard. New here? The same form creates your account.
         </p>
         {sp.error !== undefined ? (
           <p className="notice" role="alert" style={{ marginBottom: '1rem' }}>

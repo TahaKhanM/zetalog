@@ -1118,3 +1118,101 @@ button {
   gap: 0.6rem;
   flex-wrap: wrap;
 }
+
+/* ── W8 auth additions (additive only — do not reflow rules above) ──────── */
+
+/* OAuth brand buttons above the email flow. */
+.auth-oauth {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn--oauth {
+  width: 100%;
+  gap: 0.6rem;
+}
+
+.btn--oauth svg {
+  flex: none;
+}
+
+/* Password strength meter: quiet track, no red — maroon marks a failing
+ * candidate, steel the passing tiers; the label carries the meaning. */
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.strength__track {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-zl-steel) 18%, transparent);
+  overflow: hidden;
+}
+
+.strength__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition:
+    width 0.2s ease,
+    background 0.2s ease;
+}
+
+.strength[data-score='0'] .strength__fill {
+  width: 12%;
+  background: var(--color-zl-maroon);
+}
+
+.strength[data-score='1'] .strength__fill {
+  width: 40%;
+  background: color-mix(in srgb, var(--color-zl-steel) 55%, transparent);
+}
+
+.strength[data-score='2'] .strength__fill {
+  width: 70%;
+  background: var(--color-zl-steel);
+}
+
+.strength[data-score='3'] .strength__fill {
+  width: 100%;
+  background: color-mix(in srgb, var(--color-zl-steel) 70%, var(--surface-heading));
+}
+
+.strength__label {
+  font-size: 0.78rem;
+  color: var(--meta-text);
+  min-width: 5.5rem;
+  text-align: right;
+}
+
+.auth-form__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--meta-text);
+}
+
+/* Quiet inline action links (forgot password / set a password instead). */
+.auth-form__forgot {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0.2rem 0;
+  font-size: 0.82rem;
+  color: var(--meta-text);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+
+.auth-form__forgot:hover:not(:disabled) {
+  color: var(--surface-heading);
+  border-bottom-color: color-mix(in srgb, var(--color-zl-steel) 50%, transparent);
+}
+
+.auth-form__forgot:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
