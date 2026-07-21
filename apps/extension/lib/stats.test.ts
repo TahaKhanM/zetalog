@@ -14,7 +14,10 @@ import {
 } from './stats.js';
 
 function stored(opts: {
+  /** The verified score — what the popup surfaces (see StoredGame.verifiedScore). */
   score: number;
+  /** The scraped claimed score; defaults to `score`. Set it apart to prove the popup ignores it. */
+  claimedScore?: number;
   savedAtMs: number;
   status?: StoredGame['status'];
   rankableDuration?: StoredGame['rankableDuration'];
@@ -29,14 +32,41 @@ function stored(opts: {
       playedMs: 120_000,
       settings,
       events: [],
-      claimedScore: opts.score,
+      claimedScore: opts.claimedScore ?? opts.score,
     },
+    verifiedScore: opts.score,
     fingerprint: opts.fingerprint ?? fingerprint(settings),
     rankableDuration: opts.rankableDuration === undefined ? 120 : opts.rankableDuration,
     status: opts.status ?? 'kept',
     savedAtMs: opts.savedAtMs,
   };
 }
+
+// The product truth is the recomputed verifiedScore, NOT the scraped
+// claimedScore (which can miss end-of-game points — w1-report score-span race).
+// Fixture mirrors the brief: claimed 51, but the events recompute to 52.
+describe('the popup surfaces the verified score, never the scraped claimed score', () => {
+  it('ranks personal bests by verifiedScore', () => {
+    const games = [stored({ score: 52, claimedScore: 51, savedAtMs: 1, rankableDuration: 120 })];
+    expect(personalBests(games)[120]).toBe(52);
+  });
+
+  it('detects a new personal best from verifiedScore', () => {
+    const games = [
+      stored({ score: 51, claimedScore: 51, savedAtMs: 1, rankableDuration: 120 }),
+      stored({ score: 52, claimedScore: 50, savedAtMs: 2, rankableDuration: 120 }),
+    ];
+    // Discriminating: the latest game's claimed 50 is BELOW the prior best (51),
+    // so claimed-based logic would miss the PB; its verified 52 is a real PB.
+    expect(isNewPersonalBest(games)).toBe(true);
+  });
+
+  it('plots trend points from verifiedScore', () => {
+    const fp = fingerprint(ZETAMAC_DEFAULT_SETTINGS);
+    const games = [stored({ score: 52, claimedScore: 51, savedAtMs: 1, fingerprint: fp })];
+    expect(trendSeries(games, fp, 'all')[0]?.score).toBe(52);
+  });
+});
 
 describe('personalBests', () => {
   it('returns the max kept score per rankable duration', () => {

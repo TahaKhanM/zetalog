@@ -5,6 +5,7 @@ import {
   ok,
   err,
   rankableDuration,
+  recomputeScore,
   type GameRecord,
   type QuarantineReason,
   type Result,
@@ -45,6 +46,16 @@ export interface GameSync {
 /** A stored game: the raw record plus derived, denormalised fields the popup reads directly. */
 export interface StoredGame {
   readonly record: GameRecord;
+  /**
+   * The recomputed, verified score — shared `recomputeScore(record.events).score`,
+   * the same server-side truth that ranks (product invariant 1). This, NOT
+   * `record.claimedScore`, is what every popup surface (hero/PB/trend/new-PB)
+   * shows: the scraped `claimedScore` can miss end-of-game points (the score-span
+   * race, w1-report), so it is kept only for the server's claimed-vs-recomputed
+   * cross-check at submit time. Backfilled from `record.events` for legacy rows
+   * written before this field existed.
+   */
+  readonly verifiedScore: number;
   /** Settings fingerprint from shared `fingerprint()` — the grouping key for history/graphs. */
   readonly fingerprint: string;
   /** Leaderboard duration this game qualifies for, or null (mirrors shared `rankableDuration`). */
@@ -97,6 +108,9 @@ const gameSyncSchema = z.object({
 
 const storedGameSchema = z.object({
   record: gameRecordSchema,
+  // Optional on the wire: rows written before verifiedScore existed lack it and
+  // are backfilled on read (see readGames) by recomputing from record.events.
+  verifiedScore: z.number().int().nonnegative().optional(),
   fingerprint: z.string(),
   rankableDuration: rankableDurationSchema,
   status: z.enum(['kept', 'quarantined', 'removed', 'capture_failed']),
@@ -162,7 +176,13 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     if (value === undefined) return ok([]);
     const parsed = z.array(storedGameSchema).safeParse(value);
     if (!parsed.success) return err({ reason: 'corrupt-games', detail: parsed.error.message });
-    return ok(parsed.data);
+    // Backfill verifiedScore for legacy rows: recompute the verified score from
+    // the event stream, so every StoredGame the popup reads carries the truth.
+    const games: StoredGame[] = parsed.data.map((game) => ({
+      ...game,
+      verifiedScore: game.verifiedScore ?? recomputeScore(game.record.events).score,
+    }));
+    return ok(games);
   }
 
   async function writeGames(games: readonly StoredGame[]): Promise<void> {
@@ -209,6 +229,7 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
       });
       const base = {
         record,
+        verifiedScore: recomputeScore(record.events).score,
         fingerprint: fp,
         rankableDuration: rankableDuration(record.settings),
         savedAtMs: now(),
@@ -224,6 +245,7 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     saveCaptureFailed(record) {
       return append({
         record,
+        verifiedScore: recomputeScore(record.events).score,
         fingerprint: fingerprint(record.settings),
         rankableDuration: rankableDuration(record.settings),
         status: 'capture_failed',
@@ -245,6 +267,7 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
               : game.status;
         const base = {
           record: game.record,
+          verifiedScore: game.verifiedScore,
           fingerprint: game.fingerprint,
           rankableDuration: game.rankableDuration,
           savedAtMs: game.savedAtMs,

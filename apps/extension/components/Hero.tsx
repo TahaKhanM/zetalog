@@ -45,7 +45,7 @@ export function Hero(props: HeroProps): JSX.Element {
         className={`zl-num zl-hero__score${isNewPersonalBest ? ' zl-hero__score--pb' : ''}`}
         data-testid="hero-score"
       >
-        {latest.record.claimedScore}
+        {latest.verifiedScore}
       </span>
       <p className="zl-hero__meta">
         {fingerprintLabel(latest.record.settings)} ·{' '}
