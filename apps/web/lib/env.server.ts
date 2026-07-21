@@ -2,6 +2,10 @@ import { z } from 'zod';
 
 import { clientSchema, parseEnv } from './env';
 
+// Server-only tripwire: this module names the service-role key and other secrets.
+if (typeof window !== 'undefined')
+  throw new Error('lib/env.server.ts must never load in a client bundle');
+
 /**
  * Server-only environment access. Import ONLY from API routes and server-only
  * lib modules — never from a Client Component. Splitting this from `env.ts`
