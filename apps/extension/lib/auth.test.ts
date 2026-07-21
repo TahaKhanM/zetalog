@@ -3,11 +3,19 @@ import { describe, expect, it } from 'vitest';
 import {
   SESSION_KEY,
   createAuthController,
+  decodeUserId,
   requestRefresh,
+  sessionFromTokens,
   sessionSchema,
   type FetchLike,
   type Session,
 } from './auth.js';
+
+/** Build a JWT-shaped token whose payload is the given claims (unsigned; ok for decode tests). */
+function jwt(claims: Record<string, unknown>): string {
+  const seg = (o: unknown): string => Buffer.from(JSON.stringify(o)).toString('base64url');
+  return `${seg({ alg: 'HS256', typ: 'JWT' })}.${seg(claims)}.signature`;
+}
 
 const CONFIG = { supabaseUrl: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
 
@@ -148,6 +156,45 @@ describe('requestRefresh', () => {
   });
 });
 
+describe('decodeUserId', () => {
+  it('reads the sub claim from a well-formed JWT', () => {
+    expect(decodeUserId(jwt({ sub: 'user-42', role: 'authenticated' }))).toBe('user-42');
+  });
+
+  it('returns null for a token without three segments', () => {
+    expect(decodeUserId('not-a-jwt')).toBeNull();
+  });
+
+  it('returns null when the payload is not valid base64/JSON', () => {
+    expect(decodeUserId('aaa.@@@.ccc')).toBeNull();
+  });
+
+  it('returns null when there is no string sub', () => {
+    expect(decodeUserId(jwt({ role: 'authenticated' }))).toBeNull();
+    expect(decodeUserId(jwt({ sub: 123 }))).toBeNull();
+    expect(decodeUserId(jwt({ sub: '' }))).toBeNull();
+  });
+
+  it('returns null when the payload is a JSON primitive, not an object', () => {
+    const seg = (o: unknown): string => Buffer.from(JSON.stringify(o)).toString('base64url');
+    expect(decodeUserId(`${seg('h')}.${seg('just-a-string')}.sig`)).toBeNull();
+  });
+});
+
+describe('sessionFromTokens', () => {
+  it('derives userId from the access token', () => {
+    expect(sessionFromTokens(jwt({ sub: 'u1' }), 'r1')).toEqual({
+      accessToken: jwt({ sub: 'u1' }),
+      refreshToken: 'r1',
+      userId: 'u1',
+    });
+  });
+
+  it('returns null for a malformed access token', () => {
+    expect(sessionFromTokens('garbage', 'r1')).toBeNull();
+  });
+});
+
 describe('createAuthController', () => {
   it('reads null when no session is stored', async () => {
     const controller = createAuthController(fakeArea(), {
@@ -204,6 +251,45 @@ describe('createAuthController', () => {
       config: CONFIG,
     });
     expect(await corrupt.accessToken()).toBeNull();
+  });
+
+  it('isLinked reflects whether a readable session is stored', async () => {
+    const out = createAuthController(fakeArea(), {
+      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      config: CONFIG,
+    });
+    expect(await out.isLinked()).toBe(false);
+    const linkedIn = createAuthController(fakeArea({ [SESSION_KEY]: SESSION }), {
+      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      config: CONFIG,
+    });
+    expect(await linkedIn.isLinked()).toBe(true);
+  });
+
+  it('link builds a session from tokens and persists it', async () => {
+    const seg = (o: unknown): string => Buffer.from(JSON.stringify(o)).toString('base64url');
+    const access = `${seg({ alg: 'HS256' })}.${seg({ sub: 'user-7' })}.sig`;
+    const area = fakeArea();
+    const controller = createAuthController(area, {
+      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      config: CONFIG,
+    });
+    expect(await controller.link(access, 'refresh-7')).toBe(true);
+    expect(area.data.get(SESSION_KEY)).toEqual({
+      accessToken: access,
+      refreshToken: 'refresh-7',
+      userId: 'user-7',
+    });
+  });
+
+  it('link refuses a malformed access token and stores nothing', async () => {
+    const area = fakeArea();
+    const controller = createAuthController(area, {
+      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      config: CONFIG,
+    });
+    expect(await controller.link('bad', 'r')).toBe(false);
+    expect(area.data.has(SESSION_KEY)).toBe(false);
   });
 
   it('clear removes the stored session', async () => {

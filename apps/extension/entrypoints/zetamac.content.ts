@@ -1,7 +1,14 @@
 import { browser, defineContentScript } from '#imports';
 
+import { type BgRequest } from '../lib/messages.js';
 import { createStore } from '../lib/store.js';
 import { startCapture } from '../lib/wiring.js';
+
+/** Ask the background to sync now (no-op when signed out); failures are ignored. */
+function requestDrain(): void {
+  const request: BgRequest = { type: 'zl-drain' };
+  void browser.runtime.sendMessage(request).catch(() => undefined);
+}
 
 /**
  * Thin wiring only (spec §3.1). Runs solely on arithmetic.zetamac.com — the
@@ -24,7 +31,11 @@ export default defineContentScript({
         uuid: () => crypto.randomUUID(),
       },
       hooks: {
-        onGameComplete: (record) => void store.saveGame(record),
+        // Persist, then nudge the background to upload it (queued + backfilled
+        // there); a capture failure has no rankable score to sync.
+        onGameComplete: (record) => {
+          void store.saveGame(record).then(requestDrain);
+        },
         onCaptureFailed: (record) => void store.saveCaptureFailed(record),
       },
     });

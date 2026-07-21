@@ -64,6 +64,46 @@ export interface AuthConfig {
 
 const DEFAULT_CONFIG: AuthConfig = { supabaseUrl: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY };
 
+/** Decode a base64url segment to a UTF-8-safe ASCII string (JWT payloads are ASCII). */
+function base64UrlDecode(segment: string): string {
+  const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+  return atob(padded);
+}
+
+/**
+ * The `sub` (user id) claim of a Supabase access token, or null if the token is
+ * not a well-formed JWT carrying a string `sub`. The extension does not trust
+ * this for security — the server re-verifies every request — it is only used to
+ * populate {@link Session.userId} without a round-trip or a JWT dependency.
+ */
+export function decodeUserId(accessToken: string): string | null {
+  const parts = accessToken.split('.');
+  const payload = parts.length === 3 ? parts[1] : undefined;
+  if (payload === undefined) return null;
+  try {
+    const claims: unknown = JSON.parse(base64UrlDecode(payload));
+    if (typeof claims === 'object' && claims !== null && 'sub' in claims) {
+      const sub: unknown = claims.sub;
+      return typeof sub === 'string' && sub.length > 0 ? sub : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build a {@link Session} from handoff tokens, deriving `userId` from the access
+ * token. Returns null when the access token is malformed (an invalid token is
+ * not worth persisting).
+ */
+export function sessionFromTokens(accessToken: string, refreshToken: string): Session | null {
+  const userId = decodeUserId(accessToken);
+  if (userId === null) return null;
+  return { accessToken, refreshToken, userId };
+}
+
 /**
  * Exchange a refresh token for a fresh {@link Session} via the GoTrue token
  * endpoint. Pure over an injected `fetch`. Every failure path returns a typed
@@ -114,8 +154,15 @@ export interface AuthController {
   read(): Promise<Result<Session | null, AuthError>>;
   /** The current access token, or `null` if signed out / unreadable. */
   accessToken(): Promise<string | null>;
+  /** Whether a (readable) session is stored. */
+  isLinked(): Promise<boolean>;
   /** Persist a session (from the link handoff). */
   save(session: Session): Promise<void>;
+  /**
+   * Build a session from handoff tokens and persist it. Returns `true` on
+   * success, `false` if the access token is malformed (nothing is stored).
+   */
+  link(accessToken: string, refreshToken: string): Promise<boolean>;
   /** Forget the session (Unlink). Leaves local game data untouched. */
   clear(): Promise<void>;
   /**
@@ -153,8 +200,20 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
       return result.ok && result.value !== null ? result.value.accessToken : null;
     },
 
+    async isLinked() {
+      const result = await read();
+      return result.ok && result.value !== null;
+    },
+
     async save(session) {
       await area.set({ [SESSION_KEY]: session });
+    },
+
+    async link(accessToken, refreshToken) {
+      const session = sessionFromTokens(accessToken, refreshToken);
+      if (session === null) return false;
+      await area.set({ [SESSION_KEY]: session });
+      return true;
     },
 
     async clear() {
