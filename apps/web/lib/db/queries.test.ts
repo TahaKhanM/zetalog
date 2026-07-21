@@ -1,5 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
+
+import type { Db } from '../supabase/database';
 
 import {
   getLeaderboard,
@@ -59,10 +60,7 @@ function makeBuilder(response: Response, calls: Call[]): Builder {
   return builder;
 }
 
-function makeClient(responses: Record<string, Response>): {
-  client: SupabaseClient;
-  calls: Call[];
-} {
+function makeClient(responses: Record<string, Response>): { client: Db; calls: Call[] } {
   const calls: Call[] = [];
   const client = {
     from(table: string): Builder {
@@ -71,8 +69,8 @@ function makeClient(responses: Record<string, Response>): {
     },
   };
   // Single localized cast: the stub implements exactly the query surface these
-  // read functions use; the real SupabaseClient type is far larger.
-  return { client: client as unknown as SupabaseClient, calls };
+  // read functions use; the real Db type is far larger.
+  return { client: client as unknown as Db, calls };
 }
 
 const entry = (over: Record<string, unknown>): Record<string, unknown> => ({
