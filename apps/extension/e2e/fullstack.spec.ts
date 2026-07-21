@@ -101,7 +101,7 @@ test.describe('full-stack leaderboard smoke', () => {
     }
   });
 
-  test('submits a recorded game through the API and it ranks on the leaderboard', async () => {
+  test('submits a recorded game through the API, ranks it, then revokes it', async () => {
     const api = sb.API_URL;
     const suffix = Math.random().toString(36).slice(2, 8);
     const email = `e2e_${suffix}@example.com`;
@@ -153,7 +153,8 @@ test.describe('full-stack leaderboard smoke', () => {
       },
       baseUrl: WEB_URL,
     });
-    const result = await client.submitGame(acceptedGame());
+    const game = acceptedGame();
+    const result = await client.submitGame(game);
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -161,12 +162,21 @@ test.describe('full-stack leaderboard smoke', () => {
     expect(result.value.serverScore).toBe(3);
 
     // The accepted rankable game surfaces on the public leaderboard view.
-    const lbRes = await fetch(
-      `${api}/rest/v1/leaderboard_entries?user_id=eq.${user.id}&select=duration,best_score`,
-      { headers: { apikey: sb.ANON_KEY, authorization: `Bearer ${sb.ANON_KEY}` } },
-    );
-    const rows = (await lbRes.json()) as { duration: number; best_score: number }[];
-    expect(rows).toEqual([{ duration: 60, best_score: 3 }]);
+    const readLeaderboard = async (): Promise<{ duration: number; best_score: number }[]> => {
+      const res = await fetch(
+        `${api}/rest/v1/leaderboard_entries?user_id=eq.${user.id}&select=duration,best_score`,
+        { headers: { apikey: sb.ANON_KEY, authorization: `Bearer ${sb.ANON_KEY}` } },
+      );
+      return (await res.json()) as { duration: number; best_score: number }[];
+    };
+    expect(await readLeaderboard()).toEqual([{ duration: 60, best_score: 3 }]);
+
+    // Revoking through the extension's OWN API client (a background DELETE that,
+    // in a real browser, is CORS-preflighted) soft-deletes the game, so it drops
+    // off the accepted-only leaderboard view.
+    const revoked = await client.revokeGame(game.id);
+    expect(revoked.ok).toBe(true);
+    expect(await readLeaderboard()).toEqual([]);
   });
 });
 
