@@ -172,3 +172,35 @@ export async function getQuarantineQueue(service: Db): Promise<AdminGameRow[]> {
     return adminGameRowSchema.parse({ ...game, display_name: profile?.display_name ?? null });
   });
 }
+
+const boardStatsRowSchema = z.object({
+  user_id: z.string(),
+  university_slug: z.string().nullable(),
+  games_counted: z.number().int().nonnegative(),
+});
+
+/** Aggregate figures for the masthead stat rail (CO-3 §2). */
+export interface BoardStats {
+  readonly players: number;
+  readonly universities: number;
+  readonly gamesValidated: number;
+}
+
+/**
+ * Masthead statistics, derived entirely from the public leaderboard view
+ * (players with a ranked entry, universities represented, accepted games
+ * counted across all boards). One small read; cached with the pages.
+ */
+export async function getBoardStats(client: Db): Promise<BoardStats> {
+  const rows = await fetchList(
+    client.from('leaderboard_entries').select('user_id, university_slug, games_counted'),
+    boardStatsRowSchema,
+    'getBoardStats',
+  );
+  const players = new Set(rows.map((row) => row.user_id)).size;
+  const universities = new Set(
+    rows.flatMap((row) => (row.university_slug === null ? [] : [row.university_slug])),
+  ).size;
+  const gamesValidated = rows.reduce((sum, row) => sum + row.games_counted, 0);
+  return { players, universities, gamesValidated };
+}
