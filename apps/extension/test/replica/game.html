@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Arithmetic Game – Online Speed Drill</title>
+    <link href="/app.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!--
+      Offline replica of the Zetamac /game page for the extension e2e. The #game
+      DOM mirrors the real fixture (test/fixtures/zetamac-game-page.html) exactly
+      so the versioned selectors resolve identically; app.js is a deterministic,
+      jQuery-free reimplementation of the game with a short-duration override.
+    -->
+    <div id="game">
+      <span class="left">Seconds left:</span>
+      <span class="correct">Score: 0</span>
+      <div class="banner">
+        <div class="start">
+          <span class="problem"></span>
+          =
+          <input class="answer" autocomplete="off" />
+        </div>
+        <div class="end" style="display: none">
+          <p class="correct">Score: 0</p>
+          <p>
+            <a href="/game?key=a7220a92">Try again</a>
+            or <a href="/">change settings</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+      import { init } from '/dist/app.js';
+      init({"add":true,"sub":true,"mul":true,"div":true,"add_left_min":2,"add_left_max":100,"add_right_min":2,"add_right_max":100,"mul_left_min":2,"mul_left_max":12,"mul_right_min":2,"mul_right_max":100,"duration":2});
+    </script>
+  </body>
+</html>
