@@ -16,6 +16,14 @@ export interface UniBrand {
   readonly fg: string;
   /** 1–2 letter monogram. */
   readonly monogram: string;
+  /**
+   * Optional official logo asset under /public/uni-logos/, collected from the
+   * institution's OWN published brand/press assets (source URL documented in
+   * uni-logos/SOURCES.md). Rendered in place of the monogram when present;
+   * deleting this field instantly reverts the university to its monogram —
+   * the takedown kill-switch. Never sourced from third-party platforms.
+   */
+  readonly logo?: string;
 }
 
 /** WCAG relative luminance of a #rrggbb colour. */
@@ -75,6 +83,55 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
 };
 
 /**
+ * Official logo assets, keyed by seed slug, served from `/public/uni-logos/`.
+ * Every asset is a square avatar-style mark collected from the university's
+ * OWN web properties (self-served favicon/touch/manifest icons or brand
+ * pages) — provenance for each file is documented in
+ * `public/uni-logos/SOURCES.md`. Never sourced from LinkedIn, Wikipedia, or
+ * any other third party.
+ *
+ * Consulted by {@link badgeFor} independently of `CURATED_BRANDS`, so a
+ * university can carry a logo without a colour entry (its duotone monogram
+ * remains the fallback identity behind the mark).
+ *
+ * Kill-switch: removing a slug's entry here (the asset can stay on disk)
+ * instantly reverts that university to its monogram chip — use for takedown
+ * requests or a mark that turns out to be illegible at badge size.
+ */
+export const CURATED_LOGOS: Readonly<Record<string, string>> = {
+  'university-of-oxford': '/uni-logos/university-of-oxford.svg',
+  'university-of-edinburgh': '/uni-logos/university-of-edinburgh.svg',
+  'king-s-college-london-university-of-london':
+    '/uni-logos/king-s-college-london-university-of-london.png',
+  'university-of-cambridge': '/uni-logos/university-of-cambridge.png',
+  'imperial-college-london': '/uni-logos/imperial-college-london.svg',
+  // Owner-directed presentation: Warwick's own crest artwork (from their
+  // apple-touch-icon) composited onto a lavender tile — see SOURCES.md.
+  'university-of-warwick': '/uni-logos/university-of-warwick.png',
+  'university-college-london-university-of-london':
+    '/uni-logos/university-college-london-university-of-london.png',
+  'london-school-of-economics-and-political-science-university-of-london':
+    '/uni-logos/london-school-of-economics-and-political-science-university-of-london.png',
+  // Owner-supplied avatar marks (manually collected by the project owner,
+  // 2026-07-21) — see SOURCES.md. Nottingham is an explicit owner override of
+  // the earlier internal-use adjudication.
+  'university-of-manchester': '/uni-logos/university-of-manchester.png',
+  'queen-mary-university-of-london': '/uni-logos/queen-mary-university-of-london.png',
+  'university-of-nottingham': '/uni-logos/university-of-nottingham.png',
+  'university-of-southampton': '/uni-logos/university-of-southampton.png',
+  'cardiff-university': '/uni-logos/cardiff-university.png',
+  'university-of-durham': '/uni-logos/university-of-durham.png',
+  'university-of-bristol': '/uni-logos/university-of-bristol.png',
+  'university-of-glasgow': '/uni-logos/university-of-glasgow.png',
+  'university-of-bath': '/uni-logos/university-of-bath.png',
+  'university-of-st-andrews': '/uni-logos/university-of-st-andrews.png',
+  'university-of-leeds': '/uni-logos/university-of-leeds.png',
+  'the-university-of-sheffield': '/uni-logos/the-university-of-sheffield.png',
+  'university-of-birmingham': '/uni-logos/university-of-birmingham.png',
+  'university-of-exeter': '/uni-logos/university-of-exeter.png',
+};
+
+/**
  * Paper-compatible duotones for everything without a curated entry: dark,
  * bookish inks with cream monograms, all AA-safe by construction (tested).
  * Hand-tuned; order is stable — changing it changes fallback assignments.
@@ -107,14 +164,18 @@ function hashSlug(slug: string): number {
   return hash;
 }
 
-/** The badge for a university: curated brand, or a deterministic duotone. */
+/**
+ * The badge for a university: curated brand colours (or a deterministic
+ * duotone), plus the official logo when `CURATED_LOGOS` carries one.
+ */
 export function badgeFor(slug: string, name: string): UniBrand {
   const curated = CURATED_BRANDS[slug];
-  if (curated !== undefined) return curated;
   const duotone = FALLBACK_DUOTONES[hashSlug(slug) % FALLBACK_DUOTONES.length];
-  return {
+  const base: UniBrand = curated ?? {
     bg: duotone?.bg ?? '#1f3a5f',
     fg: duotone?.fg ?? '#fdf0d5',
     monogram: monogramFor(name),
   };
+  const logo = CURATED_LOGOS[slug];
+  return logo === undefined ? base : { ...base, logo };
 }
