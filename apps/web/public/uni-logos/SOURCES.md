@@ -46,3 +46,9 @@ All assets fetched 2026-07-21.
 > weight; the byte-identical originals remain in git history at commit 87d4936.
 
 > Warwick removed (2026-07-21): their own icon assets publish only the monochrome coat-of-arms crest (black/light, white/dark), illegible at 20px and off-brand. Reverted to the aubergine 'W' monogram — sharper and on-brand. The removed original remains in git history.
+
+> Warwick re-added (2026-07-21, owner direction): crest artwork is Warwick's own
+> apple-touch-icon (https://d36jn9qou1tztq.cloudfront.net/static_war/render/id7/images/apple-touch-icon-180x180.png.265479534550,
+> declared from warwick.ac.uk), composited via luminance mask onto a lavender tile
+> (#b1a4e6) to match the university's avatar-style presentation. Transformation:
+> background fill only; crest ink untouched. 180x180.
