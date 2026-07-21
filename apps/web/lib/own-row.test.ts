@@ -6,8 +6,9 @@ import { applyOwnRowHighlight } from './own-row';
 /**
  * The public boards are cached HTML with no viewer identity baked in. This pure
  * DOM helper is what the client `ViewerRowHighlight` runs after hydration to
- * personalise the cached table for the signed-in viewer — highlight their row
- * and (on the global board) offer the "add badge" affordance.
+ * personalise the cached table for the signed-in viewer: it highlights their
+ * row and reports where the "add badge" affordance should mount (the component
+ * portals a next/link `Link` there, so navigation stays client-side).
  */
 
 function board(rows: { uid: string; badge?: boolean }[]): HTMLElement {
@@ -52,43 +53,45 @@ describe('applyOwnRowHighlight', () => {
 
   it('does nothing when the viewer id is null (signed out)', () => {
     const root = board([{ uid: 'a' }]);
-    applyOwnRowHighlight(root, null, true);
+    const { badgeMount } = applyOwnRowHighlight(root, null, true);
     expect(root.querySelector('.row-self')).toBeNull();
-    expect(root.querySelector('.chip--add')).toBeNull();
+    expect(badgeMount).toBeNull();
   });
 
   it('does nothing when the viewer is not on the board', () => {
     const root = board([{ uid: 'a' }]);
-    applyOwnRowHighlight(root, 'zzz', true);
+    const { badgeMount } = applyOwnRowHighlight(root, 'zzz', true);
     expect(root.querySelector('.row-self')).toBeNull();
+    expect(badgeMount).toBeNull();
   });
 
-  it('offers the add-badge affordance on the viewer’s own unbadged row', () => {
+  it('reports the viewer’s own unbadged .player as the affordance mount', () => {
     const root = board([{ uid: 'a', badge: false }]);
-    applyOwnRowHighlight(root, 'a', true);
-    const chip = root.querySelector('[data-uid="a"] .chip--add');
-    expect(chip).not.toBeNull();
-    expect(chip?.getAttribute('href')).toBe('/verify');
+    const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
+    expect(badgeMount).not.toBeNull();
+    expect(badgeMount).toBe(root.querySelector('[data-uid="a"] .player'));
   });
 
-  it('does not offer the affordance when the viewer already has a badge', () => {
+  it('reports no mount when the viewer already has a badge', () => {
     const root = board([{ uid: 'a', badge: true }]);
-    applyOwnRowHighlight(root, 'a', true);
-    expect(root.querySelector('.chip--add')).toBeNull();
+    const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
+    expect(badgeMount).toBeNull();
   });
 
-  it('does not offer the affordance when badges are hidden (university board)', () => {
+  it('reports no mount when badges are hidden (university board)', () => {
     const root = board([{ uid: 'a', badge: false }]);
-    applyOwnRowHighlight(root, 'a', false);
-    expect(root.querySelector('.chip--add')).toBeNull();
+    const { badgeMount } = applyOwnRowHighlight(root, 'a', false);
+    expect(badgeMount).toBeNull();
     // The row is still highlighted, though.
     expect(root.querySelector('[data-uid="a"]')?.className).toContain('row-self');
   });
 
-  it('is idempotent — a second run does not duplicate the affordance', () => {
+  it('reports no mount when an affordance is already present (idempotent)', () => {
     const root = board([{ uid: 'a', badge: false }]);
-    applyOwnRowHighlight(root, 'a', true);
-    applyOwnRowHighlight(root, 'a', true);
-    expect(root.querySelectorAll('.chip--add')).toHaveLength(1);
+    const existing = document.createElement('a');
+    existing.className = 'chip chip--add';
+    root.querySelector('[data-uid="a"] .player')?.append(existing);
+    const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
+    expect(badgeMount).toBeNull();
   });
 });
