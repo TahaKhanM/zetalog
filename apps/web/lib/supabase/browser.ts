@@ -1,6 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr';
 
 import { clientEnv } from '../env';
+import type { Database } from './database';
 
 /**
  * Supabase client for use in Client Components. Reads and writes the session
@@ -9,5 +10,8 @@ import { clientEnv } from '../env';
  */
 export function createClient() {
   const env = clientEnv();
-  return createBrowserClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return createBrowserClient<Database>(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
 }

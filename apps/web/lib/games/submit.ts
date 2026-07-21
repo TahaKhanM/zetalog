@@ -38,10 +38,17 @@ export interface GameToInsert {
   readonly validation: Verdict;
 }
 
+/**
+ * The persisted status, whether freshly inserted or resolved from a conflict.
+ * A conflict can resolve to a game the user later removed, so `user_removed` is
+ * possible here even though a fresh judge only yields the three judged states.
+ */
+export type PersistedOutcome = ValidationOutcome | 'user_removed';
+
 /** The persisted outcome, whether freshly inserted or resolved from a conflict. */
 export interface PersistedGame {
   readonly id: string;
-  readonly outcome: ValidationOutcome;
+  readonly outcome: PersistedOutcome;
   readonly serverScore: number;
 }
 

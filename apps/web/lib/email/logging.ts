@@ -1,6 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-
 import { sha256Hex } from '../hash';
+import type { Db } from '../supabase/database';
 import type { EmailEvent, EmailEventLogger, EmailSender } from './types';
 
 /**
@@ -37,7 +36,7 @@ export function withEventLogging(
  * (the table is service-role only — RLS has zero policies). Insert failures
  * throw with context rather than being swallowed.
  */
-export function createSupabaseEmailEventLogger(service: SupabaseClient): EmailEventLogger {
+export function createSupabaseEmailEventLogger(service: Db): EmailEventLogger {
   return {
     async log(event) {
       const { error } = await service.from('email_events').insert({

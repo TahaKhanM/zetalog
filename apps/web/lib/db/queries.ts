@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { RankableDuration } from '@zetalog/shared';
 import { z } from 'zod';
 
@@ -15,6 +14,7 @@ import {
   type ProfileRow,
   type UniversityRow,
 } from './rows';
+import type { Db } from '../supabase/database';
 
 /**
  * Typed reads over Supabase. Every function takes the client as a parameter so
@@ -62,10 +62,7 @@ export interface LeaderboardQuery {
  * given. Reads the `leaderboard_entries` view, which already restricts to
  * accepted, rankable games and named profiles.
  */
-export function getLeaderboard(
-  client: SupabaseClient,
-  query: LeaderboardQuery,
-): Promise<LeaderboardEntry[]> {
+export function getLeaderboard(client: Db, query: LeaderboardQuery): Promise<LeaderboardEntry[]> {
   let builder = client.from('leaderboard_entries').select('*').eq('duration', query.duration);
   if (query.universitySlug !== undefined) {
     builder = builder.eq('university_slug', query.universitySlug);
@@ -92,7 +89,7 @@ export interface UniversityOption {
  * The universities that currently have at least one ranked entry, deduplicated
  * and sorted by name — the source for the `/` university filter select.
  */
-export async function getUniversityOptions(client: SupabaseClient): Promise<UniversityOption[]> {
+export async function getUniversityOptions(client: Db): Promise<UniversityOption[]> {
   const rows = await fetchList(
     client
       .from('leaderboard_entries')
@@ -109,10 +106,7 @@ export async function getUniversityOptions(client: SupabaseClient): Promise<Univ
 }
 
 /** A university by its slug, or null if the slug is unknown (drives the `/uni/[slug]` 404). */
-export function getUniversityBySlug(
-  client: SupabaseClient,
-  slug: string,
-): Promise<UniversityRow | null> {
+export function getUniversityBySlug(client: Db, slug: string): Promise<UniversityRow | null> {
   return fetchMaybe(
     client.from('universities').select('*').eq('slug', slug).maybeSingle(),
     universityRowSchema,
@@ -121,10 +115,7 @@ export function getUniversityBySlug(
 }
 
 /** A university by id — used to label the badge card on `/me`. */
-export function getUniversityById(
-  client: SupabaseClient,
-  id: string,
-): Promise<UniversityRow | null> {
+export function getUniversityById(client: Db, id: string): Promise<UniversityRow | null> {
   return fetchMaybe(
     client.from('universities').select('*').eq('id', id).maybeSingle(),
     universityRowSchema,
@@ -133,7 +124,7 @@ export function getUniversityById(
 }
 
 /** A user's own profile, or null if the row does not exist yet. */
-export function getProfile(client: SupabaseClient, userId: string): Promise<ProfileRow | null> {
+export function getProfile(client: Db, userId: string): Promise<ProfileRow | null> {
   return fetchMaybe(
     client.from('profiles').select('*').eq('id', userId).maybeSingle(),
     profileRowSchema,
@@ -146,7 +137,7 @@ export function getProfile(client: SupabaseClient, userId: string): Promise<Prof
  * The caller passes the user's cookie client; RLS restricts the read to their
  * own rows, and the explicit filter documents that intent.
  */
-export function getOwnGames(client: SupabaseClient, userId: string): Promise<GameRow[]> {
+export function getOwnGames(client: Db, userId: string): Promise<GameRow[]> {
   return fetchList(
     client
       .from('games')
@@ -167,7 +158,7 @@ const quarantineJoinSchema = gameRowSchema.extend({
  * oldest first (first-in-first-reviewed). MUST be called with the service
  * client — RLS would otherwise hide other users' rows.
  */
-export async function getQuarantineQueue(service: SupabaseClient): Promise<AdminGameRow[]> {
+export async function getQuarantineQueue(service: Db): Promise<AdminGameRow[]> {
   const rows = await fetchList(
     service
       .from('games')
