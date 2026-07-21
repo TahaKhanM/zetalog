@@ -1,12 +1,14 @@
 // Self-hosted WOFF2 fonts — zero external font requests (spec §8, invariant 7).
 // Archivo's wdth axis file carries both weight (100–900) and width (62–125%),
-// which the wordmark's font-stretch: 125% requires.
+// which the wordmark's font-stretch: 125% requires. Numerals use Azeret Mono
+// (plain zero, tabular by construction) per CO-2, weights 400/500/700.
 import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource/spline-sans/400.css';
 import '@fontsource/spline-sans/500.css';
 import '@fontsource/spline-sans/600.css';
-import '@fontsource/spline-sans-mono/400.css';
-import '@fontsource/spline-sans-mono/700.css';
+import '@fontsource/azeret-mono/400.css';
+import '@fontsource/azeret-mono/500.css';
+import '@fontsource/azeret-mono/700.css';
 import './style.css';
 
 import { palette, typography } from '@zetalog/shared';

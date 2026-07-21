@@ -1,39 +1,54 @@
 /*
- * ZetaLog popup design system. Palette hexes and font families come from
- * @zetalog/shared tokens, injected as --zl-* custom properties by main.tsx.
- * This sheet only *composes* them into semantic roles — no raw hexes, no font
- * families hard-coded here (invariant 7, spec §8).
+ * ZetaLog popup design system. The five palette hexes and the font families
+ * come from @zetalog/shared tokens, injected as --zl-* custom properties by
+ * main.tsx. This sheet only *composes* them — every colour below is either a
+ * palette var or a color-mix over one; no raw hexes, no font families
+ * (invariant 7). Colour application follows CO-2: neutrals carry the layout,
+ * brand colour does accent work only (text / border / tint / stroke), and no
+ * solid brand-colour region is larger than a chip except the wordmark.
  */
 
 :root {
   color-scheme: light dark;
 
-  /* Semantic roles — light mode (navy on cream, maroon display). */
-  --zl-bg: var(--zl-cream);
-  --zl-surface: color-mix(in srgb, var(--zl-navy) 5%, var(--zl-cream));
-  --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 9%, var(--zl-cream));
-  --zl-text: var(--zl-navy);
-  --zl-muted: color-mix(in srgb, var(--zl-navy) 55%, transparent);
-  --zl-faint: color-mix(in srgb, var(--zl-navy) 32%, transparent);
-  --zl-hairline: color-mix(in srgb, var(--zl-navy) 15%, transparent);
+  /* Light: near-white surfaces, softened navy text, brand colour as accent. */
+  --zl-bg: color-mix(in srgb, var(--zl-cream) 30%, white);
+  --zl-surface: white;
+  --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 50%, white);
+  --zl-border: color-mix(in srgb, var(--zl-cream) 60%, white);
+  --zl-divider: color-mix(in srgb, var(--zl-navy) 10%, transparent);
+  --zl-text: color-mix(in srgb, var(--zl-navy) 85%, white);
+  --zl-heading: var(--zl-navy);
+  --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+  --zl-faint: color-mix(in srgb, var(--zl-navy) 42%, white);
   --zl-display: var(--zl-maroon);
   --zl-accent: var(--zl-red);
-  --zl-chart: var(--zl-steel-blue);
-  --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 18%, transparent);
+  --zl-chart: color-mix(in srgb, var(--zl-steel-blue) 85%, transparent);
+  --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 13%, transparent);
+  --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 12%, transparent);
+  --zl-chip-text: color-mix(in srgb, var(--zl-steel-blue) 72%, var(--zl-navy));
+  --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 8%, transparent);
+  --zl-warn-text: var(--zl-maroon);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Cream on navy; the wordmark flips to cream. */
-    --zl-bg: var(--zl-navy);
-    --zl-surface: color-mix(in srgb, var(--zl-cream) 6%, var(--zl-navy));
-    --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 11%, var(--zl-navy));
-    --zl-text: var(--zl-cream);
-    --zl-muted: color-mix(in srgb, var(--zl-cream) 60%, transparent);
-    --zl-faint: color-mix(in srgb, var(--zl-cream) 36%, transparent);
-    --zl-hairline: color-mix(in srgb, var(--zl-cream) 18%, transparent);
+    --zl-bg: color-mix(in srgb, var(--zl-navy) 72%, black);
+    --zl-surface: color-mix(in srgb, var(--zl-navy) 88%, black);
+    --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 80%, black);
+    --zl-border: color-mix(in srgb, var(--zl-cream) 14%, transparent);
+    --zl-divider: color-mix(in srgb, var(--zl-cream) 12%, transparent);
+    --zl-text: color-mix(in srgb, var(--zl-cream) 90%, transparent);
+    --zl-heading: var(--zl-cream);
+    --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 70%, var(--zl-text));
+    --zl-faint: color-mix(in srgb, var(--zl-cream) 45%, transparent);
     --zl-display: var(--zl-cream);
-    --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 24%, transparent);
+    --zl-chart: var(--zl-steel-blue);
+    --zl-chart-fill: color-mix(in srgb, var(--zl-steel-blue) 20%, transparent);
+    --zl-chip-bg: color-mix(in srgb, var(--zl-steel-blue) 18%, transparent);
+    --zl-chip-text: color-mix(in srgb, var(--zl-steel-blue) 82%, var(--zl-cream));
+    --zl-warn-bg: color-mix(in srgb, var(--zl-maroon) 20%, transparent);
+    --zl-warn-text: color-mix(in srgb, var(--zl-maroon) 42%, var(--zl-cream));
   }
 }
 
@@ -54,20 +69,9 @@ body {
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  position: relative;
-  overflow: hidden;
 }
 
-/* A thin maroon instrument bar across the very top. */
-.zl-popup::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--zl-maroon), var(--zl-accent));
-}
-
-/* Numerals are the hero of every screen — always mono + tabular. */
+/* Numerals are the hero of every screen — always mono + tabular (Azeret Mono). */
 .zl-num {
   font-family: var(--zl-font-mono);
   font-variant-numeric: tabular-nums;
@@ -97,7 +101,7 @@ body {
 .zl-section {
   animation: zl-rise 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
   padding: 14px 18px;
-  border-top: 1px solid var(--zl-hairline);
+  border-top: 1px solid var(--zl-divider);
 }
 
 .zl-section:nth-of-type(1) {
@@ -124,7 +128,7 @@ body {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 15px 18px 13px;
+  padding: 16px 18px 13px;
   border-top: none;
 }
 
@@ -135,6 +139,7 @@ body {
   flex: none;
 }
 
+/* The wordmark is the one place a solid brand colour is allowed (CO-2). */
 .zl-wordmark {
   font-family: var(--zl-font-display);
   font-weight: 900;
@@ -168,10 +173,11 @@ body {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
-  color: var(--zl-text);
+  color: var(--zl-heading);
   display: block;
 }
 
+/* New PB: red text only (CO-2 — never a red fill). */
 .zl-hero__score--pb {
   color: var(--zl-accent);
 }
@@ -191,6 +197,7 @@ body {
   color: var(--zl-muted);
 }
 
+/* PB chip: red text + red border, no fill (CO-2). */
 .zl-chip {
   font-family: var(--zl-font-display);
   font-weight: 800;
@@ -198,21 +205,22 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 9px;
-  color: var(--zl-cream);
-  background: var(--zl-accent);
-  padding: 3px 7px 2px;
-  border-radius: 2px;
+  color: var(--zl-accent);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--zl-accent) 55%, transparent);
+  padding: 2px 6px 1px;
+  border-radius: 3px;
   line-height: 1;
 }
 
-/* Personal-best row: three duration columns. */
+/* Personal-best row: three duration columns on white, hairline-separated. */
 .zl-pbs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   margin-top: 14px;
-  background: var(--zl-hairline);
-  border: 1px solid var(--zl-hairline);
+  background: var(--zl-border);
+  border: 1px solid var(--zl-border);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -234,7 +242,7 @@ body {
 .zl-pb__val {
   font-size: 17px;
   font-weight: 700;
-  color: var(--zl-text);
+  color: var(--zl-heading);
 }
 
 .zl-pb__val--empty {
@@ -261,7 +269,7 @@ body {
   font-size: 10px;
   color: var(--zl-text);
   background: var(--zl-surface-strong);
-  border: 1px solid var(--zl-hairline);
+  border: 1px solid var(--zl-border);
   border-radius: 3px;
   padding: 3px 5px;
   max-width: 128px;
@@ -279,12 +287,14 @@ body {
   justify-content: space-between;
   padding: 5px 9px;
   background: var(--zl-surface);
+  border: 1px solid var(--zl-border);
   border-radius: 3px;
 }
 
 .zl-trend__row-score {
   font-size: 15px;
   font-weight: 700;
+  color: var(--zl-heading);
 }
 
 .zl-trend__row-time {
@@ -305,6 +315,7 @@ body {
   width: 100%;
 }
 
+/* Steel-blue strokes are an allowed brand accent (CO-2). */
 .zl-spark__line,
 .zl-chart__line {
   fill: none;
@@ -330,11 +341,6 @@ body {
   fill: var(--zl-faint);
 }
 
-.zl-chart__grid {
-  stroke: var(--zl-hairline);
-  stroke-width: 1;
-}
-
 .zl-spark__caps {
   display: flex;
   justify-content: space-between;
@@ -355,7 +361,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 9px 0;
-  border-bottom: 1px solid var(--zl-hairline);
+  border-bottom: 1px solid var(--zl-divider);
 }
 
 .zl-game:last-child {
@@ -364,7 +370,8 @@ body {
 
 .zl-game__score {
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 500;
+  color: var(--zl-heading);
   min-width: 34px;
 }
 
@@ -394,12 +401,13 @@ body {
   margin-top: 1px;
 }
 
+/* Status flag: steel-blue tint chip + steel text (CO-2 badge rule). */
 .zl-flag {
   font-size: 9px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--zl-display);
-  background: color-mix(in srgb, var(--zl-maroon) 12%, transparent);
+  color: var(--zl-chip-text);
+  background: var(--zl-chip-bg);
   padding: 1px 5px;
   border-radius: 2px;
 }
@@ -416,7 +424,7 @@ body {
   letter-spacing: 0.02em;
   color: var(--zl-text);
   background: transparent;
-  border: 1px solid var(--zl-hairline);
+  border: 1px solid var(--zl-border);
   border-radius: 3px;
   padding: 3px 7px;
   cursor: pointer;
@@ -430,41 +438,45 @@ body {
   border-color: var(--zl-muted);
 }
 
+/* Destructive: red text + red border on hover, never a red fill (CO-2). */
 .zl-btn--danger {
   color: var(--zl-accent);
 }
 
 .zl-btn--danger:hover {
-  background: color-mix(in srgb, var(--zl-accent) 12%, transparent);
+  background: var(--zl-surface-strong);
   border-color: var(--zl-accent);
 }
 
-/* ── Capture-failed banner ──────────────────────────────── */
+/* ── Capture-failed banner: maroon 8% tint + maroon text (CO-2) ── */
 .zl-banner {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 9px 18px;
-  background: var(--zl-maroon);
-  color: var(--zl-cream);
+  background: var(--zl-warn-bg);
+  color: var(--zl-warn-text);
   font-size: 11px;
   line-height: 1.35;
+  border-top: 1px solid var(--zl-divider);
 }
 
 .zl-banner__dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--zl-accent);
+  background: var(--zl-warn-text);
   flex: none;
 }
 
 /* ── Footer ─────────────────────────────────────────────── */
 .zl-footer {
   padding: 12px 18px 15px;
-  border-top: 1px solid var(--zl-hairline);
+  border-top: 1px solid var(--zl-divider);
 }
 
+/* Ghost button: maroon (or cream, dark) text + tinted border; hover is an 8%
+   tint, never a solid maroon fill (CO-2). */
 .zl-sync {
   width: 100%;
   font-family: var(--zl-font-body);
@@ -473,18 +485,15 @@ body {
   letter-spacing: 0.03em;
   color: var(--zl-display);
   background: transparent;
-  border: 1px solid color-mix(in srgb, var(--zl-display) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--zl-display) 38%, transparent);
   border-radius: 4px;
   padding: 8px 12px;
   cursor: pointer;
-  transition:
-    background 0.16s ease,
-    color 0.16s ease;
+  transition: background 0.16s ease;
 }
 
 .zl-sync:hover {
-  background: var(--zl-display);
-  color: var(--zl-bg);
+  background: color-mix(in srgb, var(--zl-display) 8%, transparent);
 }
 
 .zl-footer__note {
