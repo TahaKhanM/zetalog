@@ -24,6 +24,23 @@ export const RATE_WINDOW_MS = 60 * 60 * 1000;
 /** More than this many games received within {@link RATE_WINDOW_MS} is rejected. */
 export const RATE_LIMIT_MAX = 60;
 
+/** Client wall clocks before this instant (2020-01-01T00:00:00Z) are treated as broken. */
+export const MIN_PLAUSIBLE_STARTED_AT_MS = Date.parse('2020-01-01T00:00:00Z');
+
+/**
+ * The `played_at` to store for a submission. `startedAtMs` is the CLIENT's
+ * epoch-ms wall clock at game start — display-only and never trusted for
+ * ordering or rate limiting (`received_at`, stamped by the database, stays
+ * authoritative there). It is used verbatim when plausible — within
+ * [{@link MIN_PLAUSIBLE_STARTED_AT_MS}, `nowMs`] — so backfilled games keep
+ * their real play date; a future or pre-2020 value means a broken client
+ * clock, and the server receive time is stored instead.
+ */
+export function playedAtIso(startedAtMs: number, nowMs: number): string {
+  const plausible = startedAtMs >= MIN_PLAUSIBLE_STARTED_AT_MS && startedAtMs <= nowMs;
+  return new Date(plausible ? startedAtMs : nowMs).toISOString();
+}
+
 /** A validated game row ready to persist. Column mapping happens in the port. */
 export interface GameToInsert {
   readonly userId: string;
@@ -79,7 +96,8 @@ export type SubmitResult =
 /**
  * Run the submission pipeline for one already-parsed record and authenticated
  * user. `nowMs` is the server clock (the route passes `Date.now()`); it fixes
- * both the rate-limit window and the stored `played_at`.
+ * the rate-limit window and bounds the client-supplied `played_at`
+ * (see {@link playedAtIso}).
  */
 export async function submitGame(
   record: GameRecord,
@@ -119,7 +137,7 @@ export async function submitGame(
   const persisted = await port.insertGame({
     userId,
     clientGameId: record.id,
-    playedAt: new Date(nowMs).toISOString(),
+    playedAt: playedAtIso(record.startedAtMs, nowMs),
     settingsFingerprint: fingerprint(record.settings),
     rankableDuration: duration,
     claimedScore: record.claimedScore,

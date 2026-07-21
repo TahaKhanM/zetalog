@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clientEnv, serverEnv } from './env';
+import { clientEnv } from './env';
+import { serverEnv } from './env.server';
 
 const KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
