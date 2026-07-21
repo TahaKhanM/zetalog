@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { createClient } from '@/lib/supabase/browser';
-import { CODE_LENGTH, isCompleteCode, normaliseCode, signInErrorMessage } from '@/lib/signin';
+import { isCompleteCode, normaliseCode, signInErrorMessage } from '@/lib/signin';
 
 /**
  * Sign-in: passwordless six-digit email code (Supabase Auth → Resend SMTP;
@@ -79,8 +79,8 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
           className="auth-form__stack"
         >
           <p className="meta">
-            We emailed a {CODE_LENGTH}-digit code to <strong>{email}</strong>. Enter it below —
-            codes expire after an hour.
+            We emailed a sign-in code to <strong>{email}</strong>. Enter it below — codes expire
+            after an hour.
           </p>
           <label className="uni-filter">
             <span className="uni-filter__label">Sign-in code</span>
@@ -88,7 +88,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
               className="field num"
               inputMode="numeric"
               autoComplete="one-time-code"
-              placeholder="123456"
+              placeholder="12345678"
               required
               value={code}
               onChange={(event) => {

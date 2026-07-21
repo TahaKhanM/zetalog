@@ -76,3 +76,22 @@ describe('authEmailTemplates', () => {
     }
   });
 });
+
+describe('dark mode', () => {
+  it('declares both color schemes so clients apply the dark variant', () => {
+    expect(sample.html).toContain('name="color-scheme" content="light dark"');
+    expect(sample.html).toContain('@media (prefers-color-scheme: dark)');
+  });
+
+  it('uses the brand dark theme: deep navy surfaces with cream text', () => {
+    const pageDark = mixHex(palette.navy, '#000000', 0.72);
+    const cardDark = mixHex(palette.navy, '#000000', 0.88);
+    expect(sample.html).toContain(pageDark);
+    expect(sample.html).toContain(cardDark);
+    expect(sample.html).toMatch(new RegExp(`\\.em-code\\{color:${palette.cream}`));
+  });
+
+  it('overrides inline styles with !important inside the media query', () => {
+    expect(sample.html).toContain('!important');
+  });
+});
