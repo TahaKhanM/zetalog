@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseProblem, solve } from './problems.js';
+import { parseProblem, solve } from './problems';
 
 describe('parseProblem', () => {
   it.each([
