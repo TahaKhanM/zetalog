@@ -64,6 +64,20 @@ describe('authEmailTemplates', () => {
     'utf8',
   );
 
+  it('carries the three dashboard templates (W8 adds Reset Password)', () => {
+    expect(authEmailTemplates().map((t) => t.name)).toEqual([
+      'Magic Link',
+      'Confirm signup',
+      'Reset Password',
+    ]);
+  });
+
+  it('gives the recovery email reset-specific copy and subject', () => {
+    const recovery = authEmailTemplates().find((t) => t.name === 'Reset Password');
+    expect(recovery?.subject).toBe('Your ZetaLog password reset code: {{ .Token }}');
+    expect(recovery?.html).toContain('Reset your password');
+  });
+
   it.each(authEmailTemplates())('docs/ops copy of "$name" is byte-identical to the code', (t) => {
     expect(doc).toContain(t.subject);
     expect(doc).toContain(t.html);
@@ -75,6 +89,29 @@ describe('authEmailTemplates', () => {
       expect(t.html).not.toMatch(/<a[\s>]/i);
     }
   });
+
+  // Local-stack parity: supabase/config.toml points GoTrue at these files, so
+  // the ZL_FULLSTACK e2e exercises the exact production templates (and the
+  // owner pastes the same bytes into the dashboard).
+  const LOCAL_TEMPLATE_FILES: Record<string, string> = {
+    'Magic Link': 'magic_link.html',
+    'Confirm signup': 'confirmation.html',
+    'Reset Password': 'recovery.html',
+  };
+
+  it.each(authEmailTemplates())(
+    'supabase/templates copy of "$name" is byte-identical to the code',
+    (t) => {
+      const file = LOCAL_TEMPLATE_FILES[t.name];
+      expect(file).toBeDefined();
+      if (file === undefined) return;
+      const onDisk = readFileSync(
+        join(import.meta.dirname, '../../../../supabase/templates', file),
+        'utf8',
+      );
+      expect(onDisk).toBe(`${t.html}\n`);
+    },
+  );
 });
 
 describe('dark mode', () => {
