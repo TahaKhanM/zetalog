@@ -65,7 +65,7 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   // https://www.ed.ac.uk/brand — Edinburgh dark blue
   'university-of-edinburgh': { bg: '#041e42', fg: '#fdf0d5', monogram: 'E' },
   // https://www.manchester.ac.uk brand purple
-  'the-victoria-university-of-manchester': { bg: '#660099', fg: '#ffffff', monogram: 'M' },
+  'university-of-manchester': { bg: '#660099', fg: '#ffffff', monogram: 'M' },
   // https://www.kcl.ac.uk/brand — KCL red (dark ink variant for AA)
   'king-s-college-london-university-of-london': { bg: '#8a1538', fg: '#ffffff', monogram: 'K' },
   // https://www.bristol.ac.uk/brand/ — Bristol red
