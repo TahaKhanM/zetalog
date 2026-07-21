@@ -587,6 +587,120 @@ button {
   background-repeat: no-repeat;
 }
 
+/* ── CO-3 masthead: eyebrow + maroon rule + editorial title row ─────────── */
+.masthead {
+  margin-bottom: 1.5rem;
+}
+
+.masthead__eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  border-bottom: 2px solid var(--rule-strong);
+  padding-bottom: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.masthead__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* Duration tabs as large index numerals, not pills (CO-3 §2). */
+.index-tabs {
+  display: flex;
+  gap: 1.6rem;
+  align-items: baseline;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--surface-hairline);
+}
+
+.index-tab {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.2rem 0.1rem 0.55rem;
+  color: var(--meta-text);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.index-tab__unit {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-left: 0.1rem;
+}
+
+.index-tab:hover {
+  color: var(--surface-heading);
+}
+
+.index-tab[aria-selected='true'] {
+  color: var(--ink-index);
+  border-bottom-color: var(--ink-index);
+}
+
+/* Board + quiet right stat rail (stacks on narrow viewports). */
+.board-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 10.5rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .board-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stat-rail {
+    flex-direction: row;
+  }
+}
+
+.stat-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.8rem 0.95rem;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  flex: 1;
+}
+
+.stat-tile__value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+.stat-tile__label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--meta-text);
+}
+
+.player__badge-link {
+  display: inline-flex;
+  border-radius: 6px;
+}
+
+.player__badge-link:hover .uni-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-zl-steel) 45%, transparent);
+}
+
 /* ── Leaderboard ────────────────────────────────────────────────────────── */
 .board-head {
   display: flex;

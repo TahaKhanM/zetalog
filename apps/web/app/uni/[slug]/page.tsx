@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { LeaderboardView } from '@/app/_components/LeaderboardView';
 import { parseDuration } from '@/lib/leaderboard';
 import {
+  getCachedBoardStats,
   getCachedLeaderboard,
   getCachedUniversityBySlug,
   getCachedUniversityOptions,
@@ -41,9 +42,10 @@ export default async function UniversityPage({
   const university = await getCachedUniversityBySlug(slug);
   if (university === null) notFound();
 
-  const [entries, uniOptions] = await Promise.all([
+  const [entries, uniOptions, stats] = await Promise.all([
     getCachedLeaderboard(duration, slug),
     getCachedUniversityOptions(),
+    getCachedBoardStats(),
   ]);
 
   return (
@@ -55,6 +57,7 @@ export default async function UniversityPage({
       uniOptions={uniOptions}
       currentSlug={slug}
       showBadges={false}
+      stats={stats}
     />
   );
 }
