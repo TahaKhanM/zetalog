@@ -1,7 +1,8 @@
 /**
- * Pure logic for the two-step email-OTP sign-in (email → emailed digit code).
+ * Pure logic for the auth forms: emailed-code handling (sign-up confirmation
+ * and password recovery) and the GoTrue error → user-copy mapper.
  *
- * The email carries only a code — no links — so university mail filters have
+ * Code emails carry only a code — no links — so university mail filters have
  * nothing to flag (a sender/link domain mismatch is what quarantined the old
  * magic-link emails as phishing). The thin `SignInForm` shell wires these
  * helpers to the browser Supabase client.
@@ -31,20 +32,44 @@ export interface AuthErrorLike {
   readonly status?: number | undefined;
 }
 
+/** The auth step a GoTrue failure came from (each maps to distinct copy). */
+export type AuthErrorKind = 'send' | 'verify' | 'signup' | 'recovery-send' | 'update-password';
+
 /**
  * Map a GoTrue failure to safe, actionable copy. Raw server text is never
- * shown to users (it can leak internals and is useless to them).
+ * shown to users (it can leak internals and is useless to them) — and error
+ * objects are matched, never logged, so a failure can never leak a password.
  */
-export function signInErrorMessage(kind: 'send' | 'verify', error: AuthErrorLike | null): string {
+export function signInErrorMessage(kind: AuthErrorKind, error: AuthErrorLike | null): string {
   if (error?.status === 429) {
     return 'Too many attempts — wait a minute, then try again.';
   }
-  if (kind === 'send') {
-    return 'Could not send the code. Check the address and try again.';
-  }
   const message = error?.message ?? '';
-  if (/expired|invalid|not found/i.test(message)) {
-    return 'That code is wrong or has expired. Check it, or send a new one.';
+  switch (kind) {
+    case 'send':
+      return 'Could not send the code. Check the address and try again.';
+    case 'recovery-send':
+      return 'Could not send the reset code. Check the address and try again.';
+    case 'signup':
+      if (/already registered|already exists/i.test(message)) {
+        return 'An account with this email already exists — sign in instead.';
+      }
+      if (/password|weak/i.test(message)) {
+        return 'That password is too weak. Use at least 10 characters.';
+      }
+      return 'Could not create the account. Please try again.';
+    case 'update-password':
+      if (/different/i.test(message)) {
+        return 'Choose a password different from your old one.';
+      }
+      if (/password|weak/i.test(message)) {
+        return 'That password is too weak. Use at least 10 characters.';
+      }
+      return 'Could not set the password. Please try again.';
+    case 'verify':
+      if (/expired|invalid|not found/i.test(message)) {
+        return 'That code is wrong or has expired. Check it, or send a new one.';
+      }
+      return 'Could not verify the code. Please try again.';
   }
-  return 'Could not verify the code. Please try again.';
 }
