@@ -1,4 +1,4 @@
-/** Placeholder shell — replaced by the leaderboard implementation (Plan 3). */
+/** Placeholder — replaced by the global leaderboard in the next commit. */
 export default function HomePage(): React.JSX.Element {
-  return <main>ZetaLog</main>;
+  return <p className="meta">Leaderboard loading…</p>;
 }
