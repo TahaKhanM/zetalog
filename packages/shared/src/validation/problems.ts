@@ -325,7 +325,7 @@ function marginalSlots(settings: ZetamacSettings): ReadonlyMap<Operator, readonl
  * α = {@link MARGINAL_FALSE_POSITIVE_RATE} (property-tested).
  *
  * The pooled test carries the power at realistic lengths: a per-slot test
- * cannot fire below n_j ≈ ln(2K/α)/2 ≈ 24 even for a maximal deviation, so a
+ * cannot fire below n_j > 2·ln(2K/α) ≈ 24 even for a maximal deviation, so a
  * balanced four-op 60-problem attack (n_j ≈ 15) would evade per-slot tests
  * entirely; pooling its ~120 observations catches it, while the per-slot
  * tests catch a single pinned operand in longer games.
