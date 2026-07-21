@@ -54,7 +54,7 @@ export const typography = {
    * Numerals are the visual hero — always tabular so columns of scores align.
    */
   numeric: {
-    family: 'Spline Sans Mono',
+    family: 'Azeret Mono',
     fontVariantNumeric: 'tabular-nums',
   },
 } as const;
