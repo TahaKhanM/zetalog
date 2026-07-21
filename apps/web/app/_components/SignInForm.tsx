@@ -311,7 +311,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
   );
 
   const changeEmail = (
-    <button type="button" className="auth-chip__signout" disabled={busy} onClick={backToEmail}>
+    <button type="button" className="auth-form__forgot" disabled={busy} onClick={backToEmail}>
       Use a different email
     </button>
   );
@@ -381,6 +381,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             void signInWithPassword();
           }}
         >
+          <p className="auth-step display">Welcome back</p>
           <p className="meta">
             Signing in as <strong>{step.email}</strong>. {changeEmail}
           </p>
@@ -426,8 +427,9 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             void createAccount();
           }}
         >
+          <p className="auth-step display">New here — create your account</p>
           <p className="meta">
-            New account for <strong>{step.email}</strong>. {changeEmail}
+            We&apos;ll set up <strong>{step.email}</strong> with a password. {changeEmail}
           </p>
           {passwordPair('Create account', 'Creating…', 'new-password')}
         </form>
