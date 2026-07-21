@@ -108,12 +108,20 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
     // Score before problem: the accepted event must precede the next problem
     // so the server can recompute the stream in order (spec §5).
     const nextScore = readScore(scoreEl.textContent);
-    if (nextScore !== null && nextScore > lastScore) {
+    const accepted = nextScore !== null && nextScore > lastScore;
+    if (accepted) {
       recorder.scoreIncremented(at());
       lastScore = nextScore;
     }
+    // Record the next problem whenever one is present. A score increment means
+    // Zetamac accepted the answer and advanced to a fresh problem — detect that
+    // via the accept/input-clear cycle, NOT text inequality, because Zetamac
+    // legitimately repeats the same problem text back-to-back (~0.7% of default
+    // 120s games). Gating on `!==` alone would drop the repeat's `problem`
+    // event, leaving its accept an `accepted-without-problem` anomaly and
+    // undercounting the recomputed score by one.
     const nextProblem = problemEl.textContent.trim();
-    if (nextProblem.length > 0 && nextProblem !== lastProblem) {
+    if (nextProblem.length > 0 && (accepted || nextProblem !== lastProblem)) {
       recorder.problemShown(nextProblem, at());
       lastProblem = nextProblem;
     }
