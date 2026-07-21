@@ -17,4 +17,17 @@ export default defineConfig({
       128: '/icon-128.png',
     },
   },
+  hooks: {
+    // The link content script declares a localhost match so the account-link
+    // handoff is testable against a local web app (`wxt dev` / `wxt build
+    // --mode development`). The PUBLISHED build must ship only the production
+    // origin, so every localhost match is stripped from the generated manifest
+    // outside development mode.
+    'build:manifestGenerated': (wxt, manifest) => {
+      if (wxt.config.mode === 'development') return;
+      for (const script of manifest.content_scripts ?? []) {
+        script.matches = (script.matches ?? []).filter((match) => !match.includes('//localhost'));
+      }
+    },
+  },
 });
