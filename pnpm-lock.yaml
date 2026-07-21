@@ -81,10 +81,10 @@ importers:
       '@fontsource-variable/archivo':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/spline-sans':
+      '@fontsource/azeret-mono':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/spline-sans-mono':
+      '@fontsource/spline-sans':
         specifier: ^5.3.0
         version: 5.3.0
       '@supabase/ssr':
@@ -491,6 +491,9 @@ packages:
 
   '@fontsource-variable/archivo@5.3.0':
     resolution: {integrity: sha512-HogK8FJelrD1o7TlZlkIVtHgc20bO5PZRWE7mUeUTdMN055alznQV6/00J00IBeu8FQAH4s3zW9UJNvKExXf+g==}
+
+  '@fontsource/azeret-mono@5.3.0':
+    resolution: {integrity: sha512-Ag/+gN67fUry7i1yLlTnk16Rr1nnTQI2YefA/G7tYcCSr/+TC/ayMrE8Km7O0OKRgI/B5Mfel46Gq9IGY50Uaw==}
 
   '@fontsource/spline-sans-mono@5.3.0':
     resolution: {integrity: sha512-9MJxL52KuuVskwM3LbCwEP/L3ClsHsCd18gwmm5df/ZFh/TIg3LE9DT4pLyB5ptKCvEEi7JwclAe8HhCfzlBWg==}
@@ -3369,6 +3372,8 @@ snapshots:
   '@exodus/bytes@1.15.1': {}
 
   '@fontsource-variable/archivo@5.3.0': {}
+
+  '@fontsource/azeret-mono@5.3.0': {}
 
   '@fontsource/spline-sans-mono@5.3.0': {}
 
