@@ -31,3 +31,14 @@ export function readBearerToken(request: Request): string | null {
   const match = /^Bearer (.+)$/.exec(header);
   return match?.[1] ?? null;
 }
+
+/**
+ * The client IP for rate-limit keying: the first `x-forwarded-for` entry
+ * (Vercel appends its own hops after the client). Falls back to a fixed key,
+ * which collapses unattributed traffic into one shared bucket — the safe
+ * direction for a limiter.
+ */
+export function clientIpFrom(request: Request): string {
+  const first = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return first !== undefined && first !== '' ? first : 'unknown';
+}

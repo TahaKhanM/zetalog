@@ -3,6 +3,7 @@ import { randomInt } from 'node:crypto';
 import { z } from 'zod';
 
 import { userIdFromCookies } from '@/lib/auth';
+import { createIdentifierResolver } from '@/lib/auth-identifier';
 import { createSupabaseEmailEventLogger, withEventLogging } from '@/lib/email/logging';
 import { brandedCodeEmail } from '@/lib/email/template';
 import { createResendSender } from '@/lib/email/resend';
@@ -40,6 +41,7 @@ export async function POST(request: Request): Promise<Response> {
 
   return handleVerifyRequest(request, {
     authenticate: async () => userIdFromCookies(await createClient()),
+    resolveIdentifier: createIdentifierResolver(service),
     listUniversities: async () => {
       const { data, error } = await service.from('universities').select('id, domains');
       if (error !== null) throw new Error(`listUniversities: ${error.message}`);
