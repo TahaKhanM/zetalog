@@ -35,8 +35,11 @@ describe('globals.css ↔ shared tokens', () => {
     }
   });
 
-  it('contains no 6-digit hex literal other than the five brand colours', () => {
-    const found = (css.toLowerCase().match(/#[0-9a-f]{6}\b/g) ?? []).map((hex) => hex);
+  it('contains no hex literal other than the five brand colours', () => {
+    // Catch 3-, 4-, 6-, and 8-digit forms: a short or alpha hex can never be
+    // one of the five brand colours, so anything not exactly on that list is a
+    // hard-coded colour (CO-2 §3 — tints must be color-mix over the variables).
+    const found = (css.toLowerCase().match(/#[0-9a-f]{3,8}\b/g) ?? []).map((hex) => hex);
     const strays = [...new Set(found)].filter((hex) => !brandHexes.has(hex));
     expect(strays).toEqual([]);
   });
