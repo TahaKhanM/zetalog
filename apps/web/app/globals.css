@@ -815,6 +815,13 @@ button {
   background: var(--surface-border);
 }
 
+.auth-form__row {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
 .auth-form__google {
   width: 100%;
 }
