@@ -79,6 +79,12 @@ describe('latestGame', () => {
     expect(latestGame([stored({ score: 5, savedAtMs: 1, status: 'removed' })])).toBeNull();
     expect(latestGame([])).toBeNull();
   });
+
+  it('never surfaces a capture_failed record as the latest game', () => {
+    const games = [stored({ score: 0, savedAtMs: 1, status: 'capture_failed' })];
+    expect(latestGame(games)).toBeNull();
+    expect(personalBests(games)).toEqual({ 30: null, 60: null, 120: null });
+  });
 });
 
 describe('isNewPersonalBest', () => {
