@@ -116,6 +116,13 @@ The extension submits the full event stream; the claimed score is never trusted.
 2. **Physiology rules:** sustained answer times below the human floor (~250 ms per problem), inter-keystroke intervals too uniform (scripted cadence), problem rate impossible for the duration.
 3. **Consistency rules:** monotonic timestamps, event count consistent with score, total time consistent with configured duration, fingerprint actually matches default ranges for the claimed `rankable_duration`.
 4. **History rules:** a new PB far above the user's score distribution ⇒ `quarantined` for human review, not auto-accepted. Per-user rate limit on submissions (more games/hour than a human can physically play ⇒ reject).
+5. **Problem-stream conformity (W6 — problem-tampering defence):** a cheater who rewrites the _displayed_ problems (e.g. every problem becomes "2 + 2") yields an internally consistent stream that no other check catches; these rules reconstruct what Zetamac's generator can emit for the claimed settings.
+   - **Range conformity:** each solved problem's operands must be producible by the generator — add within its ranges; subtraction is the reverse of add (shown subtrahend ∈ add_left, answer ∈ add_right); multiplication within its ranges (left factor ≤ its cap); division the reverse of mul (divisor ∈ mul_left, exact quotient ∈ mul_right). An impossible problem ⇒ `rejected` (same class as non-monotonic timestamps).
+   - **Operation mix:** with ≥ 2 ops enabled each is drawn uniformly, so over n ≥ 30 problems an enabled op's share deviating past a Hoeffding two-sided union bound (`t = √(ln(2k/α)/2n)`, family-wise false-positive α = 1e-4) ⇒ `quarantined`. Abstains when a zero divisor could force a re-roll.
+   - **Repetition/entropy:** independent draws mean a single problem recurring beyond the birthday bound for the _claimed_ operand space (Poisson-tail union bound, α = 1e-4) ⇒ `quarantined`; narrow-range games are judged against their own small space and so are not flagged.
+   - **Problem-switch:** consecutive `problem` events with no `accepted` between them (Zetamac never re-renders an unsolved problem) are counted; any occurrence ⇒ `quarantined` with the count recorded.
+
+   All bounds are property-tested (fast-check, 10k seeded runs) against a faithful port of the real generator so legitimate play — across durations and non-default configs — never trips them.
 
 Outcomes: `accepted` (ranks) · `quarantined` (appears in `/admin` review queue with telemetry visualisation; approve ⇒ accepted, reject ⇒ rejected) · `rejected` (kept for audit; never ranks). All rules are pure functions in `packages/shared`, unit-tested against synthetic human-like and bot-like event-stream fixtures.
 
