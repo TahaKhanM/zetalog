@@ -66,18 +66,12 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   'university-of-edinburgh': { bg: '#041e42', fg: '#fdf0d5', monogram: 'E' },
   // https://www.manchester.ac.uk brand purple
   'university-of-manchester': { bg: '#660099', fg: '#ffffff', monogram: 'M' },
-  // https://www.kcl.ac.uk/brand — KCL red (dark ink variant for AA)
-  'king-s-college-london-university-of-london': { bg: '#8a1538', fg: '#ffffff', monogram: 'K' },
-  // https://www.bristol.ac.uk/brand/ — Bristol red
-  'university-of-bristol': { bg: '#ab1f2d', fg: '#ffffff', monogram: 'B' },
-  // https://www.gla.ac.uk/myglasgow/brandtoolkit/ — Glasgow "University blue"
+  // Pantone 485C per brandcolorcode.com/kings-college-london (black ink for AA)
+  'king-s-college-london-university-of-london': { bg: '#e12726', fg: '#000000', monogram: 'K' },
+  // Pantone 187 per bristol.ac.uk/style-guides/brand-identity
+  'university-of-bristol': { bg: '#a6192e', fg: '#ffffff', monogram: 'B' },
+  // PMS 2955 #003865 per gla.ac.uk/myglasgow/staff/brandtoolkit/colour
   'university-of-glasgow': { bg: '#003865', fg: '#ffffff', monogram: 'G' },
-  // https://www.bath.ac.uk — Bath blue
-  'university-of-bath': { bg: '#004489', fg: '#ffffff', monogram: 'B' },
-  // https://warwick/queen-mary brand — QMUL blue
-  'queen-mary-university-of-london': { bg: '#003d71', fg: '#ffffff', monogram: 'Q' },
-  // https://www.st-andrews.ac.uk/brand — St Andrews blue
-  'university-of-st-andrews': { bg: '#00539b', fg: '#ffffff', monogram: 'S' },
 };
 
 /**
