@@ -5,7 +5,7 @@
  */
 export function BrandMark({
   variant,
-  size = 24,
+  size = 32,
 }: {
   variant: 'lockup' | 'mark';
   size?: number;
