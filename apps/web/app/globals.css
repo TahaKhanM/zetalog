@@ -198,7 +198,7 @@ button {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  height: 4.1rem;
+  height: 4.4rem;
 }
 
 .wordmark {
@@ -208,7 +208,7 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--ink-display);
-  font-size: 1.35rem;
+  font-size: 1.55rem;
   line-height: 1;
 }
 
@@ -271,6 +271,20 @@ button {
   font-size: 0.82rem;
 }
 
+/* University-board masthead mark: large enough to brand the page. */
+.uni-badge--masthead {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  font-size: 1.3rem;
+}
+
+.board-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
 .uni-badge--logo {
   object-fit: contain;
   background: white;
@@ -318,19 +332,34 @@ button {
 /* The one standing solid-accent element (CO-3 allows fills up to button
  * size): the header's call to action must not whisper. The doubled class
  * outranks .btn--primary's outline treatment further down the sheet. */
+/* The one standing solid-accent fill: a branded pill in the display face,
+ * with just enough depth to read as the page's call to action. */
 .btn.nav__signin {
   margin-left: 0.25rem;
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-contrast);
-  font-weight: 700;
-  padding: 0.5rem 1.1rem;
+  font-family: var(--font-display);
+  font-stretch: 116%;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.78rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .btn.nav__signin:hover:not(:disabled) {
   background: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
   border-color: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
   color: var(--accent-contrast);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 38%, transparent);
+  transform: translateY(-1px);
 }
 
 /* ── Monogram identity tiles (CO-7: photos removed — moderation liability) ── */
@@ -1367,7 +1396,7 @@ th.ltable__rank {
 
 .auth-card__title {
   font-size: 1.55rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 1.2rem;
 }
 
 .auth-card__lede {
