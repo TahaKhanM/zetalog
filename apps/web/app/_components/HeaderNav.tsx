@@ -19,11 +19,7 @@ import { Avatar } from './Avatar';
 type AuthState =
   | { readonly status: 'loading' }
   | { readonly status: 'signed-out' }
-  | {
-      readonly status: 'signed-in';
-      readonly displayName: string | null;
-      readonly avatarUrl: string | null;
-    };
+  | { readonly status: 'signed-in'; readonly displayName: string | null };
 
 function stringOf(row: Record<string, unknown> | null, key: string): string | null {
   const value = row?.[key];
@@ -43,15 +39,11 @@ export function HeaderNav(): React.JSX.Element {
     async function loadProfile(userId: string): Promise<void> {
       const { data } = await supabase
         .from('profiles')
-        .select('display_name, avatar_url')
+        .select('display_name')
         .eq('id', userId)
         .maybeSingle();
       if (active) {
-        setAuth({
-          status: 'signed-in',
-          displayName: stringOf(data, 'display_name'),
-          avatarUrl: stringOf(data, 'avatar_url'),
-        });
+        setAuth({ status: 'signed-in', displayName: stringOf(data, 'display_name') });
       }
     }
 
@@ -120,7 +112,7 @@ function AuthChip({ auth, active }: { auth: AuthState; active: boolean }): React
       className={`auth-chip${active ? ' auth-chip--active' : ''}`}
       title="Account settings"
     >
-      <Avatar url={auth.avatarUrl} name={auth.displayName ?? '?'} size={26} />
+      <Avatar name={auth.displayName ?? '?'} size={26} />
       <span className="auth-chip__name">{name}</span>
     </Link>
   );

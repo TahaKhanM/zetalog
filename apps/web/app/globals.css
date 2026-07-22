@@ -333,7 +333,7 @@ button {
   color: var(--accent-contrast);
 }
 
-/* ── Avatars (CO-6) ─────────────────────────────────────────────────────── */
+/* ── Monogram identity tiles (CO-7: photos removed — moderation liability) ── */
 .avatar {
   display: inline-flex;
   align-items: center;
@@ -341,15 +341,6 @@ button {
   border-radius: 50%;
   flex-shrink: 0;
   user-select: none;
-  /* Defeat the preflight img { max-width: 100% } — a squashed avatar is worse
-   * than an overflowing one, and every context sizes this explicitly. */
-  max-width: none;
-}
-
-.avatar--img {
-  object-fit: cover;
-  border: 1px solid var(--surface-border);
-  background: white;
 }
 
 .avatar--monogram {
@@ -357,28 +348,6 @@ button {
   color: var(--accent);
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
-}
-
-.avatar-uploader {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-  margin-bottom: 1.1rem;
-  padding-bottom: 1.1rem;
-  border-bottom: 1px solid var(--surface-hairline);
-}
-
-.avatar-uploader__controls {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.avatar-uploader__hint {
-  flex-basis: 100%;
-  margin: 0;
-  font-size: 0.8rem;
 }
 
 .site-footer {
@@ -1183,17 +1152,6 @@ button {
 
 .tough__time {
   font-weight: 700;
-}
-
-/* ── Leaderboard avatar column (CO-6) ───────────────────────────────────── */
-.ltable__avatar-h {
-  width: 3rem;
-}
-
-.ltable__avatar-c {
-  width: 3rem;
-  padding-right: 0.35rem;
-  line-height: 0;
 }
 
 /* ── Leaderboard games column (quiet; dropped on narrow viewports) ─────── */
