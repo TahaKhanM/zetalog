@@ -19,7 +19,6 @@ describe('leaderboardEntrySchema', () => {
     games_counted: 12,
     university_name: 'University of Oxford',
     university_slug: 'university-of-oxford',
-    avatar_url: 'https://example.supabase.co/storage/v1/object/public/avatars/x?v=1',
   };
 
   it('accepts a verified entry with university columns', () => {
@@ -28,11 +27,6 @@ describe('leaderboardEntrySchema', () => {
 
   it('accepts an unverified entry with null university columns', () => {
     const row = { ...valid, university_name: null, university_slug: null };
-    expect(leaderboardEntrySchema.parse(row)).toEqual(row);
-  });
-
-  it('accepts a null avatar (none uploaded yet)', () => {
-    const row = { ...valid, avatar_url: null };
     expect(leaderboardEntrySchema.parse(row)).toEqual(row);
   });
 
@@ -181,20 +175,6 @@ describe('profileRowSchema', () => {
       uni_verified_at: null,
       is_admin: false,
       created_at: '2026-07-01T00:00:00.000Z',
-      avatar_url: null,
-    };
-    expect(profileRowSchema.parse(row)).toEqual(row);
-  });
-
-  it('accepts a profile with an avatar URL', () => {
-    const row = {
-      id: '11111111-1111-4111-8111-111111111111',
-      display_name: 'ada',
-      university_id: null,
-      uni_verified_at: null,
-      is_admin: false,
-      created_at: '2026-07-01T00:00:00.000Z',
-      avatar_url: 'https://example.supabase.co/storage/v1/object/public/avatars/x?v=1',
     };
     expect(profileRowSchema.parse(row)).toEqual(row);
   });

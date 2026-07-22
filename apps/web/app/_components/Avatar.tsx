@@ -1,30 +1,10 @@
 /**
- * A profile picture: the uploaded image when present, otherwise a monogram
- * tile in the accent ink (CO-6). Sizes match the contexts they appear in —
- * table rows, the header chip, and the account card.
+ * A monogram identity tile in the accent ink (CO-7): the display name's first
+ * letter on a soft accent square. Profile PHOTOS were removed deliberately —
+ * user-uploaded images are a moderation liability and a storage cost — so this
+ * is the only avatar the product renders.
  */
-export function Avatar({
-  url,
-  name,
-  size,
-}: {
-  url: string | null;
-  name: string;
-  size: number;
-}): React.JSX.Element {
-  if (url !== null) {
-    return (
-      // Plain <img>: a tiny, already-optimised square from our own bucket.
-      <img
-        src={url}
-        alt=""
-        width={size}
-        height={size}
-        className="avatar avatar--img"
-        style={{ width: size, height: size }}
-      />
-    );
-  }
+export function Avatar({ name, size }: { name: string; size: number }): React.JSX.Element {
   return (
     <span
       className="avatar avatar--monogram num"

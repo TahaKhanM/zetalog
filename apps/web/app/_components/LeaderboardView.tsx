@@ -4,7 +4,6 @@ import Link from 'next/link';
 import type { BoardStats, UniversityOption } from '@/lib/db/queries';
 import type { LeaderboardEntry } from '@/lib/db/rows';
 
-import { Avatar } from './Avatar';
 import { UniBadge } from './UniBadge';
 import { UniversityFilter } from './UniversityFilter';
 import { ViewerRowHighlight } from './ViewerRowHighlight';
@@ -79,7 +78,6 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
                     <th className="ltable__rank" scope="col">
                       #
                     </th>
-                    <th className="ltable__avatar-h" scope="col" aria-label="Photo" />
                     <th scope="col">Player</th>
                     <th className="ltable__games-h" scope="col">
                       Games
@@ -142,9 +140,6 @@ function LeaderboardRow({
   return (
     <tr data-uid={entry.user_id}>
       <td className={`num ltable__rank${rank <= 3 ? ' rank-top' : ''}`}>{rank}</td>
-      <td className="ltable__avatar-c">
-        <Avatar url={entry.avatar_url} name={entry.display_name} size={28} />
-      </td>
       <td>
         <span className="player">
           <span className="player__name">{entry.display_name}</span>
@@ -158,9 +153,9 @@ function LeaderboardRow({
 }
 
 function Badge({ entry }: { entry: LeaderboardEntry }): React.JSX.Element | null {
-  // Row order (CO-6): photo · name · badge · stats; the badge links to the
-  // uni board. The viewer's own "＋ add badge" affordance is added client-side
-  // by ViewerRowHighlight, so this render stays identity-free and cacheable.
+  // Row order: name · badge · stats; the badge links to the uni board. The
+  // viewer's own "＋ add badge" affordance is added client-side by
+  // ViewerRowHighlight, so this render stays identity-free and cacheable.
   if (entry.university_slug !== null && entry.university_name !== null) {
     return (
       <Link href={`/uni/${entry.university_slug}`} className="player__badge-link">

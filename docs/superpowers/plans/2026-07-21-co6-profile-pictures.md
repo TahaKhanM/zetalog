@@ -1,5 +1,11 @@
 # CO-6: Profile pictures and the prominent header
 
+> **⚠️ PARTIALLY REVERTED by CO-7 (2026-07-22).** The profile-picture system (§1 —
+> uploads, storage bucket, `avatar_url` column/view field, provider-photo sync) was
+> removed on product-owner decision: user-uploaded images are a moderation liability
+> and a storage cost on the free tier. Monogram-initial tiles replace photos. The
+> header/board restructure (§2) and the display-name backfill migration stand.
+
 **Source:** product-owner feedback after CO-5: the profile and sign-in buttons still
 read as weird/quiet; add profile pictures with an upload flow; split the leaderboard
 row into photo · name · badge · stats.

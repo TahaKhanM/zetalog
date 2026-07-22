@@ -53,7 +53,7 @@ export default async function MePage(): Promise<React.JSX.Element> {
             <p className="meta">Every figure recomputed server-side from your recorded games.</p>
           </div>
           <Link href="/account" className="identity-chip" aria-label="Account settings">
-            <Avatar url={profile?.avatar_url ?? null} name={displayName ?? '?'} size={24} />
+            <Avatar name={displayName ?? '?'} size={24} />
             {university !== null ? (
               <UniBadge slug={university.slug} name={university.name} />
             ) : null}
