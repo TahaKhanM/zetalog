@@ -36,13 +36,9 @@ export default async function SignInPage({
     <div className="auth-page">
       <div className="card card--pad auth-card">
         <div className="auth-card__mark">
-          <BrandMark variant="mark" size={32} />
+          <BrandMark variant="mark" size={52} />
         </div>
-        <h1 className="display auth-card__title">Sign in or sign up</h1>
-        <p className="meta auth-card__lede">
-          Type your email and we&apos;ll take you to the right place — existing accounts sign in,
-          new ones get created.
-        </p>
+        <h1 className="display auth-card__title">Log in or sign up</h1>
         {sp.error !== undefined ? (
           <p className="notice" role="alert" style={{ marginBottom: '1rem' }}>
             Sign-in didn&apos;t complete. Please try again.

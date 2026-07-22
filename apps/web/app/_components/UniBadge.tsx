@@ -7,6 +7,8 @@ import { badgeFor } from '@/lib/uni-brand';
  * university's brand colours. Colours/assets come exclusively from
  * `lib/uni-brand.ts`; sizes match the ledger-table and profile contexts.
  */
+const BADGE_PX = { table: 20, profile: 28, masthead: 46 } as const;
+
 export function UniBadge({
   slug,
   name,
@@ -14,10 +16,10 @@ export function UniBadge({
 }: {
   slug: string;
   name: string;
-  size?: 'table' | 'profile';
+  size?: 'table' | 'profile' | 'masthead';
 }): React.JSX.Element {
   const brand = badgeFor(slug, name);
-  const className = size === 'profile' ? 'uni-badge uni-badge--profile' : 'uni-badge';
+  const className = size === 'table' ? 'uni-badge' : `uni-badge uni-badge--${size}`;
   if (brand.logo !== undefined) {
     return (
       <img
@@ -25,8 +27,8 @@ export function UniBadge({
         alt={`${name} badge`}
         title={name}
         className={`${className} uni-badge--logo`}
-        width={size === 'profile' ? 28 : 20}
-        height={size === 'profile' ? 28 : 20}
+        width={BADGE_PX[size]}
+        height={BADGE_PX[size]}
       />
     );
   }

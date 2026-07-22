@@ -21,6 +21,8 @@ interface LeaderboardViewProps {
   /** University badges are shown on the global board, redundant on a uni board. */
   readonly showBadges: boolean;
   readonly stats: BoardStats;
+  /** A university board's own mark, branded large in the masthead. */
+  readonly universityBadge?: { readonly slug: string; readonly name: string } | undefined;
 }
 
 /**
@@ -40,7 +42,16 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
         </p>
         <div className="masthead__row">
           <div>
-            <h1 className="display board-title">{props.title}</h1>
+            <div className="board-title-row">
+              {props.universityBadge !== undefined ? (
+                <UniBadge
+                  slug={props.universityBadge.slug}
+                  name={props.universityBadge.name}
+                  size="masthead"
+                />
+              ) : null}
+              <h1 className="display board-title">{props.title}</h1>
+            </div>
             <p className="meta">{props.subtitle}</p>
           </div>
           <UniversityFilter

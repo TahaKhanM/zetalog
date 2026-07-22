@@ -58,6 +58,7 @@ export default async function UniversityPage({
       currentSlug={slug}
       showBadges={false}
       stats={stats}
+      universityBadge={{ slug, name: university.name }}
     />
   );
 }
