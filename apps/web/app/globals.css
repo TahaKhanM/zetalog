@@ -836,10 +836,29 @@ button {
   font-weight: 700;
 }
 
-.ltable__score-h,
-.ltable__games-h {
+/* th-qualified so these outrank `.ltable th`'s base left alignment — the
+ * numeral headers must share their column's right edge with the figures. */
+th.ltable__score-h,
+th.ltable__games-h {
   text-align: right;
   width: 5.5rem;
+}
+
+th.ltable__rank {
+  text-align: right;
+}
+
+/* Badges live in their own narrow column so every mark lands on the same
+ * vertical line regardless of name length. */
+.ltable__badge-h,
+.ltable__badge-c {
+  width: 2.4rem;
+  padding-inline: 0.35rem;
+}
+
+.ltable__badge-c {
+  text-align: center;
+  line-height: 0;
 }
 
 .ltable__score {
