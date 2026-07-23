@@ -4,7 +4,6 @@ import { LinkHandoff } from '@/app/_components/LinkHandoff';
 import { SignInForm } from '@/app/_components/SignInForm';
 import { userIdFromCookies } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { BrandMark } from '@/app/_components/BrandMark';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,9 +21,6 @@ export default async function LinkPage(): Promise<React.JSX.Element> {
   return (
     <div className="auth-page">
       <div className="card card--pad auth-card">
-        <div className="auth-card__mark">
-          <BrandMark variant="mark" size={32} />
-        </div>
         <h1 className="display auth-card__title">Link extension</h1>
         {signedIn ? (
           <LinkHandoff />
