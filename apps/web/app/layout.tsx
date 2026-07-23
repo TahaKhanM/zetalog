@@ -32,10 +32,20 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Applies a stored theme choice before first paint (CO-9). Inline and tiny on
+ * purpose: anything async would flash the OS theme first. Absent or invalid
+ * storage falls through to the CSS `prefers-color-scheme` default.
+ */
+const THEME_BOOTSTRAP = `try{var t=localStorage.getItem('zl-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}`;
+
 export default function RootLayout({ children }: { children: ReactNode }): React.JSX.Element {
   return (
-    <html lang="en">
+    // suppressHydrationWarning is attribute-scoped to <html>: the theme
+    // bootstrap legitimately stamps data-theme before React hydrates.
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
         <header className="site-header">
           <div className="shell site-header__row">
             <Link href="/" className="brand-link" aria-label="ZetaLog home">

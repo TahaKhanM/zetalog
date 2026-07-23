@@ -52,9 +52,14 @@
 }
 
 /* The blackboard (CO-5): a true deep navy — no maroon anywhere; steel takes
- * over every accent role and cream stays the chalk. */
+ * over every accent role and cream stays the chalk.
+ *
+ * CO-9 theming: the OS preference applies unless the user chose a theme with
+ * the header toggle (html[data-theme], persisted in localStorage). The token
+ * block appears twice — once for the system path, once for the explicit
+ * choice — because a media query cannot join a selector list. KEEP IN SYNC. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
     --surface-card: color-mix(in srgb, var(--color-zl-navy) 84%, black);
     --surface-raised: color-mix(in srgb, var(--color-zl-navy) 78%, black);
@@ -75,6 +80,28 @@
     --chart-stroke-opacity: 1;
     color-scheme: dark;
   }
+}
+
+:root[data-theme='dark'] {
+  --surface-page: color-mix(in srgb, var(--color-zl-navy) 72%, black);
+  --surface-card: color-mix(in srgb, var(--color-zl-navy) 84%, black);
+  --surface-raised: color-mix(in srgb, var(--color-zl-navy) 78%, black);
+  --surface-border: color-mix(in srgb, var(--color-zl-steel) 22%, transparent);
+  --surface-hairline: color-mix(in srgb, var(--color-zl-steel) 16%, transparent);
+  --rule-strong: color-mix(in srgb, var(--color-zl-steel) 55%, transparent);
+  --surface-text: color-mix(in srgb, var(--color-zl-cream) 88%, transparent);
+  --surface-heading: var(--color-zl-cream);
+  --surface-shadow: color-mix(in srgb, black 40%, transparent);
+  --meta-text: color-mix(in srgb, var(--color-zl-steel) 52%, var(--surface-text));
+  --ink-index: var(--color-zl-steel);
+  --ink-display: var(--color-zl-cream);
+  --accent: var(--color-zl-steel);
+  --accent-strong: color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
+  --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
+  --accent-border: color-mix(in srgb, var(--color-zl-steel) 32%, transparent);
+  --accent-contrast: var(--color-zl-navy);
+  --chart-stroke-opacity: 1;
+  color-scheme: dark;
 }
 
 /* ── Base elements ──────────────────────────────────────────────────────── */
@@ -241,10 +268,6 @@ button {
   gap: 0.5rem;
 }
 
-.auth-card__mark {
-  margin-bottom: 0.9rem;
-}
-
 /* CO-3 university monogram badge — colours arrive inline from uni-brand.ts,
  * the single sanctioned non-palette hex source; never set colours here. */
 .uni-badge {
@@ -360,6 +383,31 @@ button {
   color: var(--accent-contrast);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 38%, transparent);
   transform: translateY(-1px);
+}
+
+/* Paper/blackboard switch (CO-9): a quiet round ghost at the header's far right. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+  transition: border-color 0.15s ease;
+}
+
+.theme-toggle:hover:not(:disabled) {
+  border-color: var(--accent-strong);
+}
+
+.theme-toggle:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* ── Monogram identity tiles (CO-7: photos removed — moderation liability) ── */
