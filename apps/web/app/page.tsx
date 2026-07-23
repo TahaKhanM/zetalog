@@ -33,7 +33,6 @@ export default async function HomePage({
   return (
     <LeaderboardView
       title="Global leaderboard"
-      subtitle="Everyone's best scores from real games — each one checked before it counts."
       entries={entries}
       duration={duration}
       uniOptions={uniOptions}

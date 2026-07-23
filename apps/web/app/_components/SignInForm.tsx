@@ -617,6 +617,10 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             }}
           />
         </label>
+        <p className="auth-form__hint">
+          Use your university email and its badge appears next to your name on the boards
+          automatically.
+        </p>
         {/* Only busy gates the button: `required` already blocks an empty
             submit, and a value-dependent `disabled` flickers during hydration. */}
         <button type="submit" className="btn btn--primary" disabled={busy}>
