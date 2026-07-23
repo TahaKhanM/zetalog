@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/browser';
 
 import { Avatar } from './Avatar';
+import { ThemeToggle } from './ThemeToggle';
 
 /**
  * Header nav + auth chip. Client-side on purpose: it reads the session in an
@@ -90,6 +91,7 @@ export function HeaderNav(): React.JSX.Element {
         My progress
       </Link>
       <AuthChip auth={auth} active={isActive('/account')} />
+      <ThemeToggle />
     </nav>
   );
 }
