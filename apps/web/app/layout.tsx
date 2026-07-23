@@ -60,7 +60,6 @@ export default function RootLayout({ children }: { children: ReactNode }): React
         <footer className="site-footer">
           <div className="shell site-footer__row">
             <span className="site-footer__brand">
-              <BrandMark variant="mark" size={22} />
               <span>Not affiliated with Zetamac.</span>
             </span>
             <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
