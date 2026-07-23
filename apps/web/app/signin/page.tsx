@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { SignInForm } from '@/app/_components/SignInForm';
 import { userIdFromCookies } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { BrandMark } from '@/app/_components/BrandMark';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,9 +34,6 @@ export default async function SignInPage({
   return (
     <div className="auth-page">
       <div className="card card--pad auth-card">
-        <div className="auth-card__mark">
-          <BrandMark variant="mark" size={52} />
-        </div>
         <h1 className="display auth-card__title">Log in or sign up</h1>
         {sp.error !== undefined ? (
           <p className="notice" role="alert" style={{ marginBottom: '1rem' }}>
