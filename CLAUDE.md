@@ -7,6 +7,19 @@ Frictionless Zetamac score tracker (browser extension) + UK-university leaderboa
 - Design spec: `docs/superpowers/specs/2026-07-20-zetalog-design.md`
 - Implementation plan: `docs/superpowers/plans/` (execute in order; keep checkboxes current)
 
+## Copy rules (HARD RULES for every word a user sees)
+
+Applies to all UI strings, page copy, empty states, hints, errors, and store listings.
+Violating any of these is a bug:
+
+1. No em dashes. Use a period or a comma, or restructure the sentence.
+2. No Oxford commas.
+3. Plain, direct language. Short sentences. No marketing fluff, no "seamlessly",
+   "effortlessly", "supercharge", "unlock" or similar.
+4. Say what the thing does, not how impressive it is. "Scores sync after each game"
+   beats "your scores are recomputed and validated server-side".
+5. No exclamation marks. No rhetorical questions.
+
 ## Quality bar
 
 Flagship CV project: assume every line will be read by senior engineers at quantitative
