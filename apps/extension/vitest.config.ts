@@ -1,6 +1,6 @@
 import { configDefaults, defineConfig } from 'vitest/config';
 
-/** 100% on every metric — the bar for the pure cores (CLAUDE.md quality bar). */
+/** 100% on every metric — the bar for the pure cores. */
 const FULL = { statements: 100, branches: 100, functions: 100, lines: 100 } as const;
 
 export default defineConfig({

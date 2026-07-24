@@ -1,7 +1,7 @@
 /**
  * Small helpers for the JSON API. Every error is the same typed shape —
  * `{ error: { code, message } }` — so the extension and the site can branch on
- * a stable `code` (spec §5, brief "API routes").
+ * a stable `code`.
  */
 
 /** A typed API error body. */

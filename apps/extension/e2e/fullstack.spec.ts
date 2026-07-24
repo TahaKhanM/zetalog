@@ -8,7 +8,7 @@ import { expect, test } from '@playwright/test';
 import { createApiClient } from '../lib/api.js';
 
 /**
- * OPTIONAL full-stack smoke (brief "e2e — OPTIONAL"). Proves the extension's real
+ * OPTIONAL full-stack smoke. Proves the extension's real
  * API client submits a recorded game through the live `POST /api/games` route to
  * a local Supabase, is judged `accepted`, and surfaces on the leaderboard.
  *

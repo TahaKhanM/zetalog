@@ -7,7 +7,7 @@ import type { GameEvent } from './schemas';
  * by operation, which times tables drag, which skills (carrying, borrowing,
  * big tables) run slow, and the individual problems that took longest.
  *
- * Pure functions over telemetry — no I/O, no clocks (spec §11). Only VERIFIED
+ * Pure functions over telemetry — no I/O, no clocks. Only VERIFIED
  * solves participate: an unverified accept says nothing about skill.
  */
 

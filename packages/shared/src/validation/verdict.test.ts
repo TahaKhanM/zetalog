@@ -115,7 +115,7 @@ describe('judge', () => {
       const base = i * 2500;
       events.push({ kind: 'problem', at: base, text: '3 + 4 = ' });
       events.push({ kind: 'input', at: base + 800 + (i % 5) * 90, value: '7' });
-      // Base shifted from the brief's 1000 to 1200 so `accepted` always follows
+      // Base shifted from 1000 to 1200 so `accepted` always follows
       // `input` (max input offset is 1160); the original 1000 base overlaps for
       // i = 14, 28, 29 and spuriously trips non-monotonic-timestamps.
       events.push({ kind: 'accepted', at: base + 1200 + (i % 7) * 80, answer: 7 });

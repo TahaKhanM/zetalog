@@ -4,7 +4,7 @@ import { relativeTime } from '../lib/format.js';
 import type { GraphMode, TrendPoint } from '../lib/stats.js';
 
 interface AdaptiveTrendProps {
-  /** Rendering mode from `graphMode(count)` (spec §3.3). */
+  /** Rendering mode from `graphMode(count)`. */
   readonly mode: GraphMode;
   /** Kept scores for the selected config, ascending in time. */
   readonly series: readonly TrendPoint[];
@@ -45,7 +45,7 @@ function plot(series: readonly TrendPoint[], width: number, height: number, pad:
 }
 
 /**
- * The adaptive trend graph (spec §3.3): a recent-scores list under 5 games, a
+ * The adaptive trend graph: a recent-scores list under 5 games, a
  * sparkline at 5–19, and a full line chart at 20+. Steel-blue strokes, mono
  * axis numerals, no gridline clutter.
  */

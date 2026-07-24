@@ -1,5 +1,5 @@
 /**
- * Pure password policy + strength hinting for the W8 auth flows (sign-up and
+ * Pure password policy + strength hinting for the auth flows (sign-up and
  * recovery). No dependencies, no I/O, and — deliberately — no logging: a
  * password value must never reach a log, error detail, test snapshot, or
  * telemetry event anywhere in this codebase.

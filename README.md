@@ -1,93 +1,91 @@
 <p align="center">
-  <img src="Assets/icons/icon-128.png" alt="ZetaLog" width="96" height="96" />
+  <img src="Assets/icons/icon-128.png" alt="ZetaLog" width="88" height="88" />
 </p>
 
 <h1 align="center">ZetaLog</h1>
 
 <p align="center">
-  Frictionless score tracking and a UK-university leaderboard for
-  <a href="https://arithmetic.zetamac.com/">Zetamac</a>, the mental-maths speed drill.
+  A score tracker and worldwide leaderboard for
+  <a href="https://arithmetic.zetamac.com/">Zetamac</a>, the mental-arithmetic
+  game used to build speed for quant interviews.
+</p>
+
+<p align="center">
+  <a href="https://www.zetalog.co.uk">zetalog.co.uk</a>
 </p>
 
 ---
 
-ZetaLog is two things:
+ZetaLog has two parts:
 
-- **A browser extension** that sits in the background and records every Zetamac game you
-  play — no buttons, no setup. It shows your progress over time, quarantines obvious
-  restarts and outliers (restorable, never silently deleted), and works fully offline with
-  no account.
-- **An opt-in leaderboard** ranking verified personal bests at 30s / 60s / 120s on the
-  default Zetamac configuration — globally and per UK university, with badges earned by
-  verifying a university email address.
+- **A Chrome extension** that records every Zetamac game you play, with no setup and
+  no account. It charts your progress, keeps a personal-best per duration, and works
+  fully offline. Restarts and outliers are flagged for review rather than silently
+  dropped, and nothing is ever hard-deleted.
+- **A web leaderboard** that ranks verified personal bests at 30s, 60s and 120s on the
+  default Zetamac settings, globally and per UK university, with a badge earned by
+  verifying a university email.
 
-## How it works
+Scores are never taken on trust. The extension submits the full per-problem event
+stream (problem text, keystroke timings, answer moments) and the server **recomputes
+the score** from it, then runs physiological, consistency and per-user statistical
+checks before a game is allowed to rank. Anything suspicious lands in a review queue.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    Z[Zetamac page] -->|content script records\nper-problem event stream| E[Extension\nlocal-first storage]
-    E -->|popup| G[Progress graphs,\nquarantine, history]
-    E -->|optional sign-in| A[API /api/games]
-    A -->|recompute score,\nvalidate event stream| V{Validation}
+    Z[Zetamac page] -->|content script records\nper-problem event stream| E[Extension\nlocal storage]
+    E -->|popup| G[Progress, analysis,\nhistory]
+    E -->|opt-in sync| A[POST /api/games]
+    A -->|recompute + validate| V{Judge}
     V -->|accepted| D[(Supabase Postgres)]
     V -->|suspicious| Q[Admin review queue]
     D --> L[Leaderboards\nglobal + per-university]
 ```
 
-Scores are never self-reported: the extension submits the full per-problem event stream
-(problem text, keystroke timings, answer moments) and the server **recomputes the score**,
-then applies physiological plausibility rules (human answer-rate floors, keystroke-cadence
-uniformity checks), consistency rules, and per-user statistical history checks before a
-game may rank. Suspicious submissions land in a human review queue.
+| Path              | Contents                                                                            |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| `packages/shared` | Pure domain logic: schemas, design tokens, score recomputation, validation pipeline |
+| `apps/extension`  | WXT extension (Chrome, Manifest V3): recorder, popup, background sync               |
+| `apps/web`        | Next.js app on Vercel: leaderboards, dashboard, API routes, admin                   |
+| `supabase/`       | Postgres migrations, row-level-security policies, UK-university seed data           |
+| `docs/`           | Operational runbooks and Chrome Web Store listing                                   |
 
-## Repository
+## Design
 
-| Path                      | Contents                                                                                                             |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `packages/shared`         | Pure, exhaustively tested domain logic: types, design tokens, settings fingerprinting, quarantine + validation rules |
-| `apps/extension`          | WXT extension (Chrome-family, Manifest V3)                                                                           |
-| `apps/web`                | Next.js site on Vercel: leaderboards, personal dashboard, API, admin                                                 |
-| `supabase/`               | Postgres migrations, RLS policies, UK-university seed data                                                           |
-| `docs/superpowers/specs/` | The design spec (source of truth)                                                                                    |
+The domain core is deterministic and dependency-free: scoring, validation and
+anti-abuse rules are pure functions in `packages/shared`, with clocks and randomness
+injected rather than read. Both the extension (client-side pre-flagging) and the
+server (authoritative judging) run the same code, so a score is evaluated identically
+wherever it is checked.
 
-## Engineering standards
-
-This project is built to be read. In brief:
-
-- **Strict TypeScript** (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), zero-warning
-  type-aware linting, and `pnpm verify` (format → lint → typecheck → test → build) green on
-  every commit.
-- **Pure domain core:** all scoring and anti-abuse logic is deterministic, dependency-injected,
-  and property-tested; `packages/shared` enforces 100% branch coverage in CI.
-- **Errors as values, zod at every boundary,** and RLS-default-deny with service-role writes
-  confined to the server.
-
-The full bar is specified in the design spec, §11.
+The server is the only writer. All game writes go through the API with the Supabase
+service role; row-level security is default-deny and the service-role key never
+reaches a client bundle. Every external boundary (DOM, network, storage) is validated
+with [zod](https://zod.dev) schemas, and errors are returned as typed values rather
+than thrown.
 
 ## Development
 
 ```sh
 pnpm install
-pnpm verify        # format, lint, typecheck, test, build — the same gate CI runs
+pnpm verify        # format, lint, typecheck, test, build — the gate CI runs
 ```
 
-Copy `.env.example` and fill in Supabase + Resend credentials for the web app
-(the extension needs no secrets).
+`pnpm verify` must pass before every commit. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for the full engineering bar.
 
-## Status
+Copy `.env.example` to `.env.local` and fill in the Supabase and Resend credentials
+for the web app. The extension needs no secrets.
 
-Feature-complete and reviewed against the design spec
-(`docs/superpowers/specs/2026-07-20-zetalog-design.md`). All four subsystems are built and
-whole-branch reviewed — the domain core (`packages/shared`), the extension (`apps/extension`),
-the database (`supabase/`), and the web app (`apps/web`) — along with the account
-linking, background sync, and end-to-end flows that tie them together. The suite is 449 unit
-tests plus a Playwright end-to-end run.
+## Tests
 
-What remains is deployment: provisioning the hosted Supabase project, deploying the web app to
-Vercel, and submitting the extension to the Chrome Web Store — following the runbooks in
-`supabase/README.md` and `docs/store/`.
+Around 700 unit tests across the workspace, plus Playwright end-to-end runs for the
+extension and the web app. `packages/shared` holds 100% branch coverage, enforced in
+CI. Database policies are covered by pgTAP.
 
 ## Licenses
 
 The bundled fonts are licensed under the SIL Open Font License 1.1; see
-[`THIRD-PARTY-LICENSES.md`](THIRD-PARTY-LICENSES.md).
+[THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).

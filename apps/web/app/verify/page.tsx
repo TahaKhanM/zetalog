@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Verify university email' };
 
-/** `/verify` — uni-email OTP flow (spec §7). Requires a signed-in account. */
+/** `/verify` — uni-email OTP flow. Requires a signed-in account. */
 export default async function VerifyPage(): Promise<React.JSX.Element> {
   const supabase = await createClient();
   if ((await userIdFromCookies(supabase)) === null) redirect('/signin?next=/verify');

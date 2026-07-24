@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 /**
- * Two-step university verification (spec §7): request a code for a uni email,
+ * Two-step university verification: request a code for a uni email,
  * then confirm the 6 digits. Every API failure maps to a specific, plain
  * message — unknown domain, rate limited (3/hour), daily capacity, wrong code
  * (with attempts left), expired, or locked out.

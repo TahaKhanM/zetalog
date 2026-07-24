@@ -1,7 +1,7 @@
 import { badgeFor } from '@/lib/uni-brand';
 
 /**
- * University badge (CO-3 §3): the institution's official mark when we hold a
+ * University badge: the institution's official mark when we hold a
  * documented, officially-published asset (see lib/uni-brand.ts `logo` — with
  * its per-university monogram kill-switch), otherwise a monogram chip in the
  * university's brand colours. Colours/assets come exclusively from

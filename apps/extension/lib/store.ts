@@ -16,14 +16,14 @@ import { z } from 'zod';
 const GAMES_KEY = 'zl:v1:games';
 const PREFS_KEY = 'zl:v1:prefs';
 
-/** Above this many stored games, oldest non-rankable event streams are pruned (spec §9). */
+/** Above this many stored games, oldest non-rankable event streams are pruned. */
 export const PRUNE_LIMIT = 400;
 
 /** A status a row can hold before Remove — i.e. anywhere Restore may return it to. */
 export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
 
 /**
- * Where a game stands relative to the leaderboard sync (W4). `revoked` is the
+ * Where a game stands relative to the leaderboard sync. `revoked` is the
  * TERMINAL state after a completed server-side removal — it stops the queue
  * from re-deriving the revoke, and a later restore of the game re-derives a
  * fresh submit from it.
@@ -31,8 +31,7 @@ export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
 export type SyncState = 'pending' | 'uploaded' | 'failed' | 'revoked';
 
 /**
- * Per-game sync metadata written back after an upload attempt (brief "Sync queue
- * + backfill"). `outcome`/`serverScore` mirror the server's verdict once
+ * Per-game sync metadata written back after an upload attempt. `outcome`/`serverScore` mirror the server's verdict once
  * uploaded so the popup can show it. This is sync bookkeeping, not game data:
  * Unlink clears it, and it is absent until the account is linked (invariant 4).
  * The outcome values mirror the API client's `SubmitOutcome`.
@@ -77,7 +76,7 @@ export interface StoredGame {
 /** Time range for the popup trend graph; persisted so the user's choice sticks. */
 export type TrendRange = 10 | 25 | 50 | 'all';
 
-/** Popup graph preferences (spec §3.3): which config to show and how much history. */
+/** Popup graph preferences: which config to show and how much history. */
 export interface Prefs {
   /** null → the popup falls back to the most-played fingerprint. */
   readonly selectedFingerprint: string | null;
@@ -86,7 +85,7 @@ export interface Prefs {
 
 const DEFAULT_PREFS: Prefs = { selectedFingerprint: null, range: 'all' };
 
-/** Corruption is surfaced, never swallowed — the caller decides how to react (spec §9). */
+/** Corruption is surfaced, never swallowed — the caller decides how to react. */
 export interface StoreError {
   readonly reason: 'corrupt-games' | 'corrupt-prefs';
   readonly detail: string;
@@ -129,7 +128,7 @@ const prefsSchema = z.object({
  * Reclaim storage by clearing the event streams of the oldest *non-rankable*
  * games first, once the store exceeds `limit` rows. Rankable games keep their
  * events (they still need server backfill); scores and status are never
- * touched, and no row is ever deleted (spec §9, invariant 3).
+ * touched, and no row is ever deleted.
  */
 export function pruneStoredGames(games: readonly StoredGame[], limit = PRUNE_LIMIT): StoredGame[] {
   if (games.length <= limit) return [...games];

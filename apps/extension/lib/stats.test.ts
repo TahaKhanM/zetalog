@@ -63,7 +63,7 @@ function solves(text: string, answer: number, solveMs: number, count: number): G
 
 // The product truth is the recomputed verifiedScore, NOT the scraped
 // claimedScore (which can miss end-of-game points — w1-report score-span race).
-// Fixture mirrors the brief: claimed 51, but the events recompute to 52.
+// Fixture: claimed 51, but the events recompute to 52.
 describe('the popup surfaces the verified score, never the scraped claimed score', () => {
   it('ranks personal bests by verifiedScore', () => {
     const games = [stored({ score: 52, claimedScore: 51, savedAtMs: 1, rankableDuration: 120 })];

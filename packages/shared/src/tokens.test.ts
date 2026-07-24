@@ -33,7 +33,7 @@ describe('color roles', () => {
 });
 
 describe('typography', () => {
-  it('keeps the display face inside the spec weight range 800-900', () => {
+  it('keeps the display face inside the weight range 800-900', () => {
     expect(typography.display.weightMin).toBeGreaterThanOrEqual(800);
     expect(typography.display.weightMax).toBeLessThanOrEqual(900);
     expect(typography.display.weightMin).toBeLessThanOrEqual(typography.display.weightMax);

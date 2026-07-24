@@ -48,7 +48,7 @@ export function applyOwnRowHighlight(
   // mount if an affordance is already present (e.g. a second call after a
   // client-side refresh re-ran the effect).
   if (!showAddBadge) return NO_DECORATION;
-  // A badge may be the legacy text chip or the CO-3 monogram/logo `.uni-badge`.
+  // A badge may be the legacy text chip or the monogram/logo `.uni-badge`.
   if (row.querySelector('.chip--badge, .uni-badge') !== null) return NO_DECORATION;
   if (row.querySelector('.chip--add') !== null) return NO_DECORATION;
 

@@ -5,7 +5,7 @@ import { LINK_ACK, LINK_READY, isLinkPing, parseLinkMessage } from '../lib/link.
 import { type BgRequest, type BgResponse } from '../lib/messages.js';
 
 /**
- * Account-link handoff receiver (brief "Session handoff"). The browser runs this
+ * Account-link handoff receiver. The browser runs this
  * script ONLY on our own `/link` origins, so it — and therefore the extension it
  * belongs to — is the guaranteed recipient of the session the page posts. No
  * extension id ever appears in a URL and the token can reach no other recipient.

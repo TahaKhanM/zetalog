@@ -22,7 +22,7 @@ function rangeLabel(range: TrendRange): string {
   return range === 'all' ? 'All' : `Last ${String(range)}`;
 }
 
-/** Config + range selectors, shown in chart mode; choices persist via prefs (spec §3.3). */
+/** Config + range selectors, shown in chart mode; choices persist via prefs. */
 export function TrendControls(props: TrendControlsProps): JSX.Element {
   const { configs, selectedFingerprint, onSelectFingerprint, range, onSelectRange } = props;
   return (

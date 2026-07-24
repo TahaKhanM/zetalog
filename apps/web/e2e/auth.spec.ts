@@ -4,7 +4,7 @@ import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * W8 full-stack auth proof (OPT-IN like me.spec.ts: skipped unless
+ * Full-stack auth proof (OPT-IN like me.spec.ts: skipped unless
  * ZL_FULLSTACK=1 with a local `supabase start` running). Drives the REAL
  * browser → form → API route → GoTrue → @supabase/ssr cookie chain:
  *
@@ -107,7 +107,7 @@ async function continueWithEmail(page: Page, email: string): Promise<void> {
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
 }
 
-test.describe('W8 auth flows', () => {
+test.describe('auth flows', () => {
   test.skip(!FULLSTACK, 'set ZL_FULLSTACK=1 with a local `supabase start` running');
   test.describe.configure({ timeout: 240_000 });
 

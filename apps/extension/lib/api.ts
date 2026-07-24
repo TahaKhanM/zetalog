@@ -5,14 +5,14 @@ import { type FetchLike } from './auth.js';
 import { WEB_APP_URL } from './config.js';
 
 /**
- * Typed client for the W3 game API (brief "Extension session + API client").
+ * Typed client for the game API.
  * Bearer-authenticated; on a 401 it performs exactly one token refresh and
  * retries; responses are zod-parsed; results are values, never thrown. The
  * claimed score is never trusted server-side — {@link SubmitSuccess.serverScore}
  * is the recomputed, authoritative score.
  */
 
-/** The persisted status the server assigns a submission (spec §5). */
+/** The persisted status the server assigns a submission. */
 export const submitOutcomeSchema = z.enum(['accepted', 'quarantined', 'rejected', 'user_removed']);
 export type SubmitOutcome = z.infer<typeof submitOutcomeSchema>;
 

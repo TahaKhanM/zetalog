@@ -2,7 +2,7 @@ import { palette } from '@zetalog/shared';
 
 /**
  * The branded transactional email: a code-only message in the ZetaLog design
- * language (spec §8 as amended by CO-2). Email clients cannot load our fonts
+ * language. Email clients cannot load our fonts
  * or CSS variables, so brand colours are imported from the shared tokens and
  * tints are computed here — no palette hex is hand-written in this module.
  *
@@ -13,7 +13,7 @@ import { palette } from '@zetalog/shared';
  * - a hidden preheader so the code shows in inbox preview lines.
  */
 
-/** Blend `hex` toward `base` (CO-2 tint formula), returning a lowercase hex. */
+/** Blend `hex` toward `base`, returning a lowercase hex. */
 export function mixHex(hex: string, base: string, weight: number): string {
   const channel = (source: string, index: number): number =>
     parseInt(source.slice(1 + index * 2, 3 + index * 2), 16);

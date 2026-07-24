@@ -4,7 +4,7 @@ import { type ApiClient } from './api.js';
 import { type StorageArea, type Store, type StoredGame } from './store.js';
 
 /**
- * The leaderboard sync queue and its drain (brief "Sync queue + backfill").
+ * The leaderboard sync queue and its drain.
  *
  * The queue is *derived* state: {@link reconcileQueue} rebuilds it from local
  * history on every drain, so backfill (upload every kept rankable game on first

@@ -1,5 +1,5 @@
 /**
- * Pure message helpers for the extension account-link handoff (spec §3.4). The
+ * Pure message helpers for the extension account-link handoff. The
  * `/link` page's LinkHandoff posts the current session to `window` on an
  * explicit click; the extension's content script (running only on this origin)
  * validates and forwards it, then posts an ack back. Keeping the message shape

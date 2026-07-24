@@ -1,24 +1,32 @@
+# Dependencies
 node_modules/
+
+# Environment
 .env
 .env.*
 !.env.example
-.DS_Store
+
+# Build output
 dist/
 .output/
 .wxt/
 .next/
-.vercel/
 .turbo/
+*.tsbuildinfo
+
+# Test artifacts
 coverage/
 test-results/
 playwright-report/
 .last-run.json
-*.log
-.superpowers/
-.claude/worktrees/
-*.tsbuildinfo
-.vercel
 
-# Playwright MCP session artifacts
-.playwright-mcp/
+# Deployment
+.vercel/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
 .seed-session.json

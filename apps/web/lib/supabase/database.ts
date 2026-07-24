@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * A deliberately loose `Database` type for the Supabase clients.
  *
- * W2 owns the schema and there is no generated types artifact shared into this
+ * The database layer owns the schema and there is no generated types artifact shared into this
  * stream, so rather than duplicate (and risk drifting from) the real schema, we
  * describe every table/view row as `Record<string, unknown>`. That is enough to
  * make writes type-check (they accept object literals instead of collapsing to

@@ -1,5 +1,5 @@
 /**
- * The actual ZetaLog mark (CO-3 §1): the icon from Assets, never stretched,
+ * The actual ZetaLog mark: the icon from Assets, never stretched,
  * never recoloured. `lockup` pairs it with the Archivo wordmark for the
  * header/footer; `mark` renders the icon alone (auth cards).
  */

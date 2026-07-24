@@ -28,7 +28,7 @@ export function ViewerRowHighlight({
     const supabase = createClient();
     void supabase.auth.getSession().then(async ({ data }) => {
       const userId = data.session?.user.id ?? null;
-      // Users who chose "not at a university" (CO-11) opted out of the badge
+      // Users who chose "not at a university" opted out of the badge
       // flow; do not offer the affordance to them.
       let offerBadge = showAddBadge;
       if (userId !== null && offerBadge) {

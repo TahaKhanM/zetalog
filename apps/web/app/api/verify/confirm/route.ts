@@ -9,7 +9,7 @@ import { handleVerifyConfirm } from './handler';
 export const dynamic = 'force-dynamic';
 
 /**
- * `POST /api/verify/confirm` — finish uni-email verification (spec §7). Core
+ * `POST /api/verify/confirm` — finish uni-email verification. Core
  * logic lives in {@link handleVerifyConfirm}; this file wires real ports.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -74,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
     },
     applyVerification: async ({ userId, universityId, verificationId, nowIso }) => {
       // Stamp the verification FIRST: the partial unique index on verified
-      // aliases (W8) makes this the statement that can lose a claim race —
+      // aliases makes this the statement that can lose a claim race —
       // losing must not leave a half-applied profile.
       const verification = await service
         .from('uni_verifications')

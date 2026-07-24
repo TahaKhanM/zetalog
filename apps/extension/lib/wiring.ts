@@ -18,7 +18,7 @@ export interface CaptureClock {
 export interface CaptureHooks {
   /** A completed (or mid-game-exited) game — the store applies quarantine + status. */
   readonly onGameComplete: (record: GameRecord) => void;
-  /** A capture failure — surfaces the "recorder needs an update" banner (spec §3.1, §9). */
+  /** A capture failure — surfaces the "recorder needs an update" banner. */
   readonly onCaptureFailed: (record: GameRecord) => void;
 }
 
@@ -125,7 +125,7 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
   const observer = new MutationObserver(() => {
     if (finished) return;
     // Score before problem: the accepted event must precede the next problem
-    // so the server can recompute the stream in order (spec §5).
+    // so the server can recompute the stream in order.
     const nextScore = readScore(scoreEl.textContent);
     const accepted = nextScore !== null && nextScore > lastScore;
     if (accepted) {

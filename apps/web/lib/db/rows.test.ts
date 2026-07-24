@@ -83,7 +83,7 @@ describe('storedValidationSchema', () => {
     expect(storedValidationSchema.parse(verdict)).toEqual(verdict);
   });
 
-  it('defaults the W6 problem fields to empty for rows judged before they shipped', () => {
+  it('defaults the problem fields to empty for rows judged before they shipped', () => {
     const legacy = {
       outcome: 'accepted',
       serverScore: 40,

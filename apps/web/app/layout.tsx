@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Applies a stored theme choice before first paint (CO-9). Inline and tiny on
+ * Applies a stored theme choice before first paint. Inline and tiny on
  * purpose: anything async would flash the OS theme first. Absent or invalid
  * storage falls through to the CSS `prefers-color-scheme` default.
  */

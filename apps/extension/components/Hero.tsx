@@ -18,8 +18,7 @@ interface HeroProps {
 
 /**
  * The hero: the latest kept score in mono tabular numerals (red on a new PB),
- * its config + relative time, and the per-duration personal-best row (spec
- * §3.3). Numerals are the visual hero of the screen (§8).
+ * its config + relative time, and the per-duration personal-best row. Numerals are the visual hero of the screen.
  */
 export function Hero(props: HeroProps): JSX.Element {
   const { latest, isNewPersonalBest, bests, nowMs } = props;

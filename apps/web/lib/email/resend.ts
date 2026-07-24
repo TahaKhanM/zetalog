@@ -5,7 +5,7 @@ import { serverEnv } from '../env.server';
 import type { EmailSender } from './types';
 
 /**
- * The Resend-backed {@link EmailSender} (spec §7). This is the only place the
+ * The Resend-backed {@link EmailSender}. This is the only place the
  * app talks to an email provider directly; swapping to Brevo/SES means writing
  * one more file like this and changing the factory call — verification logic is
  * untouched. Note this sends the uni-verification OTP; Supabase Auth's magic

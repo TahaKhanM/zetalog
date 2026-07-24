@@ -1,6 +1,6 @@
 import { RANKABLE_DURATIONS, type RankableDuration } from '@zetalog/shared';
 
-/** The default leaderboard duration when `?d=` is missing or invalid (spec §6). */
+/** The default leaderboard duration when `?d=` is missing or invalid. */
 export const DEFAULT_DURATION: RankableDuration = 120;
 
 /**

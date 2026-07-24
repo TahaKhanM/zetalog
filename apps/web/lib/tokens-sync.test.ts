@@ -5,7 +5,7 @@ import { palette } from '@zetalog/shared';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Single-source-of-truth enforcement (brief + CO-2 §3): globals.css must define
+ * Single-source-of-truth enforcement: globals.css must define
  * the five brand hexes exactly as packages/shared/src/tokens.ts declares them,
  * and it must contain NO other 6-digit hex literal — every tint is a color-mix
  * over these variables, so a stray hex means someone hard-coded a colour.
@@ -38,7 +38,7 @@ describe('globals.css ↔ shared tokens', () => {
   it('contains no hex literal other than the five brand colours', () => {
     // Catch 3-, 4-, 6-, and 8-digit forms: a short or alpha hex can never be
     // one of the five brand colours, so anything not exactly on that list is a
-    // hard-coded colour (CO-2 §3 — tints must be color-mix over the variables).
+    // hard-coded colour.
     const found = (css.toLowerCase().match(/#[0-9a-f]{3,8}\b/g) ?? []).map((hex) => hex);
     const strays = [...new Set(found)].filter((hex) => !brandHexes.has(hex));
     expect(strays).toEqual([]);

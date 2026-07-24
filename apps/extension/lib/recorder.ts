@@ -6,7 +6,7 @@ const MAX_INPUT_LENGTH = 12;
 /**
  * Resolved facts a recorder needs up front. The content script injects these
  * (Date.now wall-clock start, crypto.randomUUID id) so the core stays pure
- * and fully deterministic in tests (CLAUDE.md quality bar).
+ * and fully deterministic in tests.
  */
 export interface RecorderDeps {
   readonly settings: ZetamacSettings;
@@ -38,7 +38,7 @@ function toAnswer(value: string): number {
   return Number.isFinite(parsed) ? Math.trunc(parsed) : 0;
 }
 
-/** Create a recorder for one game (spec §3.1 — telemetry captured for every game). */
+/** Create a recorder for one game. */
 export function createRecorder(deps: RecorderDeps): Recorder {
   const events: GameEvent[] = [];
   let lastInputValue = '';

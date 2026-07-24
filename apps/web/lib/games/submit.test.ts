@@ -194,7 +194,7 @@ describe('submitGame — judging and persistence', () => {
     const result = await submitGame(record({ events, claimedScore: 1 }), USER_ID, NOW_MS, port);
     expect(result.status).toBe(201);
     expect(result.body).toMatchObject({ outcome: 'rejected' });
-    // The W6 verdict fields flow through the pipeline into the validation jsonb.
+    // The verdict fields flow through the pipeline into the validation jsonb.
     expect(inserted[0]?.validation.problemViolations.map((v) => v.rule)).toContain(
       'range-nonconforming',
     );

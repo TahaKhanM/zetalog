@@ -1,5 +1,5 @@
 /**
- * University email-domain matching (spec §7). Matching is exact and
+ * University email-domain matching. Matching is exact and
  * case-insensitive: `student@ox.ac.uk` matches the registered `ox.ac.uk`, but
  * a subdomain (`cs.ox.ac.uk`) or a look-alike (`notox.ac.uk`) does not. Uni
  * emails are used solely to prove affiliation and are never displayed.

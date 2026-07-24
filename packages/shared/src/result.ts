@@ -1,6 +1,6 @@
 /**
  * A typed success-or-failure value. Fallible domain operations return this
- * instead of throwing (spec §11 — "errors are values").
+ * instead of throwing.
  */
 export type Result<T, E> =
   { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: E };

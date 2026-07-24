@@ -113,7 +113,7 @@ describe('POST /api/verify/confirm', () => {
     expect(response.status).toBe(429);
   });
 
-  it('maps a lost verified-alias race to 409 email-taken (W8 integrity)', async () => {
+  it('maps a lost verified-alias race to 409 email-taken', async () => {
     const response = await handleVerifyConfirm(
       request({ code: CODE }),
       deps({

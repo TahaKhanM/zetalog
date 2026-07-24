@@ -3,7 +3,7 @@ import { err, ok, type Result } from '@zetalog/shared';
 /**
  * Version of the Zetamac DOM contract this module encodes. Bump whenever a
  * selector changes so `capture_failed` records can be correlated with the
- * recorder revision that produced them (spec §3.1, §9 — "DOM resilience").
+ * recorder revision that produced them.
  */
 export const SELECTORS_VERSION = 1;
 

@@ -8,7 +8,7 @@ import {
 import { LeaderboardView } from './_components/LeaderboardView';
 
 /**
- * Cacheable public render, revalidated every 30s (spec §6). The board reads NO
+ * Cacheable public render, revalidated every 30s. The board reads NO
  * cookies — the viewer's own-row highlight is applied client-side after
  * hydration (see ViewerRowHighlight) — so this stays a shared, identity-free
  * server render and signed-out visitors cost zero auth work.
@@ -17,7 +17,7 @@ export const revalidate = 30;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-/** `/` — the global leaderboard (spec §6). Reads via the anon (public) client. */
+/** `/` — the global leaderboard. Reads via the anon (public) client. */
 export default async function HomePage({
   searchParams,
 }: {

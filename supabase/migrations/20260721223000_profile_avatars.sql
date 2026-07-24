@@ -1,4 +1,4 @@
--- CO-6: profile pictures.
+-- Profile pictures.
 --
 -- 1. `profiles.avatar_url` — the public URL of the user's avatar (with a
 --    cache-busting version query), written ONLY by the avatar API route via

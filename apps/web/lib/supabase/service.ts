@@ -10,7 +10,7 @@ if (typeof window !== 'undefined')
 /**
  * Service-role Supabase client — bypasses RLS. Import ONLY from API routes and
  * server-only lib modules; it must never reach a Client Component or the
- * extension bundle (CLAUDE.md #2). Session persistence is disabled: this client
+ * extension bundle. Session persistence is disabled: this client
  * authenticates with the service key, never a user cookie.
  */
 export function createServiceClient(): Db {

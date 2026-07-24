@@ -1,4 +1,4 @@
--- W8 alias-login integrity: the verified-alias uniqueness index and the
+-- Alias-login integrity: the verified-alias uniqueness index and the
 -- service-role identifier lookup function.
 --
 -- Same conventions as 01–03: pgTAP bookkeeping runs as the session superuser;

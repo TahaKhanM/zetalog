@@ -1,6 +1,6 @@
 -- ZetaLog schema: core tables, types, and indexes.
 --
--- Design invariants enforced here (spec §4, §5):
+-- Design invariants enforced here:
 --   * Never trust a claimed score -> claimed_score and server_score are stored
 --     separately; only server_score ranks (see leaderboard_entries view).
 --   * All game writes go through the API service role -> no client-writable
@@ -104,11 +104,11 @@ create index games_quarantine_queue_idx
   on public.games (received_at)
   where status = 'quarantined';
 
--- Per-user submission rate limiting (spec §5), newest first.
+-- Per-user submission rate limiting, newest first.
 create index games_user_received_idx on public.games (user_id, received_at desc);
 
 -- OTP verification attempts. Service-role only (no client access). Retained for
--- rate limiting (3 per address per hour, spec §7) and audit.
+-- rate limiting (3 per address per hour) and audit.
 create table public.uni_verifications (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles (id) on delete cascade,
@@ -128,7 +128,7 @@ create index uni_verifications_user_idx
 create index uni_verifications_email_idx
   on public.uni_verifications (email, created_at desc);
 
--- Email send-failure log (spec §7). Recipient addresses are hashed, never
+-- Email send-failure log. Recipient addresses are hashed, never
 -- stored in the clear. Service-role only.
 create table public.email_events (
   id uuid primary key default gen_random_uuid(),

@@ -1,4 +1,4 @@
-/** The PB-jump rule needs this many accepted games before it activates (spec §5 step 4). */
+/** The PB-jump rule needs this many accepted games before it activates. */
 export const PB_JUMP_MIN_HISTORY = 10;
 
 /** A new score may exceed the personal best by this many points... */
@@ -14,7 +14,7 @@ export interface HistoryContext {
 
 /**
  * Statistical smell test: a score massively above everything the user has
- * ever posted goes to human review rather than auto-accepting (spec §5).
+ * ever posted goes to human review rather than auto-accepting.
  */
 export function checkHistory(score: number, context: HistoryContext): 'pb-jump' | null {
   if (context.acceptedScores.length < PB_JUMP_MIN_HISTORY) return null;

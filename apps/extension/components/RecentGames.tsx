@@ -41,10 +41,10 @@ export function syncTag(
 }
 
 /**
- * The recent-games list (10 most recent, any status; spec §3.3). Non-kept
+ * The recent-games list (10 most recent, any status). Non-kept
  * scores are greyed and struck through; each row carries its config, relative
  * time, a quarantine/status flag, and Restore / Remove actions. Remove is the
- * only destructive control, so it is the sole red element (§8).
+ * only destructive control, so it is the sole red element.
  */
 export function RecentGames(props: RecentGamesProps): JSX.Element {
   const { games, nowMs, onRestore, onRemove } = props;

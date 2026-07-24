@@ -1,5 +1,5 @@
 /**
- * A monogram identity tile in the accent ink (CO-7): the display name's first
+ * A monogram identity tile in the accent ink: the display name's first
  * letter on a soft accent square. Profile PHOTOS were removed deliberately —
  * user-uploaded images are a moderation liability and a storage cost — so this
  * is the only avatar the product renders.

@@ -11,7 +11,7 @@ function requestDrain(): void {
 }
 
 /**
- * Thin wiring only (spec §3.1). Runs solely on arithmetic.zetamac.com — the
+ * Thin wiring only. Runs solely on arithmetic.zetamac.com — the
  * match pattern is the origin guard (invariant 8) — and only on `/game` pages.
  * All logic lives in the tested lib/ modules; this file just injects the real
  * clock/uuid and the storage repository.

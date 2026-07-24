@@ -2,7 +2,7 @@
 
 -- handle_new_user ----------------------------------------------------------
 -- SECURITY DEFINER trigger on auth.users: creates the profiles row for every
--- new account and awards the "instant badge" (spec §7) when the sign-up email
+-- new account and awards the "instant badge" when the sign-up email
 -- domain matches a seeded university.
 --
 -- SECURITY DEFINER is required: the insert into auth.users happens under the
@@ -41,7 +41,7 @@ begin
   values (
     new.id,
     v_university_id,
-    -- Instant badge only when a domain matched; otherwise verify later (§7).
+    -- Instant badge only when a domain matched; otherwise verify later.
     case when v_university_id is not null then now() end
   );
 
@@ -50,7 +50,7 @@ end;
 $$;
 
 comment on function public.handle_new_user() is
-  'Creates the profiles row on signup and awards the instant university badge when the email domain matches a seeded university (spec §7).';
+  'Creates the profiles row on signup and awards the instant university badge when the email domain matches a seeded university.';
 
 create trigger on_auth_user_created
   after insert on auth.users

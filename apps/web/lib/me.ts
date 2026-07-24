@@ -34,7 +34,7 @@ const FLAG_LABELS: Record<StoredValidation['flags'][number]['rule'], string> = {
   'entry-burst': 'Pasted answers',
 };
 
-/** Human phrase for each hard problem-stream impossibility (W6). */
+/** Human phrase for each hard problem-stream impossibility. */
 const PROBLEM_VIOLATION_LABELS: Record<
   StoredValidation['problemViolations'][number]['rule'],
   string
@@ -42,7 +42,7 @@ const PROBLEM_VIOLATION_LABELS: Record<
   'range-nonconforming': 'Problem outside the claimed range',
 };
 
-/** Human phrase for each statistical problem-stream flag (W6). */
+/** Human phrase for each statistical problem-stream flag. */
 const PROBLEM_FLAG_LABELS: Record<StoredValidation['problemFlags'][number]['rule'], string> = {
   'operation-mix': 'Implausible operation mix',
   'operand-marginal': 'Operands skew easy',

@@ -7,16 +7,15 @@ import { findUniversityForEmail } from '@/lib/uni';
 import { expiresAtMs, generateCode, hashCode, type RandomInt } from '@/lib/verification';
 
 /**
- * The testable core of `POST /api/verify/request` (spec §7, W8 alias
- * integrity): domain check, ownership check (a verified uni email becomes a
+ * The testable core of `POST /api/verify/request`: domain check, ownership check (a verified uni email becomes a
  * LOGIN alias, so an address claimed by any other account is refused before a
  * code is ever sent), per-address hourly limit, global daily cap, code
  * generation, send, and persistence — all over injected ports.
  */
 
-/** Max verification emails to one address per rolling hour (CLAUDE.md #6). */
+/** Max verification emails to one address per rolling hour. */
 export const MAX_REQUESTS_PER_HOUR = 3;
-/** Global daily email cap guard: at or above this in 24h, refuse (spec §7). */
+/** Global daily email cap guard: at or above this in 24h, refuse. */
 export const EMAIL_DAILY_CAP = 90;
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -69,7 +68,7 @@ export async function handleVerifyRequest(
     return apiError(404, 'unknown-university', 'That email domain is not a known UK university.');
   }
 
-  // W8 alias integrity: a verified uni email doubles as a login alias, so an
+  // Alias integrity: a verified uni email doubles as a login alias, so an
   // address can only belong to one account. Refuse before spending any email
   // budget. (The partial unique index closes the confirm-time race.)
   const verdict = adjudicateAliasClaim({

@@ -1,7 +1,7 @@
 import type { Result } from '@zetalog/shared';
 
 /**
- * The email boundary (spec §7). Every send goes through one {@link EmailSender}
+ * The email boundary. Every send goes through one {@link EmailSender}
  * so the provider (Resend today) can be swapped without touching verification
  * logic, and so sends can be decorated with logging in exactly one place.
  */
@@ -33,7 +33,7 @@ export type EmailEventStatus = 'sent' | 'failed';
 
 /**
  * One row destined for `email_events`. The recipient is stored only as a
- * SHA-256 hash (spec §7 — "sha-256 recipient hash, never the address").
+ * SHA-256 hash.
  */
 export interface EmailEvent {
   readonly kind: string;
