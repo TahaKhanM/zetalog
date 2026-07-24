@@ -1823,9 +1823,13 @@ th.ltable__rank {
   font-size: 0.92rem;
 }
 
-/* Full-width helper: what to do when the code is held. */
+/* Full-width helper: the copy sits beside a single vertical checklist. */
 .hiw-callout {
   margin-top: 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem 2.5rem;
+  align-items: start;
 }
 
 .hiw-callout__title {
@@ -1833,21 +1837,14 @@ th.ltable__rank {
   margin-bottom: 0.35rem;
 }
 
-/* The checklist: accent dot markers; a row on wide screens, stacked on narrow. */
+/* The checklist: accent dot markers, always a single vertical column. */
 .hiw-checks {
   list-style: none;
-  margin: 0.6rem 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.hiw-checks--row {
-  margin-top: 0.9rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 0.7rem 1.5rem;
+  gap: 0.6rem;
 }
 
 .hiw-checks li {
@@ -1872,6 +1869,13 @@ th.ltable__rank {
 .hiw-checks a {
   color: var(--accent);
   border-bottom: 1px solid var(--accent-border);
+}
+
+@media (max-width: 680px) {
+  .hiw-callout {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
 }
 
 @media (max-width: 640px) {
