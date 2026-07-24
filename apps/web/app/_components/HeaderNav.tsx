@@ -30,6 +30,7 @@ function stringOf(row: Record<string, unknown> | null, key: string): string | nu
 export function HeaderNav(): React.JSX.Element {
   const pathname = usePathname();
   const [auth, setAuth] = useState<AuthState>({ status: 'loading' });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -73,43 +74,105 @@ export function HeaderNav(): React.JSX.Element {
     };
   }, []);
 
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // While the menu is open, close it on Escape or a click outside the header.
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onKey(event: KeyboardEvent): void {
+      if (event.key === 'Escape') setMenuOpen(false);
+    }
+    function onPointerDown(event: PointerEvent): void {
+      const header = document.querySelector('.site-header__row');
+      if (header !== null && !header.contains(event.target as Node)) setMenuOpen(false);
+    }
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [menuOpen]);
+
   const isActive = (href: string): boolean =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const closeMenu = (): void => {
+    setMenuOpen(false);
+  };
 
-  // Two siblings so the mobile header can keep the account cluster on the top
-  // row with the brand and drop the links to their own row (see globals.css).
+  // The links + account live in `.nav`, which is an inline row on desktop and a
+  // drop-down panel on mobile (toggled by the burger). The theme toggle and the
+  // burger stay in the header at every width, so the mobile bar is uncluttered.
   return (
     <>
-      <nav className="nav" aria-label="Primary">
-        <Link href="/" className="nav__link" aria-current={isActive('/') ? 'page' : undefined}>
+      <nav id="site-menu" className="nav" data-open={menuOpen} aria-label="Primary">
+        <Link
+          href="/"
+          className="nav__link"
+          aria-current={isActive('/') ? 'page' : undefined}
+          onClick={closeMenu}
+        >
           Leaderboard
         </Link>
-        <Link href="/me" className="nav__link" aria-current={isActive('/me') ? 'page' : undefined}>
+        <Link
+          href="/me"
+          className="nav__link"
+          aria-current={isActive('/me') ? 'page' : undefined}
+          onClick={closeMenu}
+        >
           My progress
         </Link>
         <Link
           href="/how-it-works"
           className="nav__link"
           aria-current={isActive('/how-it-works') ? 'page' : undefined}
+          onClick={closeMenu}
         >
           How it works
         </Link>
+        <AuthChip auth={auth} active={isActive('/account')} onNavigate={closeMenu} />
       </nav>
-      <div className="nav__cluster">
-        <AuthChip auth={auth} active={isActive('/account')} />
+      <div className="nav__controls">
         <ThemeToggle />
+        <button
+          type="button"
+          className="nav__burger"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          aria-controls="site-menu"
+          onClick={() => {
+            setMenuOpen((open) => !open);
+          }}
+        >
+          <span className="nav__burger-box" data-open={menuOpen} aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
       </div>
     </>
   );
 }
 
-function AuthChip({ auth, active }: { auth: AuthState; active: boolean }): React.JSX.Element {
+function AuthChip({
+  auth,
+  active,
+  onNavigate,
+}: {
+  auth: AuthState;
+  active: boolean;
+  onNavigate: () => void;
+}): React.JSX.Element {
   if (auth.status === 'loading') {
     return <span className="auth-chip auth-chip--loading" aria-hidden="true" />;
   }
   if (auth.status === 'signed-out') {
     return (
-      <Link href="/signin" className="btn btn--primary btn--sm nav__signin">
+      <Link href="/signin" className="btn btn--primary btn--sm nav__signin" onClick={onNavigate}>
         Sign in
       </Link>
     );
@@ -120,6 +183,7 @@ function AuthChip({ auth, active }: { auth: AuthState; active: boolean }): React
       href="/account"
       className={`auth-chip${active ? ' auth-chip--active' : ''}`}
       title="Account settings"
+      onClick={onNavigate}
     >
       <Avatar name={auth.displayName ?? '?'} size={26} />
       <span className="auth-chip__name">{name}</span>
