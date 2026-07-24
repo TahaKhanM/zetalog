@@ -1,7 +1,7 @@
 import type { GameRecord } from '../schemas';
 import type { RecomputedScore } from '../score';
 
-/** Recorder jitter allowance beyond the configured duration (spec §5 step 3). */
+/** Recorder jitter allowance beyond the configured duration. */
 export const DURATION_TOLERANCE_MS = 2000;
 
 /** A structural integrity problem found in a submitted record. */
@@ -15,7 +15,7 @@ export interface ConsistencyViolation {
  * Structural integrity checks over a submitted record. Timestamp and
  * duration violations indicate a fabricated stream and reject outright;
  * a claimed-score mismatch merely records that the page disagreed — the
- * recomputed score is authoritative either way (spec §5).
+ * recomputed score is authoritative either way.
  */
 export function checkConsistency(
   record: GameRecord,

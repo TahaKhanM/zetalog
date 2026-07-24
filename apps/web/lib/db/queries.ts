@@ -152,8 +152,7 @@ export function getOwnGames(client: Db, userId: string): Promise<GameRow[]> {
 const aliasEmailSchema = z.object({ email: z.string() });
 
 /**
- * The user's verified university alias email (W8: it doubles as a login
- * identifier), or null when none is verified. MUST be called with the service
+ * The user's verified university alias email, or null when none is verified. MUST be called with the service
  * client — `uni_verifications` has no client policies by design.
  */
 export async function getVerifiedAliasEmail(service: Db, userId: string): Promise<string | null> {
@@ -202,7 +201,7 @@ const boardStatsRowSchema = z.object({
   games_counted: z.number().int().nonnegative(),
 });
 
-/** Aggregate figures for the masthead stat rail (CO-3 §2). */
+/** Aggregate figures for the masthead stat rail. */
 export interface BoardStats {
   readonly players: number;
   readonly universities: number;

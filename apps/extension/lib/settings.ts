@@ -43,7 +43,7 @@ type RawSettings = z.infer<typeof rawSettingsSchema>;
 /** Matches `init({ ...flat object... })`; the settings object is never nested. */
 const INIT_CALL_PATTERN = /init\(\s*(\{[^{}]*\})\s*\)/u;
 
-/** Zetamac's default duration when the `duration` field is omitted (spec recon note). */
+/** Zetamac's default duration when the `duration` field is omitted. */
 const DEFAULT_DURATION_SECONDS = 120;
 
 function err_<T>(

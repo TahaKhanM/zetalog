@@ -1,7 +1,7 @@
 import { apiError, apiJson } from '@/lib/http';
 
 /**
- * The testable core of `DELETE /api/verify/alias` (CO-11): remove the user's
+ * The testable core of `DELETE /api/verify/alias`: remove the user's
  * verified university email. The alias and the badge are one system, so
  * removal clears both. Idempotent: removing when nothing is verified still
  * answers 200. Re-verifying later restores both.

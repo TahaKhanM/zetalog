@@ -4,14 +4,14 @@ import { z } from 'zod';
 /**
  * Zod schemas for every Supabase row this app reads. Rows arrive as untyped
  * JSON from PostgREST; parsing them here is the single trusted boundary
- * (spec §11 — "validate every external boundary"). Column names are
- * snake_case to match the database exactly (W2's contract).
+ *. Column names are
+ * snake_case to match the database exactly.
  */
 
 /** The three leaderboard-eligible durations, as stored in `rankable_duration`. */
 const rankableDurationSchema = z.union([z.literal(30), z.literal(60), z.literal(120)]);
 
-/** `game_status` enum (W2). `user_removed` is a soft delete — never a hard delete. */
+/** `game_status` enum. `user_removed` is a soft delete — never a hard delete. */
 export const gameStatusSchema = z.enum(['accepted', 'quarantined', 'rejected', 'user_removed']);
 export type GameStatus = z.infer<typeof gameStatusSchema>;
 
@@ -48,7 +48,7 @@ const problemFlagSchema = z.object({
  * The `validation` jsonb column: the full {@link Verdict} `judge` produced for a
  * game. Parsed back out to render status chips (/me) and flag/violation chips
  * plus reviewer context (/admin). `problemViolations`/`problemFlags` default to
- * empty so rows judged before the W6 checks shipped still parse.
+ * empty so rows judged before the checks shipped still parse.
  */
 export const storedValidationSchema = z.object({
   outcome: z.enum(['accepted', 'quarantined', 'rejected']),
@@ -61,7 +61,7 @@ export const storedValidationSchema = z.object({
 });
 export type StoredValidation = z.infer<typeof storedValidationSchema>;
 
-/** A row of the `leaderboard_entries` view (W2): one (user, duration) best. */
+/** A row of the `leaderboard_entries` view: one (user, duration) best. */
 export const leaderboardEntrySchema = z.object({
   user_id: z.uuid(),
   display_name: z.string(),
@@ -105,7 +105,7 @@ export const profileRowSchema = z.object({
   uni_verified_at: z.string().nullable(),
   is_admin: z.boolean(),
   created_at: z.string(),
-  /** CO-11: the user chose "not at a university"; the UI stops offering the badge flow. */
+  /** The user chose "not at a university"; the UI stops offering the badge flow. */
   independent: z.boolean(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;

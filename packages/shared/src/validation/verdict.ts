@@ -8,7 +8,7 @@ import { checkProblems, type ProblemFlag, type ProblemViolation } from './proble
 /** The three outcomes a submitted game can be judged to. */
 export type ValidationOutcome = 'accepted' | 'quarantined' | 'rejected';
 
-/** The complete result of judging one submission (spec §5). */
+/** The complete result of judging one submission. */
 export interface Verdict {
   readonly outcome: ValidationOutcome;
   /** The recomputed score — the only score that ever ranks. */
@@ -16,9 +16,9 @@ export interface Verdict {
   readonly violations: readonly ConsistencyViolation[];
   readonly flags: readonly PhysiologyFlag[];
   readonly historyFlag: 'pb-jump' | null;
-  /** Hard problem-stream impossibilities (W6): any one rejects, like a bad timestamp. */
+  /** Hard problem-stream impossibilities: any one rejects, like a bad timestamp. */
   readonly problemViolations: readonly ProblemViolation[];
-  /** Statistical problem-stream implausibilities (W6): grounds for quarantine. */
+  /** Statistical problem-stream implausibilities: grounds for quarantine. */
   readonly problemFlags: readonly ProblemFlag[];
 }
 
@@ -38,7 +38,7 @@ const REJECTING_RULES: ReadonlySet<ConsistencyViolation['rule']> = new Set([
  * claimed-score mismatch alone does not reject because the recomputed
  * score is authoritative regardless of what the page displayed.
  *
- * The W6 problem-stream checks slot into the same policy: a hard range
+ * The problem-stream checks slot into the same policy: a hard range
  * violation is an impossible stream (reject); an operation-mix, entropy, or
  * problem-switch flag is a plausibility doubt (quarantine).
  */

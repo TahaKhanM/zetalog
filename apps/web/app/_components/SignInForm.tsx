@@ -8,7 +8,7 @@ import { isCompleteCode, normaliseCode, signInErrorMessage } from '@/lib/signin'
 import { createClient } from '@/lib/supabase/browser';
 
 /**
- * W8 email-first auth: one form serves sign-in, sign-up, recovery, and the
+ * Email-first auth: one form serves sign-in, sign-up, recovery, and the
  * OTP-era set-password migration. The email step asks `/api/auth/lookup`
  * which flow to reveal; passwords sign in through `/api/auth/login` (which
  * also accepts a verified uni alias and sets the @supabase/ssr cookies

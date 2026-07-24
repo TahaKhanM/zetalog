@@ -1,4 +1,4 @@
--- CO-6 follow-up: CO-5 added the handle CHECK as NOT VALID, assuming legacy
+-- The handle CHECK was added as NOT VALID, assuming legacy
 -- spaced names could persist untouched. But NOT VALID only skips validation of
 -- existing rows AT REST — every UPDATE re-checks the whole row, so a profile
 -- keeping a legacy name could no longer change anything (avatar sync included).

@@ -2,7 +2,7 @@ import { apiError, apiJson } from '@/lib/http';
 
 /**
  * The testable core of `DELETE /api/games/[clientGameId]`. A user soft-deletes
- * one of their own games (spec §3.2 — never a hard delete); the leaderboard
+ * one of their own games; the leaderboard
  * view recomputes the PB naturally.
  */
 

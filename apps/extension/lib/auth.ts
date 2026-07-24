@@ -5,12 +5,11 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from './config.js';
 import { singleFlight } from './single-flight.js';
 
 /**
- * Extension account session and Supabase token refresh (brief "Extension session
- * + API client"). supabase-js stays OUT of the bundle: the one thing the
+ * Extension account session and Supabase token refresh. supabase-js stays OUT of the bundle: the one thing the
  * extension needs from Supabase — trading a refresh token for a fresh access
  * token — is a single raw `fetch` to the GoTrue token endpoint. Tokens are only
  * ever sent to {@link SUPABASE_URL} and are NEVER written to an error detail or
- * a log (brief "Constraints").
+ * a log.
  */
 
 /** Versioned storage key for the persisted account session. */

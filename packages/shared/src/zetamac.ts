@@ -1,6 +1,6 @@
 import type { OperandRange, ZetamacSettings } from './schemas';
 
-/** Durations (seconds) whose default-config games rank on leaderboards (spec §1). */
+/** Durations (seconds) whose default-config games rank on leaderboards. */
 export const RANKABLE_DURATIONS = [30, 60, 120] as const;
 
 /** One of the leaderboard-eligible game durations in seconds: 30, 60, or 120. */
@@ -43,7 +43,7 @@ export function fingerprint(settings: ZetamacSettings): string {
 /**
  * The leaderboard duration this game qualifies for, or null if any
  * operation/range differs from Zetamac defaults or the duration is not
- * 30/60/120 (spec §3.1).
+ * 30/60/120.
  */
 export function rankableDuration(settings: ZetamacSettings): RankableDuration | null {
   const atDefaultDuration = {

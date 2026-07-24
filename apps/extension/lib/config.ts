@@ -2,7 +2,7 @@
  * The ZetaLog web app. The popup's "Sync to leaderboard" button opens
  * `WEB_APP_URL + '/link'` in a new tab, and the API client posts recorded games
  * to `WEB_APP_URL + '/api/games'`. Together with the account session this is the
- * entire sync seam (W4); the product stays fully functional signed out
+ * entire sync seam; the product stays fully functional signed out
  * (invariant 4) — nothing here runs until the user links an account.
  */
 export const WEB_APP_URL = 'https://www.zetalog.co.uk';
@@ -30,7 +30,6 @@ export const SUPABASE_ANON_KEY = 'sb_publishable_oB9siDNO9u8Vo9HPUEXXdA_pZlr7MxE
 /**
  * Origins the account-link handoff is accepted from and tokens may be sent to.
  * The link content script only runs on these, and the token refresh only talks
- * to {@link SUPABASE_URL} — no token ever reaches any other recipient (brief
- * "Constraints"). localhost is included for the full-stack e2e / local dev.
+ * to {@link SUPABASE_URL} — no token ever reaches any other recipient. localhost is included for the full-stack e2e / local dev.
  */
 export const LINK_ORIGINS = ['https://www.zetalog.co.uk', 'http://localhost:3000'] as const;

@@ -2,7 +2,7 @@ import { err, ok, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
 /**
- * Validation for the account-link postMessage handoff (brief "Session handoff").
+ * Validation for the account-link postMessage handoff.
  * The web app's LinkHandoff posts the current session ONLY on an explicit user
  * click; the link content script (which the browser runs solely on our own
  * `/link` origins) validates the message and forwards the tokens to the

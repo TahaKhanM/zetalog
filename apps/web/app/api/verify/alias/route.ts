@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * `DELETE /api/verify/alias` — remove the verified university email and the
- * badge that came with it (CO-11). Core logic lives in
+ * badge that came with it. Core logic lives in
  * {@link handleAliasDelete}; this file wires the real service-role writes.
  */
 export async function DELETE(): Promise<Response> {

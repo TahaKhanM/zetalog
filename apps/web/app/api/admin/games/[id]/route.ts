@@ -8,7 +8,7 @@ import { handleAdminAction } from './handler';
 export const dynamic = 'force-dynamic';
 
 /**
- * `POST /api/admin/games/[id]` — an admin resolves a quarantined game (spec §5).
+ * `POST /api/admin/games/[id]` — an admin resolves a quarantined game.
  * Core logic lives in {@link handleAdminAction}; this file wires real ports.
  */
 export async function POST(

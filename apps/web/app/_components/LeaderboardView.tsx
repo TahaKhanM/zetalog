@@ -8,7 +8,7 @@ import { UniBadge } from './UniBadge';
 import { UniversityFilter } from './UniversityFilter';
 import { ViewerRowHighlight } from './ViewerRowHighlight';
 
-/** Tab order per spec §6: 120s default, then 60s, 30s. */
+/** Tab order: 120s default, then 60s, 30s. */
 const DURATION_TABS: readonly RankableDuration[] = [120, 60, 30];
 
 interface LeaderboardViewProps {
@@ -27,7 +27,7 @@ interface LeaderboardViewProps {
 }
 
 /**
- * The shared leaderboard surface (CO-3 §2): an editorial masthead — eyebrow,
+ * The shared leaderboard surface: an editorial masthead — eyebrow,
  * maroon rule, duration tabs as large index numerals — over a ruled ledger
  * table, with a quiet stat rail. Server-rendered and identity-free (the
  * viewer's own row is decorated client-side by ViewerRowHighlight).

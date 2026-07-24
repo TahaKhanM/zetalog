@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'My progress' };
 
 /**
- * `/me` — the private progress dashboard (spec §6): personal bests, the trend
+ * `/me` — the private progress dashboard: personal bests, the trend
  * chart, in-depth per-problem analysis, and history. Account settings live at
  * `/account`; this page is purely about the numbers.
  */

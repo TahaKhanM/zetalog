@@ -10,7 +10,7 @@ import {
 } from '@zetalog/shared';
 
 /**
- * The server side of "aggressive validation" (spec §5), as a pure pipeline over
+ * The server side of "aggressive validation", as a pure pipeline over
  * an injected {@link SubmitPort}. The route wires the port to Supabase; tests
  * fake it. The claimed score is never trusted — {@link judge} recomputes it.
  *

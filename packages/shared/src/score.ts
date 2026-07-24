@@ -17,7 +17,7 @@ export interface ScoreAnomaly {
   readonly at: number;
 }
 
-/** The server-side truth recomputed from raw events (spec §5 step 1). */
+/** The server-side truth recomputed from raw events. */
 export interface RecomputedScore {
   /** Count of verified outcomes — the only score that ranks. */
   readonly score: number;

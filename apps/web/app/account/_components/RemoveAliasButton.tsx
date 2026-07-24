@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 /**
- * Remove the verified university email (CO-11). The alias and the badge are
+ * Remove the verified university email. The alias and the badge are
  * one system, so the first click asks for confirmation and spells that out.
  * Re-verifying on /verify restores both.
  */

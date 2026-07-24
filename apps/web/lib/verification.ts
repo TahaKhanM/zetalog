@@ -1,7 +1,7 @@
 import { sha256Hex, timingSafeEqualHex } from './hash';
 
 /**
- * Pure uni-email verification logic (spec §7). Time and randomness are
+ * Pure uni-email verification logic. Time and randomness are
  * injected, so every path is deterministic under test; the route supplies
  * `crypto.randomInt` and the wall clock. Only the SHA-256 of a code is ever
  * stored — the plaintext lives only in the email.

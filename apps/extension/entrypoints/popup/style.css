@@ -3,7 +3,7 @@
  * come from @zetalog/shared tokens, injected as --zl-* custom properties by
  * main.tsx. This sheet only *composes* them — every colour below is either a
  * palette var or a color-mix over one; no raw hexes, no font families
- * (invariant 7). Colour application follows CO-3 "examination paper": the
+ * (invariant 7). Colour application follows "examination paper": the
  * surface is warm paper, maroon is the structural ink (ruling, hairlines,
  * index), navy the working ink, steel strictly chart/metadata; no solid
  * brand-colour region larger than a chip except the wordmark.
@@ -12,7 +12,7 @@
 :root {
   color-scheme: light dark;
 
-  /* Light (CO-11 modern neutral, matching the site): cool grey surfaces,
+  /* Light: cool grey surfaces,
    * white cards, navy ink, maroon as the single accent. */
   --zl-bg: color-mix(in srgb, var(--zl-navy) 6%, white);
   --zl-surface: white;
@@ -35,7 +35,7 @@
   --zl-warn-text: var(--zl-maroon);
 }
 
-/* Dark: the blackboard — navy-derived surfaces, cream ruling (CO-3 §1). */
+/* Dark: the blackboard — navy-derived surfaces, cream ruling. */
 /* Dark, aligned with the site's scheme. Two selectors carry the same values:
  * the OS default (unless light is pinned) and the pinned override. Keep both
  * blocks in sync. */
@@ -171,7 +171,7 @@ body {
   flex: none;
 }
 
-/* The wordmark is the one place a solid brand colour is allowed (CO-2). */
+/* The wordmark is the one place a solid brand colour is allowed. */
 .zl-wordmark {
   font-family: var(--zl-font-display);
   font-weight: 900;
@@ -268,7 +268,7 @@ body {
   display: block;
 }
 
-/* New PB: red text only (CO-2 — never a red fill). */
+/* New PB: red text only. */
 .zl-hero__score--pb {
   color: var(--zl-accent);
 }
@@ -288,7 +288,7 @@ body {
   color: var(--zl-muted);
 }
 
-/* PB chip: red text + red border, no fill (CO-2). */
+/* PB chip: red text + red border, no fill. */
 .zl-chip {
   font-family: var(--zl-font-display);
   font-weight: 800;
@@ -403,7 +403,7 @@ body {
   width: 100%;
 }
 
-/* Steel-blue strokes are an allowed brand accent (CO-2). */
+/* Steel-blue strokes are an allowed brand accent. */
 .zl-spark__line,
 .zl-chart__line {
   fill: none;
@@ -501,7 +501,7 @@ body {
   margin-top: 1px;
 }
 
-/* Status flag: steel-blue tint chip + steel text (CO-2 badge rule). */
+/* Status flag: steel-blue tint chip + steel text. */
 .zl-flag {
   font-size: 9px;
   letter-spacing: 0.04em;
@@ -513,7 +513,7 @@ body {
 }
 
 /* Per-game sync chip: steel tint when synced/pending, maroon tint on failure
-   (CO-2 — tints only, never a solid fill). */
+  . */
 .zl-synctag {
   font-size: 9px;
   letter-spacing: 0.04em;
@@ -569,7 +569,7 @@ body {
   border-color: var(--zl-muted);
 }
 
-/* Destructive: red text + red border on hover, never a red fill (CO-2). */
+/* Destructive: red text + red border on hover, never a red fill. */
 .zl-btn--danger {
   color: var(--zl-accent);
 }
@@ -579,7 +579,7 @@ body {
   border-color: var(--zl-accent);
 }
 
-/* ── Capture-failed banner: maroon 8% tint + maroon text (CO-2) ── */
+/* ── Capture-failed banner: maroon 8% tint + maroon text ── */
 .zl-banner {
   display: flex;
   align-items: center;
@@ -607,7 +607,7 @@ body {
 }
 
 /* Ghost button: maroon (or cream, dark) text + tinted border; hover is an 8%
-   tint, never a solid maroon fill (CO-2). */
+   tint, never a solid maroon fill. */
 .zl-sync {
   width: 100%;
   font-family: var(--zl-font-body);

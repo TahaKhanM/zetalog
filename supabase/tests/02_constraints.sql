@@ -20,7 +20,7 @@ values
    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'authenticated', 'authenticated',
    'b@nomatch.example');
 
--- display_name CHECK (CO-5 handle rule): valid names accepted ---------------
+-- display_name CHECK: valid names accepted ---------------
 select lives_ok(
   $$ update public.profiles set display_name = 'abc'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,

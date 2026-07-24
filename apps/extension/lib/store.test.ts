@@ -483,7 +483,7 @@ describe('pruneStoredGames', () => {
     expect(pruned[0]?.record.claimedScore).toBe(games[0]?.record.claimedScore);
   });
 
-  it('exposes a limit of 400 (spec §9)', () => {
+  it('exposes a limit of 400', () => {
     expect(PRUNE_LIMIT).toBe(400);
   });
 });

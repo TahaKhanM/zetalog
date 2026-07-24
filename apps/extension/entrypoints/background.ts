@@ -8,8 +8,7 @@ import { createStore } from '../lib/store.js';
 import { createSyncQueueStore, drainSync } from '../lib/sync.js';
 
 /**
- * Background service worker: the sole owner of the sync queue drain (spec §3.4,
- * brief "Sync queue + backfill"). Thin wiring only — every decision lives in the
+ * Background service worker: the sole owner of the sync queue drain. Thin wiring only — every decision lives in the
  * tested `lib/` cores. It is message-triggered (link / drain / unlink from the
  * popup and content scripts) and alarm-triggered (retry drain on backoff). MV3
  * service workers are ephemeral, so no state is held in memory: the session,

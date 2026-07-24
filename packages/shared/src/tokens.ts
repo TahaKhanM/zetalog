@@ -1,5 +1,5 @@
 /**
- * Design tokens fixed by the ZetaLog design spec (§8 — "Design language").
+ * Design tokens fixed by the ZetaLog design spec.
  *
  * These values are contractual: both the extension and the website consume
  * them, and no other file may hard-code palette hexes or font families.
@@ -52,7 +52,7 @@ export const typography = {
   /**
    * Every numeral on every screen: scores, timers, leaderboards, chart axes.
    * Numerals are the visual hero — always tabular so columns of scores align.
-   * Azeret Mono (plain zero, tabular by construction) per CO-2.
+   * Azeret Mono (plain zero, tabular by construction).
    */
   numeric: {
     family: 'Azeret Mono',

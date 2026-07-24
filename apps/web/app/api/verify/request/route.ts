@@ -15,7 +15,7 @@ import { handleVerifyRequest } from './handler';
 export const dynamic = 'force-dynamic';
 
 /**
- * `POST /api/verify/request` — start uni-email verification (spec §7). Sends a
+ * `POST /api/verify/request` — start uni-email verification. Sends a
  * 6-digit code via the email module (never Supabase's sender). Core logic
  * lives in {@link handleVerifyRequest}; this file wires real ports.
  */

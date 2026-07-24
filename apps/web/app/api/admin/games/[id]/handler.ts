@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { apiError, apiJson } from '@/lib/http';
 
 /**
- * The testable core of `POST /api/admin/games/[id]` (spec §5): an admin resolves
+ * The testable core of `POST /api/admin/games/[id]`: an admin resolves
  * a quarantined game — approve → accepted (ranks), reject → rejected (audit).
  */
 

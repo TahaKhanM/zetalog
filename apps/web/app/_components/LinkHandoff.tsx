@@ -7,7 +7,7 @@ import { isLinkAck, isLinkReady, linkPingMessage, linkSessionMessage } from '@/l
 import { createClient } from '@/lib/supabase/browser';
 
 /**
- * Extension link handoff (spec §3.4). On an explicit click — never on load — it
+ * Extension link handoff. On an explicit click — never on load — it
  * reads the current Supabase session and `window.postMessage`s its tokens,
  * scoped to this exact origin. The extension's content script (which the browser
  * runs only on this origin) forwards them to the extension and posts back a

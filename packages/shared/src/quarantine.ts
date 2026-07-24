@@ -1,4 +1,4 @@
-/** A game counts as a restart when it played under this fraction of its duration (spec §3.2). */
+/** A game counts as a restart when it played under this fraction of its duration. */
 export const RESTART_PLAYED_FRACTION = 0.8;
 
 /** Minimum kept games on a fingerprint before the outlier rule activates. */
@@ -34,7 +34,7 @@ export function median(values: readonly number[]): number {
 }
 
 /**
- * Decide whether a finished game is auto-quarantined (spec §3.2). Both the
+ * Decide whether a finished game is auto-quarantined. Both the
  * extension (pre-flag) and the server (authoritative mirror) call this with
  * identical inputs. Quarantine is always restorable — callers must never
  * delete on the strength of this verdict.

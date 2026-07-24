@@ -1,10 +1,10 @@
--- CO-7: remove profile pictures entirely (product decision — user-uploaded
+-- Remove profile pictures entirely (product decision: user-uploaded
 -- images are a moderation liability, and stored images cost real space on the
--- free tier). The display-name handle rules from CO-5/CO-6 are untouched;
+-- free tier). The display-name handle rules are untouched;
 -- monogram initials replace photos in the UI.
 --
 -- The view must be dropped and recreated (create or replace cannot remove a
--- column). Recreating loses grants, so the exact W2 posture is restored below:
+-- column). Recreating loses grants, so the exact original posture is restored below:
 -- intentionally SECURITY DEFINER, SELECT-only for anon/authenticated (see the
 -- 20260720235630 migration for the accepted advisor-warning rationale).
 

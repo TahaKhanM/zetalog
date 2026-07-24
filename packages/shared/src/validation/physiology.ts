@@ -1,6 +1,6 @@
 import type { RecomputedScore } from '../score';
 
-/** Below this per-problem solve time we consider the answer super-human (spec §5 step 2). */
+/** Below this per-problem solve time we consider the answer super-human. */
 export const MIN_HUMAN_SOLVE_MS = 250;
 
 /** Flag when at least this fraction of solved problems beat {@link MIN_HUMAN_SOLVE_MS}. */
@@ -29,7 +29,7 @@ export function coefficientOfVariation(values: readonly number[]): number {
 /**
  * Physiological plausibility screening. Flags are grounds for quarantine
  * and human review — never automatic rejection, because exceptional humans
- * exist (spec §5).
+ * exist.
  */
 export function checkPhysiology(recomputed: RecomputedScore): readonly PhysiologyFlag[] {
   const flags: PhysiologyFlag[] = [];

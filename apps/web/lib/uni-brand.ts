@@ -1,12 +1,12 @@
 /**
- * University badge brands (CO-3 §3): monogram marks in official brand
+ * University badge brands: monogram marks in official brand
  * colours — never crests, shields, or logos (trademark + design invariant).
  *
  * `CURATED_BRANDS` is keyed by the seed's university slug. Each entry's
  * background is the institution's published primary brand colour; the
  * monogram colour is chosen from the same identity for WCAG AA contrast
  * (enforced by test over the whole map — see uni-brand.test.ts). This module
- * is the single sanctioned home for non-palette hexes (CO-3 §4).
+ * is the single sanctioned home for non-palette hexes.
  */
 
 export interface UniBrand {

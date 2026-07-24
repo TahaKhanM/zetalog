@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 /**
- * Playwright config for the web app's full-stack e2e (W7 bug 3 regression).
+ * Playwright config for the web app's full-stack e2e.
  *
  * The single spec is OPT-IN (skipped unless `ZL_FULLSTACK=1`), because it needs
  * a local Supabase stack (`supabase start`) and boots `next dev` itself — the

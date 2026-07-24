@@ -3,9 +3,9 @@ import { displayNameSchema } from '@/lib/profile';
 import { z } from 'zod';
 
 /**
- * The testable core of `POST /api/profile` (spec §7): change the display name
+ * The testable core of `POST /api/profile`: change the display name
  * (validated against the same rule as the DB CHECK, unique violation mapped to
- * 409) or the CO-11 `independent` flag ("not at a university"), or both.
+ * 409) or the `independent` flag ("not at a university"), or both.
  */
 
 const bodySchema = z
