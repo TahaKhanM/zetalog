@@ -9,7 +9,7 @@ export function CaptureFailedBanner(): JSX.Element {
   return (
     <div className="zl-banner" role="status">
       <span className="zl-banner__dot" />
-      <span>Recorder needs an update — recent games may be missing.</span>
+      <span>Recorder needs an update. Recent games may be missing.</span>
     </div>
   );
 }

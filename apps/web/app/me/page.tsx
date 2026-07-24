@@ -50,7 +50,7 @@ export default async function MePage(): Promise<React.JSX.Element> {
         <div className="masthead__row">
           <div>
             <h1 className="display board-title">My progress</h1>
-            <p className="meta">Every figure recomputed server-side from your recorded games.</p>
+            <p className="meta">Recomputed from your recorded games.</p>
           </div>
           <Link href="/account" className="identity-chip" aria-label="Account settings">
             <Avatar name={displayName ?? '?'} size={24} />
@@ -75,7 +75,7 @@ export default async function MePage(): Promise<React.JSX.Element> {
       <section className="me__section" aria-label="Personal bests">
         <h2 className="me__h2">Personal bests</h2>
         {bests.length === 0 ? (
-          <p className="meta">No ranked games yet — play a default-config game to set a PB.</p>
+          <p className="meta">No ranked games yet. Play a default-settings game to set a best.</p>
         ) : (
           <div className="pb-grid">
             {bests.map((best) => (
@@ -105,8 +105,8 @@ export default async function MePage(): Promise<React.JSX.Element> {
         <section className="me__section" aria-label="Analysis">
           <h2 className="me__h2">Analysis</h2>
           <p className="meta">
-            Once accepted games arrive with full telemetry, this page breaks your solve times down
-            by operation, times table, and skill — and names the problems that slow you down.
+            Play a few games and this page breaks your solve times down by operation, times table
+            and skill. It also names the problems that slow you down.
           </p>
         </section>
       )}

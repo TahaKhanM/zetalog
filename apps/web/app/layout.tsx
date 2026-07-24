@@ -20,8 +20,8 @@ const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
 
 export const metadata: Metadata = {
   title: {
-    default: 'ZetaLog — Zetamac leaderboards',
-    template: '%s — ZetaLog',
+    default: 'ZetaLog · Zetamac leaderboards',
+    template: '%s · ZetaLog',
   },
   description:
     'Frictionless Zetamac score tracking with server-validated, per-university leaderboards.',
@@ -62,9 +62,12 @@ export default function RootLayout({ children }: { children: ReactNode }): React
             <span className="site-footer__brand">
               <span>Not affiliated with Zetamac.</span>
             </span>
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
-              GitHub
-            </a>
+            <span className="site-footer__links">
+              <Link href="/how-it-works">How it works</Link>
+              <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
+                GitHub
+              </a>
+            </span>
           </div>
         </footer>
       </body>

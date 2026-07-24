@@ -12,16 +12,17 @@
 :root {
   color-scheme: light dark;
 
-  /* Light: warm exam-paper surfaces, maroon ruling, navy working ink. */
-  --zl-bg: color-mix(in srgb, var(--zl-cream) 38%, white);
-  --zl-surface: color-mix(in srgb, var(--zl-cream) 14%, white);
-  --zl-surface-strong: color-mix(in srgb, var(--zl-cream) 26%, white);
-  --zl-border: color-mix(in srgb, var(--zl-maroon) 13%, transparent);
-  --zl-divider: color-mix(in srgb, var(--zl-maroon) 10%, transparent);
-  --zl-rule: color-mix(in srgb, var(--zl-maroon) 36%, transparent);
-  --zl-text: color-mix(in srgb, var(--zl-navy) 86%, white);
+  /* Light (CO-11 modern neutral, matching the site): cool grey surfaces,
+   * white cards, navy ink, maroon as the single accent. */
+  --zl-bg: color-mix(in srgb, var(--zl-navy) 6%, white);
+  --zl-surface: white;
+  --zl-surface-strong: color-mix(in srgb, var(--zl-navy) 8%, white);
+  --zl-border: color-mix(in srgb, var(--zl-navy) 13%, transparent);
+  --zl-divider: color-mix(in srgb, var(--zl-navy) 9%, transparent);
+  --zl-rule: color-mix(in srgb, var(--zl-navy) 16%, transparent);
+  --zl-text: color-mix(in srgb, var(--zl-navy) 88%, white);
   --zl-heading: var(--zl-navy);
-  --zl-muted: color-mix(in srgb, var(--zl-steel-blue) 44%, var(--zl-text));
+  --zl-muted: color-mix(in srgb, var(--zl-navy) 52%, white);
   --zl-faint: color-mix(in srgb, var(--zl-navy) 42%, white);
   --zl-display: var(--zl-maroon);
   --zl-index: var(--zl-maroon);

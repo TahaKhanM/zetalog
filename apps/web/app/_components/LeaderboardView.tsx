@@ -36,7 +36,7 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
   const basePath = props.currentSlug === null ? '/' : `/uni/${props.currentSlug}`;
 
   return (
-    <section aria-label={props.title}>
+    <section aria-label={props.title} className="board-enter">
       <header className="masthead">
         <p className="masthead__eyebrow display">
           {props.currentSlug === null ? 'The leaderboard' : 'University board'}
@@ -190,7 +190,10 @@ function EmptyState(): React.JSX.Element {
   return (
     <div className="card card--pad empty">
       <p className="empty__title num">No scores yet</p>
-      <p className="meta">Install the extension and play a ranked game to appear here.</p>
+      <p className="meta">
+        <Link href="/how-it-works">Install the extension</Link> and play a ranked game to appear
+        here.
+      </p>
     </div>
   );
 }
