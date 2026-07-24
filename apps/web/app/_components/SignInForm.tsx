@@ -427,7 +427,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             void createAccount();
           }}
         >
-          <p className="auth-step display">New here — create your account</p>
+          <p className="auth-step display">Create your account</p>
           <p className="meta">
             We&apos;ll set up <strong>{step.email}</strong> with a password. {changeEmail}
           </p>
@@ -452,13 +452,11 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
           <p className="meta">
             {!isSignup && step.intent === 'setup' ? (
               <>
-                Let&apos;s finish setting up your password — your account predates them. We emailed
-                a code to <strong>{step.email}</strong>.
+                Your account needs a password. We emailed a code to <strong>{step.email}</strong>.
               </>
             ) : (
               <>
-                We emailed a code to <strong>{step.email}</strong>. Enter it below — codes expire
-                after an hour.
+                We emailed a code to <strong>{step.email}</strong>. Codes expire after an hour.
               </>
             )}
           </p>
@@ -537,7 +535,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
     return (
       <div className="auth-form">
         <p className="meta">
-          <strong>{step.email}</strong> signs in with {label} — no password is set. {changeEmail}
+          <strong>{step.email}</strong> signs in with {label}. No password is set yet. {changeEmail}
         </p>
         <div className="auth-oauth" style={{ marginTop: '0.9rem' }}>
           {step.provider === 'github' ? (
@@ -617,10 +615,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             }}
           />
         </label>
-        <p className="auth-form__hint">
-          Use your university email and its badge appears next to your name on the boards
-          automatically.
-        </p>
+        <p className="auth-form__hint">Use your university email to get its badge on the boards.</p>
         {/* Only busy gates the button: `required` already blocks an empty
             submit, and a value-dependent `disabled` flickers during hydration. */}
         <button type="submit" className="btn btn--primary" disabled={busy}>

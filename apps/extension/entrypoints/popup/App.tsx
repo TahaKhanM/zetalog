@@ -156,7 +156,7 @@ export function App(): JSX.Element {
             <span className="zl-eyebrow">Focus</span>
           </div>
           <p className="zl-focus">
-            <span className="zl-focus__label">{focus.label}</span> —{' '}
+            <span className="zl-focus__label">{focus.label}</span>:{' '}
             <span className="zl-num">{(focus.medianSolveMs / 1000).toFixed(1)}s</span> median,{' '}
             <span className="zl-num">{focus.ratio.toFixed(1)}×</span> your fastest area
           </p>

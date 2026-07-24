@@ -33,6 +33,16 @@ root.setProperty(
 root.setProperty('--zl-font-body', `'${typography.body.family}', sans-serif`);
 root.setProperty('--zl-font-mono', `'${typography.numeric.family}', monospace`);
 
+// Apply a pinned theme before first paint (the ThemeToggle persists it).
+try {
+  const storedTheme = window.localStorage.getItem('zl-theme');
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    document.documentElement.dataset.theme = storedTheme;
+  }
+} catch {
+  // No storage access means no pinned theme; the OS preference applies.
+}
+
 const container = document.getElementById('root');
 if (container === null) throw new Error('popup root element missing');
 createRoot(container).render(
