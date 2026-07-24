@@ -55,30 +55,32 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
             </div>
             {props.subtitle !== undefined ? <p className="meta">{props.subtitle}</p> : null}
           </div>
-          <UniversityFilter
-            options={props.uniOptions}
-            currentSlug={props.currentSlug}
-            duration={props.duration}
-          />
         </div>
       </header>
 
       <div className="board-layout">
         <div>
-          <nav className="index-tabs" role="tablist" aria-label="Game duration">
-            {DURATION_TABS.map((duration) => (
-              <Link
-                key={duration}
-                href={`${basePath}?d=${String(duration)}`}
-                role="tab"
-                aria-selected={duration === props.duration}
-                className="index-tab num"
-              >
-                {duration}
-                <span className="index-tab__unit">s</span>
-              </Link>
-            ))}
-          </nav>
+          <div className="board-controls">
+            <nav className="index-tabs" role="tablist" aria-label="Game duration">
+              {DURATION_TABS.map((duration) => (
+                <Link
+                  key={duration}
+                  href={`${basePath}?d=${String(duration)}`}
+                  role="tab"
+                  aria-selected={duration === props.duration}
+                  className="index-tab num"
+                >
+                  {duration}
+                  <span className="index-tab__unit">s</span>
+                </Link>
+              ))}
+            </nav>
+            <UniversityFilter
+              options={props.uniOptions}
+              currentSlug={props.currentSlug}
+              duration={props.duration}
+            />
+          </div>
 
           {props.entries.length === 0 ? (
             <EmptyState />

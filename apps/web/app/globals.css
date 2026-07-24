@@ -41,13 +41,17 @@
   --surface-shadow: color-mix(in srgb, var(--color-zl-navy) 8%, transparent);
   --meta-text: color-mix(in srgb, var(--color-zl-navy) 52%, white);
   --ink-index: var(--color-zl-maroon);
-  --ink-display: var(--color-zl-navy);
+  /* Maroon carries the display headings in light, mirroring how cream carries
+   * them on the blackboard (CO-12). */
+  --ink-display: var(--color-zl-maroon);
   --ink-wordmark: var(--color-zl-maroon);
   --accent: var(--color-zl-maroon);
   --accent-strong: color-mix(in srgb, var(--color-zl-maroon) 62%, transparent);
   --accent-soft: color-mix(in srgb, var(--color-zl-maroon) 7%, transparent);
   --accent-border: color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
   --accent-contrast: white;
+  /* The viewer's own row: a neutral grey wash, never a red tint (CO-12). */
+  --row-self: color-mix(in srgb, var(--color-zl-navy) 6%, transparent);
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
@@ -80,6 +84,7 @@
     --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
     --accent-border: color-mix(in srgb, var(--color-zl-steel) 32%, transparent);
     --accent-contrast: var(--color-zl-navy);
+    --row-self: color-mix(in srgb, var(--color-zl-cream) 8%, transparent);
     --chart-stroke-opacity: 1;
     color-scheme: dark;
   }
@@ -104,6 +109,7 @@
   --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
   --accent-border: color-mix(in srgb, var(--color-zl-steel) 32%, transparent);
   --accent-contrast: var(--color-zl-navy);
+  --row-self: color-mix(in srgb, var(--color-zl-cream) 8%, transparent);
   --chart-stroke-opacity: 1;
   color-scheme: dark;
 }
@@ -246,7 +252,7 @@ button {
   gap: 0.5rem;
 }
 
-/* CO-3 university monogram badge — colours arrive inline from uni-brand.ts,
+/* University monogram badge — colours arrive inline from uni-brand.ts,
  * the single sanctioned non-palette hex source; never set colours here. */
 .uni-badge {
   display: inline-flex;
@@ -691,7 +697,7 @@ button {
 }
 
 .row-self {
-  background: var(--accent-soft);
+  background: var(--row-self);
 }
 
 /* Inputs */
@@ -790,9 +796,11 @@ button {
   }
 }
 
+/* Top-aligned so the university filter holds one position regardless of how
+ * many lines the board title takes (CO-12: no jump between global and uni). */
 .masthead__row {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1.25rem;
   flex-wrap: wrap;
@@ -910,17 +918,28 @@ button {
   line-height: 1;
 }
 
+/* One control bar on every board: duration tabs left, university filter right.
+ * Fixed structure means switching boards never shifts the dropdown (CO-12). */
 .board-controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.board-controls .index-tabs {
+  margin-bottom: 0;
 }
 
 .uni-filter {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+}
+
+.uni-filter__select {
+  min-width: 12rem;
 }
 
 .uni-filter__label {
@@ -928,6 +947,18 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--meta-text);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .table-wrap {
@@ -1387,9 +1418,57 @@ th.ltable__rank {
   margin-inline: auto;
 }
 
+.hiw-hero__eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.9rem;
+}
+
 .hiw-hero__title {
   font-size: clamp(1.9rem, 5.4vw, 3rem);
   line-height: 1.08;
+}
+
+.hiw-mini-ol {
+  margin: 0.6rem 0 0.9rem;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hiw-inline-link {
+  margin-top: 1rem;
+}
+
+/* Long-form prose (privacy policy). */
+.prose {
+  max-width: 44rem;
+  line-height: 1.65;
+}
+
+.prose p,
+.prose ul {
+  color: var(--surface-text);
+  margin: 0.9rem 0;
+}
+
+.prose ul {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.prose__h2 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  color: var(--surface-heading);
+}
+
+.prose a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent-border);
 }
 
 .hiw-hero__lede {
