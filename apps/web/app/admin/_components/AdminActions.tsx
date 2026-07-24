@@ -23,7 +23,7 @@ export function AdminActions({ gameId }: { gameId: string }): React.JSX.Element 
         body: JSON.stringify({ action }),
       });
       if (!response.ok) {
-        setError('Action failed — the queue may have changed.');
+        setError('Action failed. Refresh and try again.');
         return;
       }
       router.refresh();
