@@ -64,6 +64,7 @@ export default function RootLayout({ children }: { children: ReactNode }): React
             </span>
             <span className="site-footer__links">
               <Link href="/how-it-works">How it works</Link>
+              <Link href="/privacy">Privacy</Link>
               <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
                 GitHub
               </a>
