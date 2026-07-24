@@ -18,9 +18,9 @@ interface FooterProps {
 
 /**
  * The footer account affordance. Signed out, it offers "Sync to
- * leaderboard" (opens /link). Signed in, it shows the sync status, a leaderboard
- * privacy checkbox, and an Unlink control — a ghost/outlined treatment
- * throughout, never a solid fill.
+ * leaderboard" (opens /link). Signed in, it shows the linked status (a steady
+ * state, not a spinner), a leaderboard privacy checkbox, and an Unlink control —
+ * a ghost/outlined treatment throughout, never a solid fill.
  */
 export function Footer({
   linked,
@@ -35,7 +35,7 @@ export function Footer({
         <div className="zl-account">
           <span className="zl-account__status">
             <span className="zl-account__dot" aria-hidden="true" />
-            {optedOut === true ? 'Linked, scores private' : 'Syncing to leaderboard'}
+            {optedOut === true ? 'Linked, scores private' : 'Linked to leaderboard'}
           </span>
           <button className="zl-btn" type="button" onClick={onUnlink}>
             Unlink

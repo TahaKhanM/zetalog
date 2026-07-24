@@ -22,7 +22,7 @@ describe('Footer', () => {
     expect(screen.queryByText('Unlink')).toBeNull();
   });
 
-  it('signed in: shows the syncing status and Unlink, invoking onUnlink', () => {
+  it('signed in: shows the linked status and Unlink, invoking onUnlink', () => {
     const onUnlink = vi.fn();
     render(
       <Footer
@@ -33,7 +33,7 @@ describe('Footer', () => {
         onSetPrivacy={vi.fn()}
       />,
     );
-    expect(screen.getByText('Syncing to leaderboard')).toBeTruthy();
+    expect(screen.getByText('Linked to leaderboard')).toBeTruthy();
     expect(screen.queryByText('Sync to leaderboard')).toBeNull();
     fireEvent.click(screen.getByText('Unlink'));
     expect(onUnlink).toHaveBeenCalledTimes(1);
