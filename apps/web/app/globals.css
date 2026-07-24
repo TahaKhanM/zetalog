@@ -1789,11 +1789,16 @@ th.ltable__rank {
   margin-bottom: 1.4rem;
 }
 
+/* Two equal-height cards (stretch), each with its action pinned to the base. */
 .hiw-after__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
   gap: 1rem;
-  align-items: start;
+}
+
+.hiw-block {
+  display: flex;
+  flex-direction: column;
 }
 
 .hiw-block__title {
@@ -1806,14 +1811,29 @@ th.ltable__rank {
 }
 
 .hiw-block__cta {
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+
+/* The quieter "not at a university" footnote, set off from the copy above. */
+.hiw-block__aside {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--surface-hairline);
+  font-size: 0.92rem;
+}
+
+/* Full-width helper: what to do when the code is held. */
+.hiw-callout {
   margin-top: 1rem;
 }
 
-.hiw-block__sub {
-  margin-top: 0.9rem;
+.hiw-callout__title {
+  font-size: 1.1rem;
+  margin-bottom: 0.35rem;
 }
 
-/* The junk/quarantine checklist: accent dot markers. */
+/* The checklist: accent dot markers; a row on wide screens, stacked on narrow. */
 .hiw-checks {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -1821,6 +1841,13 @@ th.ltable__rank {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.hiw-checks--row {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.7rem 1.5rem;
 }
 
 .hiw-checks li {
@@ -1845,12 +1872,6 @@ th.ltable__rank {
 .hiw-checks a {
   color: var(--accent);
   border-bottom: 1px solid var(--accent-border);
-}
-
-.hiw-block__note {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--surface-hairline);
 }
 
 @media (max-width: 640px) {
