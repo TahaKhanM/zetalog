@@ -19,6 +19,11 @@ import { HeaderNav } from './_components/HeaderNav';
 const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
 
 export const metadata: Metadata = {
+  // Canonical base is the www host: it is a Vercel-managed CNAME, so unlike the
+  // apex A record it can never point at a stale IP. Search results, shared
+  // links and OG image URLs all resolve through it (the apex just 308s here).
+  metadataBase: new URL('https://www.zetalog.co.uk'),
+  alternates: { canonical: '/' },
   title: {
     default: 'ZetaLog · Zetamac leaderboards',
     template: '%s · ZetaLog',
