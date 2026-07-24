@@ -4,7 +4,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'ZetaLog',
-    description: 'Frictionless score tracking and progress graphs for Zetamac.',
+    description: 'Track your Zetamac scores and compare them on a worldwide leaderboard.',
     // `alarms` powers the background sync-retry drain (exponential backoff); the
     // content-script origins (Zetamac + the /link pages) are declared per
     // entrypoint, so no host_permissions are needed.

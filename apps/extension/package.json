@@ -1,6 +1,6 @@
 {
   "name": "@zetalog/extension",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "postinstall": "wxt prepare",
     "test": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "zip": "wxt zip"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
