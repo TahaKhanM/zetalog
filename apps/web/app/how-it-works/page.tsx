@@ -65,12 +65,13 @@ function PuzzleGlyph(): React.JSX.Element {
 export default function HowItWorksPage(): React.JSX.Element {
   return (
     <div className="hiw board-enter">
-      <section className="hiw-hero" aria-label="Get ZetaLog">
-        <p className="hiw-hero__eyebrow display">Get ZetaLog</p>
-        <h1 className="display hiw-hero__title">Add the extension in about a minute.</h1>
+      <section className="hiw-hero" aria-label="What ZetaLog is">
+        <p className="hiw-hero__eyebrow display">How it works</p>
+        <h1 className="display hiw-hero__title">Track your Zetamac scores. Compare worldwide.</h1>
         <p className="hiw-hero__lede">
-          ZetaLog records every Zetamac game you play and ranks your best against players worldwide.
-          It is not on the Chrome Web Store yet, so you load it by hand once.
+          Zetamac is the mental arithmetic game people use to build speed for quant interviews.
+          ZetaLog is a Chrome extension that records every game you play and a leaderboard that
+          ranks your best against players around the world.
         </p>
         <p className="hiw-hero__actions">
           <a href={EXTENSION_ZIP} download className="btn btn--primary hiw-download__btn">
@@ -88,7 +89,8 @@ export default function HowItWorksPage(): React.JSX.Element {
       <section className="hiw-install" id="install" aria-label="Install">
         <h2 className="display hiw-install__title">Load it into Chrome</h2>
         <p className="meta hiw-install__intro">
-          Download the file above, then follow these five steps.
+          It is not on the Chrome Web Store yet, so download the file above and load it by hand.
+          Five steps, about a minute.
         </p>
 
         <ol className="walk" aria-label="How to load the extension">
@@ -206,18 +208,58 @@ export default function HowItWorksPage(): React.JSX.Element {
             </div>
           </li>
         </ol>
-
-        <p className="hiw-install__foot meta">
-          Scores are yours alone until you connect them. To rank on the leaderboard,{' '}
-          <Link href="/signin">make an account</Link> and press Sync to leaderboard in the popup. At
-          a UK university? Verify your student email in your account to add a badge. The source is
-          on{' '}
-          <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
-            GitHub
-          </a>
-          .
-        </p>
       </section>
+
+      <section className="hiw-after" aria-label="After you install">
+        <h2 className="display hiw-after__title">After you install</h2>
+        <div className="hiw-after__grid">
+          <div className="hiw-block card card--pad">
+            <h3 className="hiw-block__title display">Link your account</h3>
+            <p className="meta">
+              Your games stay on your machine until you connect them. Make a free account, open the
+              popup and press Sync to leaderboard. That links this browser once, and every new game
+              uploads on its own from then on.
+            </p>
+            <p className="hiw-block__cta">
+              <Link href="/signin" className="btn btn--ghost btn--sm">
+                Make an account
+              </Link>
+            </p>
+          </div>
+
+          <div className="hiw-block card card--pad">
+            <h3 className="hiw-block__title display">Add a university badge</h3>
+            <p className="meta">
+              At a UK university? Verify your student email to show your university mark next to
+              your name and open a board for your university alone. In your account, choose Verify
+              email and enter the code sent to your student address.
+            </p>
+            <p className="meta hiw-block__sub">
+              The code has not arrived? University mail systems often hold outside senders:
+            </p>
+            <ul className="hiw-checks">
+              <li>Check your junk or spam folder and mark the message as safe.</li>
+              <li>
+                On Microsoft or Outlook accounts, look in quarantine, either a held-messages notice
+                you were sent or the security portal your university uses, and choose Release.
+              </li>
+              <li>Still nothing after a minute? Request a fresh code and try again.</li>
+            </ul>
+            <p className="meta hiw-block__note">
+              Not at a university, or would rather not say? Choose that in your account. You stay on
+              the global board with no badge, and can change it any time.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <p className="hiw-foot meta">
+        Prefer to read the source first? It is on{' '}
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
+          GitHub
+        </a>
+        .
+      </p>
     </div>
   );
 }
