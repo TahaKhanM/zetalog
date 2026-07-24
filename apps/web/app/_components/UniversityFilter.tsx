@@ -23,9 +23,10 @@ export function UniversityFilter({
 
   return (
     <label className="uni-filter">
-      <span className="uni-filter__label">University</span>
+      <span className="uni-filter__label sr-only">University</span>
       <select
-        className="field field--select"
+        className="field field--select uni-filter__select"
+        aria-label="University"
         value={currentSlug ?? ''}
         onChange={(event) => {
           const slug = event.target.value;

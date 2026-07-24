@@ -51,7 +51,6 @@ export default async function UniversityPage({
   return (
     <LeaderboardView
       title={university.name}
-      subtitle="Best scores from players with a verified university email."
       entries={entries}
       duration={duration}
       uniOptions={uniOptions}
