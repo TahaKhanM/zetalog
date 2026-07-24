@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import {
   adminGameRowSchema,
+  backfillGameRowSchema,
   gameRowSchema,
   leaderboardEntrySchema,
   parseRows,
@@ -10,6 +11,7 @@ import {
   universityRowSchema,
   type AdminGameRow,
   type GameRow,
+  type GameStatus,
   type LeaderboardEntry,
   type ProfileRow,
   type UniversityRow,
@@ -147,6 +149,50 @@ export function getOwnGames(client: Db, userId: string): Promise<GameRow[]> {
     gameRowSchema,
     'getOwnGames',
   );
+}
+
+/** A game as the extension backfills it (camelCase, no telemetry/validation). */
+export interface BackfillGame {
+  readonly clientGameId: string;
+  readonly playedAt: string;
+  readonly settingsFingerprint: string;
+  readonly rankableDuration: RankableDuration | null;
+  readonly claimedScore: number;
+  readonly serverScore: number;
+  readonly status: GameStatus;
+}
+
+/**
+ * A user's recent games for the extension to backfill after linking, newest
+ * first and capped. Excludes the telemetry/validation blobs to keep the payload
+ * small; the extension rebuilds settings from the fingerprint.
+ */
+export async function getRecentGamesForUser(
+  client: Db,
+  userId: string,
+  limit: number,
+): Promise<BackfillGame[]> {
+  const rows = await fetchList(
+    client
+      .from('games')
+      .select(
+        'client_game_id, played_at, settings_fingerprint, rankable_duration, claimed_score, server_score, status',
+      )
+      .eq('user_id', userId)
+      .order('played_at', { ascending: false })
+      .limit(limit),
+    backfillGameRowSchema,
+    'getRecentGamesForUser',
+  );
+  return rows.map((row) => ({
+    clientGameId: row.client_game_id,
+    playedAt: row.played_at,
+    settingsFingerprint: row.settings_fingerprint,
+    rankableDuration: row.rankable_duration,
+    claimedScore: row.claimed_score,
+    serverScore: row.server_score,
+    status: row.status,
+  }));
 }
 
 const aliasEmailSchema = z.object({ email: z.string() });

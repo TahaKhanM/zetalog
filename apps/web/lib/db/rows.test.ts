@@ -176,6 +176,7 @@ describe('profileRowSchema', () => {
       is_admin: false,
       created_at: '2026-07-01T00:00:00.000Z',
       independent: false,
+      leaderboard_opt_out: false,
     };
     expect(profileRowSchema.parse(row)).toEqual(row);
   });

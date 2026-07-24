@@ -91,6 +91,22 @@ export const gameRowSchema = z.object({
 });
 export type GameRow = z.infer<typeof gameRowSchema>;
 
+/**
+ * The lightweight projection the extension backfills from: everything needed to
+ * reconstruct a game for display, minus the heavy telemetry/validation blobs.
+ * The extension rebuilds the settings from `settings_fingerprint`.
+ */
+export const backfillGameRowSchema = z.object({
+  client_game_id: z.uuid(),
+  played_at: z.string(),
+  settings_fingerprint: z.string(),
+  rankable_duration: rankableDurationSchema.nullable(),
+  claimed_score: z.number().int().nonnegative(),
+  server_score: z.number().int().nonnegative(),
+  status: gameStatusSchema,
+});
+export type BackfillGameRow = z.infer<typeof backfillGameRowSchema>;
+
 /** A `games` row joined to its owner's display name — the admin queue shape. */
 export const adminGameRowSchema = gameRowSchema.extend({
   display_name: z.string().nullable(),
@@ -107,6 +123,8 @@ export const profileRowSchema = z.object({
   created_at: z.string(),
   /** The user chose "not at a university"; the UI stops offering the badge flow. */
   independent: z.boolean(),
+  /** The user opted out of the public leaderboards; their scores stay private. */
+  leaderboard_opt_out: z.boolean(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;
 
