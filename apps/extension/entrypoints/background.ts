@@ -2,6 +2,7 @@ import { browser, defineBackground } from '#imports';
 
 import { createApiClient } from '../lib/api.js';
 import { createAuthController, type FetchLike } from '../lib/auth.js';
+import { remoteGameToStored } from '../lib/backfill.js';
 import { bgRequestSchema, type BgResponse } from '../lib/messages.js';
 import { singleFlight } from '../lib/single-flight.js';
 import { createStore } from '../lib/store.js';
@@ -34,6 +35,17 @@ export default defineBackground(() => {
     drainSync({ api, store, queue, now: () => Date.now(), isLinked: () => auth.isLinked() }),
   );
 
+  // Pull the account's game history and merge it into local storage so the
+  // popup shows games synced from any device. Single-flight: link and popup
+  // open can both trigger it. No-op (false) when signed out or on any error.
+  const backfill = singleFlight(async (): Promise<boolean> => {
+    if (!(await auth.isLinked())) return false;
+    const remote = await api.listGames();
+    if (!remote.ok) return false;
+    const result = await store.importBackfill(remote.value.map(remoteGameToStored));
+    return result.ok;
+  });
+
   browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     void (async (): Promise<void> => {
       const parsed = bgRequestSchema.safeParse(message);
@@ -44,7 +56,10 @@ export default defineBackground(() => {
       switch (parsed.data.type) {
         case 'zl-link': {
           const linked = await auth.link(parsed.data.accessToken, parsed.data.refreshToken);
-          if (linked) await drain();
+          if (linked) {
+            await backfill();
+            await drain();
+          }
           sendResponse({ ok: linked } satisfies BgResponse);
           break;
         }
@@ -72,6 +87,11 @@ export default defineBackground(() => {
         case 'zl-set-privacy': {
           const result = await api.setLeaderboardOptOut(parsed.data.optOut);
           sendResponse({ ok: result.ok } satisfies BgResponse);
+          break;
+        }
+        case 'zl-backfill': {
+          const ok = await backfill();
+          sendResponse({ ok } satisfies BgResponse);
           break;
         }
       }

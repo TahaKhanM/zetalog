@@ -115,6 +115,9 @@ export function App(): JSX.Element {
         setOptedOut(reply.leaderboardOptOut);
       }
     });
+    // Pull the account's history so games synced from other devices (or before
+    // this install) show up; the merged write triggers a reload via onChanged.
+    void tellBackground({ type: 'zl-backfill' });
     return () => {
       active = false;
     };

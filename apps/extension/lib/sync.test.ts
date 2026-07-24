@@ -81,6 +81,7 @@ function fakeApi(handlers: {
     },
     getProfile: () => Promise.resolve(ok({ leaderboardOptOut: false })),
     setLeaderboardOptOut: () => Promise.resolve(ok(null)),
+    listGames: () => Promise.resolve(ok([])),
   };
 }
 

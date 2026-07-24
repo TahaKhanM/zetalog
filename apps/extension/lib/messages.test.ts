@@ -23,6 +23,10 @@ describe('bgRequestSchema', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-set-privacy' }).success).toBe(false);
   });
 
+  it('accepts a backfill request', () => {
+    expect(bgRequestSchema.safeParse({ type: 'zl-backfill' }).success).toBe(true);
+  });
+
   it('rejects a link request missing tokens', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-link' }).success).toBe(false);
   });

@@ -577,3 +577,58 @@ describe('createStore.restore — sync bookkeeping', () => {
     expect(restored.value.sync).toEqual({ state: 'revoked' });
   });
 });
+
+describe('createStore.importBackfill', () => {
+  function backfilled(id: string, score: number): StoredGame {
+    return {
+      record: {
+        id,
+        startedAtMs: 1_700_000_000_000,
+        playedMs: 120_000,
+        settings: ZETAMAC_DEFAULT_SETTINGS,
+        events: [],
+        claimedScore: score,
+      },
+      verifiedScore: score,
+      fingerprint: fingerprint(ZETAMAC_DEFAULT_SETTINGS),
+      rankableDuration: 120,
+      status: 'kept',
+      savedAtMs: 500,
+      sync: { state: 'uploaded', outcome: 'accepted', serverScore: score },
+    };
+  }
+
+  it('adds remote games not already stored locally', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    await store.saveGame(gameRecord({ score: 30 }));
+    const result = await store.importBackfill([
+      backfilled(crypto.randomUUID(), 40),
+      backfilled(crypto.randomUUID(), 50),
+    ]);
+    expect(result.ok).toBe(true);
+    const list = await store.listGames();
+    expect(list.ok && list.value).toHaveLength(3);
+  });
+
+  it('keeps the local game on an id clash (local wins)', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const local = await store.saveGame(gameRecord({ score: 30 }));
+    const id = local.ok ? local.value.record.id : '';
+    await store.importBackfill([backfilled(id, 99)]);
+    const list = await store.listGames();
+    expect(list.ok && list.value).toHaveLength(1);
+    expect(list.ok && list.value[0]?.record.claimedScore).toBe(30);
+  });
+
+  it('is a no-op when there is nothing new to add', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const result = await store.importBackfill([]);
+    expect(result.ok && result.value).toEqual([]);
+  });
+
+  it('surfaces corrupt local storage', async () => {
+    const store = createStore(fakeArea({ [GAMES_KEY]: 'nope' }), tickingClock());
+    const result = await store.importBackfill([backfilled(crypto.randomUUID(), 10)]);
+    expect(result.ok).toBe(false);
+  });
+});

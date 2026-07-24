@@ -91,6 +91,22 @@ export const gameRowSchema = z.object({
 });
 export type GameRow = z.infer<typeof gameRowSchema>;
 
+/**
+ * The lightweight projection the extension backfills from: everything needed to
+ * reconstruct a game for display, minus the heavy telemetry/validation blobs.
+ * The extension rebuilds the settings from `settings_fingerprint`.
+ */
+export const backfillGameRowSchema = z.object({
+  client_game_id: z.uuid(),
+  played_at: z.string(),
+  settings_fingerprint: z.string(),
+  rankable_duration: rankableDurationSchema.nullable(),
+  claimed_score: z.number().int().nonnegative(),
+  server_score: z.number().int().nonnegative(),
+  status: gameStatusSchema,
+});
+export type BackfillGameRow = z.infer<typeof backfillGameRowSchema>;
+
 /** A `games` row joined to its owner's display name — the admin queue shape. */
 export const adminGameRowSchema = gameRowSchema.extend({
   display_name: z.string().nullable(),
