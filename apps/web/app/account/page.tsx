@@ -12,6 +12,7 @@ import { UniBadge } from '../_components/UniBadge';
 import { DisplayNameForm } from '../me/_components/DisplayNameForm';
 import { ChangePasswordForm } from './_components/ChangePasswordForm';
 import { IndependentToggle } from './_components/IndependentToggle';
+import { LeaderboardPrivacyToggle } from './_components/LeaderboardPrivacyToggle';
 import { RemoveAliasButton } from './_components/RemoveAliasButton';
 
 export const dynamic = 'force-dynamic';
@@ -179,6 +180,18 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
               </span>
             </>
           )}
+        </div>
+      </section>
+
+      <section className="me__section" aria-label="Leaderboard privacy">
+        <h2 className="me__h2">Leaderboard privacy</h2>
+        <div className="card card--pad badge-card">
+          <p className="meta" style={{ margin: 0 }}>
+            {profile?.leaderboard_opt_out === true
+              ? 'Your scores are private. Your progress page still works, but you do not appear on any public board.'
+              : 'Your best scores appear on the public boards next to your name.'}
+          </p>
+          <LeaderboardPrivacyToggle optedOut={profile?.leaderboard_opt_out === true} />
         </div>
       </section>
 

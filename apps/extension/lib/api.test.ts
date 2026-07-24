@@ -232,3 +232,79 @@ describe('createApiClient.revokeGame', () => {
     expect(calls).toHaveLength(0);
   });
 });
+
+describe('createApiClient.getProfile', () => {
+  it('GETs the profile and parses the opt-out flag', async () => {
+    const { fetch, calls } = scriptedFetch([
+      { status: 200, body: { displayName: 'ada', independent: false, leaderboardOptOut: true } },
+    ]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.getProfile()).toEqual({ ok: true, value: { leaderboardOptOut: true } });
+    expect(calls[0]?.url).toBe('https://app.test/api/profile');
+    expect(calls[0]?.method).toBe('GET');
+    expect(calls[0]?.body).toBeUndefined();
+  });
+
+  it('treats a 404 (no profile row yet) as visible', async () => {
+    const { fetch } = scriptedFetch([{ status: 404, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.getProfile()).toEqual({ ok: true, value: { leaderboardOptOut: false } });
+  });
+
+  it('reports a network error when the 200 body is malformed', async () => {
+    const { fetch } = scriptedFetch([{ status: 200, body: { displayName: 'ada' } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.getProfile()).toEqual({ ok: false, error: { kind: 'network' } });
+  });
+
+  it('maps an unexpected status to a server error', async () => {
+    const { fetch } = scriptedFetch([{ status: 500, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.getProfile()).toEqual({
+      ok: false,
+      error: { kind: 'server', status: 500 },
+    });
+  });
+
+  it('reports a network error when fetch throws', async () => {
+    const { fetch } = scriptedFetch([new Error('offline')]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.getProfile()).toEqual({ ok: false, error: { kind: 'network' } });
+  });
+});
+
+describe('createApiClient.setLeaderboardOptOut', () => {
+  it('POSTs the opt-out to /api/profile and resolves ok on 200', async () => {
+    const { fetch, calls } = scriptedFetch([{ status: 200, body: { ok: true } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.setLeaderboardOptOut(true)).toEqual({ ok: true, value: null });
+    expect(calls[0]?.url).toBe('https://app.test/api/profile');
+    expect(calls[0]?.method).toBe('POST');
+    expect(JSON.parse(calls[0]?.body ?? '')).toEqual({ leaderboardOptOut: true });
+  });
+
+  it('maps 400 to bad-request', async () => {
+    const { fetch } = scriptedFetch([{ status: 400, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.setLeaderboardOptOut(false)).toEqual({
+      ok: false,
+      error: { kind: 'bad-request' },
+    });
+  });
+
+  it('maps an unexpected status to a server error', async () => {
+    const { fetch } = scriptedFetch([{ status: 500, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.setLeaderboardOptOut(true)).toEqual({
+      ok: false,
+      error: { kind: 'server', status: 500 },
+    });
+  });
+
+  it('propagates the auth error without a network call when signed out', async () => {
+    const { fetch, calls } = scriptedFetch([]);
+    const client = createApiClient({ fetch, auth: fakeAuth(null), baseUrl: 'https://app.test' });
+    expect(await client.setLeaderboardOptOut(true)).toEqual({ ok: false, error: { kind: 'auth' } });
+    expect(calls).toHaveLength(0);
+  });
+});

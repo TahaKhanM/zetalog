@@ -107,6 +107,8 @@ export const profileRowSchema = z.object({
   created_at: z.string(),
   /** The user chose "not at a university"; the UI stops offering the badge flow. */
   independent: z.boolean(),
+  /** The user opted out of the public leaderboards; their scores stay private. */
+  leaderboard_opt_out: z.boolean(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;
 

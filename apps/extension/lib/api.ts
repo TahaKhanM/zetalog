@@ -1,6 +1,10 @@
 import { err, ok, type GameRecord, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
+/** The subset of `GET /api/profile` the extension reads (extra fields ignored). */
+export const profileViewSchema = z.object({ leaderboardOptOut: z.boolean() });
+export type ProfileView = z.infer<typeof profileViewSchema>;
+
 import { type FetchLike } from './auth.js';
 import { WEB_APP_URL } from './config.js';
 
@@ -52,10 +56,14 @@ export interface ApiDeps {
   readonly baseUrl?: string;
 }
 
-/** The game API surface the sync queue drives. */
+/** The API surface the sync queue and the popup drive. */
 export interface ApiClient {
   submitGame(record: GameRecord): Promise<Result<SubmitSuccess, ApiError>>;
   revokeGame(clientGameId: string): Promise<Result<null, ApiError>>;
+  /** The caller's own leaderboard-privacy state (defaults to visible if no row yet). */
+  getProfile(): Promise<Result<ProfileView, ApiError>>;
+  /** Set the leaderboard opt-out (true keeps the account off the public boards). */
+  setLeaderboardOptOut(optOut: boolean): Promise<Result<null, ApiError>>;
 }
 
 /** A completed request: HTTP status and best-effort parsed JSON body. */
@@ -72,7 +80,7 @@ export function createApiClient(deps: ApiDeps): ApiClient {
     method: string,
     path: string,
     token: string,
-    body: GameRecord | undefined,
+    body: object | undefined,
   ): Promise<Result<RawResponse, ApiError>> {
     let response;
     try {
@@ -97,7 +105,7 @@ export function createApiClient(deps: ApiDeps): ApiClient {
   async function authed(
     method: string,
     path: string,
-    body: GameRecord | undefined,
+    body: object | undefined,
   ): Promise<Result<RawResponse, ApiError>> {
     const token = await deps.auth.accessToken();
     if (token === null) return err({ kind: 'auth' });
@@ -147,6 +155,37 @@ export function createApiClient(deps: ApiDeps): ApiClient {
           return ok(null);
         case 404:
           return err({ kind: 'not-found' });
+        default:
+          return err({ kind: 'server', status });
+      }
+    },
+
+    async getProfile() {
+      const response = await authed('GET', '/api/profile', undefined);
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      switch (status) {
+        case 200: {
+          const body = profileViewSchema.safeParse(parsed);
+          return body.success ? ok(body.data) : err({ kind: 'network' });
+        }
+        // No profile row yet: treat as visible (the default) rather than an error.
+        case 404:
+          return ok({ leaderboardOptOut: false });
+        default:
+          return err({ kind: 'server', status });
+      }
+    },
+
+    async setLeaderboardOptOut(optOut) {
+      const response = await authed('POST', '/api/profile', { leaderboardOptOut: optOut });
+      if (!response.ok) return response;
+      const { status } = response.value;
+      switch (status) {
+        case 200:
+          return ok(null);
+        case 400:
+          return err({ kind: 'bad-request' });
         default:
           return err({ kind: 'server', status });
       }

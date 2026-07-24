@@ -659,3 +659,22 @@ body {
   background: var(--zl-chart);
   flex: none;
 }
+
+/* Leaderboard privacy: a compact checkbox row under the account status. */
+.zl-privacy {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--zl-muted);
+  cursor: pointer;
+}
+
+.zl-privacy__box {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  accent-color: var(--zl-display);
+  cursor: pointer;
+}

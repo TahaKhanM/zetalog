@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { handleProfilePost, type ProfilePostDeps } from './handler';
+import {
+  handleProfileGet,
+  handleProfilePost,
+  type ProfileGetDeps,
+  type ProfilePostDeps,
+} from './handler';
 
 function request(body: unknown): Request {
   return new Request('http://localhost/api/profile', {
@@ -15,6 +20,7 @@ function deps(over: Partial<ProfilePostDeps> = {}): ProfilePostDeps {
     authenticate: vi.fn(async () => Promise.resolve('user-1')),
     setDisplayName: vi.fn(async () => Promise.resolve('ok' as const)),
     setIndependent: vi.fn(async () => Promise.resolve()),
+    setLeaderboardOptOut: vi.fn(async () => Promise.resolve()),
     ...over,
   };
 }
@@ -75,8 +81,61 @@ describe('POST /api/profile', () => {
     expect(setIndependent).toHaveBeenCalledWith('user-1', false);
   });
 
+  it('sets the leaderboard opt-out without touching the name', async () => {
+    const setLeaderboardOptOut = vi.fn(async () => Promise.resolve());
+    const response = await handleProfilePost(
+      request({ leaderboardOptOut: true }),
+      deps({ setLeaderboardOptOut }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, leaderboardOptOut: true });
+    expect(setLeaderboardOptOut).toHaveBeenCalledWith('user-1', true);
+  });
+
   it('rejects a body with nothing to change', async () => {
     const response = await handleProfilePost(request({}), deps());
     expect(response.status).toBe(400);
+  });
+});
+
+describe('GET /api/profile', () => {
+  function getDeps(over: Partial<ProfileGetDeps> = {}): ProfileGetDeps {
+    return {
+      authenticate: vi.fn(async () => Promise.resolve('user-1')),
+      readProfile: vi.fn(async () =>
+        Promise.resolve({ displayName: 'ada', independent: false, leaderboardOptOut: false }),
+      ),
+      ...over,
+    };
+  }
+
+  it('returns 401 when not signed in', async () => {
+    const response = await handleProfileGet(
+      getDeps({ authenticate: vi.fn(async () => Promise.resolve(null)) }),
+    );
+    expect(response.status).toBe(401);
+  });
+
+  it('returns the profile flags', async () => {
+    const response = await handleProfileGet(
+      getDeps({
+        readProfile: vi.fn(async () =>
+          Promise.resolve({ displayName: 'ada', independent: true, leaderboardOptOut: true }),
+        ),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      displayName: 'ada',
+      independent: true,
+      leaderboardOptOut: true,
+    });
+  });
+
+  it('returns 404 when there is no profile row yet', async () => {
+    const response = await handleProfileGet(
+      getDeps({ readProfile: vi.fn(async () => Promise.resolve(null)) }),
+    );
+    expect(response.status).toBe(404);
   });
 });

@@ -3,10 +3,12 @@ import { z } from 'zod';
 /**
  * The runtime message protocol between the extension's surfaces and its
  * background service worker. The link content script sends `zl-link`; the popup
- * sends `zl-drain` (sync now) and `zl-unlink`; the Zetamac content script sends
- * `zl-drain` after saving a game. The background validates every message with
- * {@link bgRequestSchema} before acting — tokens travel only over this
- * intra-extension channel, never to the network or a log.
+ * sends `zl-drain` (sync now), `zl-unlink`, and the leaderboard-privacy
+ * `zl-get-profile` / `zl-set-privacy`; the Zetamac content script sends
+ * `zl-drain` after saving a game. Profile requests are routed through the
+ * background because it owns token refresh. The background validates every
+ * message with {@link bgRequestSchema} before acting — tokens travel only over
+ * this intra-extension channel, never to the network or a log.
  */
 export const bgRequestSchema = z.discriminatedUnion('type', [
   z.object({
@@ -16,12 +18,19 @@ export const bgRequestSchema = z.discriminatedUnion('type', [
   }),
   z.object({ type: z.literal('zl-drain') }),
   z.object({ type: z.literal('zl-unlink') }),
+  z.object({ type: z.literal('zl-get-profile') }),
+  z.object({ type: z.literal('zl-set-privacy'), optOut: z.boolean() }),
 ]);
 
 /** A message the background handles. */
 export type BgRequest = z.infer<typeof bgRequestSchema>;
 
-/** The background's reply. `ok` is false on a rejected/unrecognised request. */
+/**
+ * The background's reply. `ok` is false on a rejected/unrecognised request or an
+ * auth/network failure. `leaderboardOptOut` is present only on a successful
+ * `zl-get-profile` reply.
+ */
 export interface BgResponse {
   readonly ok: boolean;
+  readonly leaderboardOptOut?: boolean;
 }
