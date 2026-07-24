@@ -17,6 +17,12 @@ describe('bgRequestSchema', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-unlink' }).success).toBe(true);
   });
 
+  it('accepts profile read and privacy requests', () => {
+    expect(bgRequestSchema.safeParse({ type: 'zl-get-profile' }).success).toBe(true);
+    expect(bgRequestSchema.safeParse({ type: 'zl-set-privacy', optOut: true }).success).toBe(true);
+    expect(bgRequestSchema.safeParse({ type: 'zl-set-privacy' }).success).toBe(false);
+  });
+
   it('rejects a link request missing tokens', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-link' }).success).toBe(false);
   });

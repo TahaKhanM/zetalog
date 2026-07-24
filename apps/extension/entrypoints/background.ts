@@ -59,6 +59,21 @@ export default defineBackground(() => {
           await store.clearAllSync();
           sendResponse({ ok: true } satisfies BgResponse);
           break;
+        case 'zl-get-profile': {
+          // Routed through the background so token refresh stays in one owner.
+          const profile = await api.getProfile();
+          sendResponse(
+            (profile.ok
+              ? { ok: true, leaderboardOptOut: profile.value.leaderboardOptOut }
+              : { ok: false }) satisfies BgResponse,
+          );
+          break;
+        }
+        case 'zl-set-privacy': {
+          const result = await api.setLeaderboardOptOut(parsed.data.optOut);
+          sendResponse({ ok: result.ok } satisfies BgResponse);
+          break;
+        }
       }
     })();
     return true; // keep the message channel open for the async sendResponse

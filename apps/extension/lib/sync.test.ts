@@ -79,6 +79,8 @@ function fakeApi(handlers: {
       revoked.push(id);
       return Promise.resolve(handlers.revoke?.(id) ?? ok(null));
     },
+    getProfile: () => Promise.resolve(ok({ leaderboardOptOut: false })),
+    setLeaderboardOptOut: () => Promise.resolve(ok(null)),
   };
 }
 

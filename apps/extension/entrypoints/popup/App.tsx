@@ -10,7 +10,7 @@ import { RecentGames } from '../../components/RecentGames.js';
 import { TrendControls, type ConfigOption } from '../../components/TrendControls.js';
 import { createAuthController } from '../../lib/auth.js';
 import { WEB_APP_URL } from '../../lib/config.js';
-import { type BgRequest } from '../../lib/messages.js';
+import { type BgRequest, type BgResponse } from '../../lib/messages.js';
 import {
   fingerprintLabel,
   focusArea,
@@ -36,6 +36,23 @@ function tellBackground(request: BgRequest): Promise<unknown> {
   return browser.runtime.sendMessage(request).catch(() => undefined);
 }
 
+/** Send a message and return the typed reply, or null on any failure. */
+async function askBackground(request: BgRequest): Promise<BgResponse | null> {
+  try {
+    const reply: unknown = await browser.runtime.sendMessage(request);
+    if (
+      typeof reply === 'object' &&
+      reply !== null &&
+      typeof (reply as BgResponse).ok === 'boolean'
+    ) {
+      return reply as BgResponse;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 const DEFAULT_PREFS: Prefs = { selectedFingerprint: null, range: 'all' };
 const RECENT_LIMIT = 10;
 
@@ -58,6 +75,8 @@ export function App(): JSX.Element {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [linked, setLinked] = useState(false);
+  // The leaderboard opt-out for the linked account: null until read from the server.
+  const [optedOut, setOptedOut] = useState<boolean | null>(null);
 
   const reload = useCallback(async (): Promise<void> => {
     const [gamesResult, prefsResult, isLinked] = await Promise.all([
@@ -82,6 +101,32 @@ export function App(): JSX.Element {
       browser.storage.onChanged.removeListener(onChanged);
     };
   }, [reload]);
+
+  // Read the leaderboard-privacy state once the account is linked (the
+  // background owns the token, so the read is routed through it).
+  useEffect(() => {
+    if (!linked) {
+      setOptedOut(null);
+      return;
+    }
+    let active = true;
+    void askBackground({ type: 'zl-get-profile' }).then((reply) => {
+      if (active && reply?.ok === true && typeof reply.leaderboardOptOut === 'boolean') {
+        setOptedOut(reply.leaderboardOptOut);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [linked]);
+
+  function setPrivacy(next: boolean): void {
+    const previous = optedOut;
+    setOptedOut(next); // optimistic; revert if the write does not land
+    void askBackground({ type: 'zl-set-privacy', optOut: next }).then((reply) => {
+      if (reply?.ok !== true) setOptedOut(previous);
+    });
+  }
 
   const now = Date.now();
   const configs = useMemo(() => configOptions(games), [games]);
@@ -179,7 +224,13 @@ export function App(): JSX.Element {
 
       {hasCaptureFailure ? <CaptureFailedBanner /> : null}
 
-      <Footer linked={linked} onSync={sync} onUnlink={unlink} />
+      <Footer
+        linked={linked}
+        optedOut={optedOut}
+        onSync={sync}
+        onUnlink={unlink}
+        onSetPrivacy={setPrivacy}
+      />
     </div>
   );
 }
