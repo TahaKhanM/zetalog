@@ -242,9 +242,13 @@ export default function HowItWorksPage(): React.JSX.Element {
         </div>
 
         <div className="hiw-callout card card--pad">
-          <h3 className="hiw-callout__title display">The verification code has not arrived?</h3>
-          <p className="meta">University mail often holds mail from outside senders. Try these:</p>
-          <ul className="hiw-checks hiw-checks--row">
+          <div className="hiw-callout__intro">
+            <h3 className="hiw-callout__title display">The verification code has not arrived?</h3>
+            <p className="meta">
+              University mail often holds mail from outside senders. Try these:
+            </p>
+          </div>
+          <ul className="hiw-checks">
             <li>Check your junk or spam folder and mark the message as safe.</li>
             <li>
               On a Microsoft or Outlook account, open the{' '}
