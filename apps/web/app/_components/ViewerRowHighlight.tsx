@@ -26,13 +26,24 @@ export function ViewerRowHighlight({
   useEffect(() => {
     let cancelled = false;
     const supabase = createClient();
-    void supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(async ({ data }) => {
+      const userId = data.session?.user.id ?? null;
+      // Users who chose "not at a university" (CO-11) opted out of the badge
+      // flow; do not offer the affordance to them.
+      let offerBadge = showAddBadge;
+      if (userId !== null && offerBadge) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('independent')
+          .eq('id', userId)
+          .maybeSingle();
+        if ((profile as { independent?: unknown } | null)?.independent === true) {
+          offerBadge = false;
+        }
+      }
+      // The single side effect happens here, so one staleness check suffices.
       if (cancelled) return;
-      const decoration = applyOwnRowHighlight(
-        document,
-        data.session?.user.id ?? null,
-        showAddBadge,
-      );
+      const decoration = applyOwnRowHighlight(document, userId, offerBadge);
       setBadgeMount(decoration.badgeMount);
     });
     return () => {
