@@ -19,12 +19,12 @@ export interface TrendPoint {
   readonly at: number;
 }
 
-/** How the popup should render a config's history, by kept-game count (spec §3.3). */
+/** How the popup should render a config's history, by kept-game count. */
 export type GraphMode = 'list' | 'sparkline' | 'chart';
 
 const isKept = (game: StoredGame): boolean => game.status === 'kept';
 
-/** Best kept score for each rankable duration (spec §3.3 PB row). */
+/** Best kept score for each rankable duration. */
 export function personalBests(games: readonly StoredGame[]): PersonalBests {
   const bests = { 30: null, 60: null, 120: null } as Record<RankableDuration, number | null>;
   for (const duration of RANKABLE_DURATIONS) {
@@ -65,7 +65,7 @@ export function isNewPersonalBest(games: readonly StoredGame[]): boolean {
   return latest.verifiedScore > Math.max(...priorScores);
 }
 
-/** Kept scores for one fingerprint, ascending in time, limited to the range (spec §3.3). */
+/** Kept scores for one fingerprint, ascending in time, limited to the range. */
 export function trendSeries(
   games: readonly StoredGame[],
   fingerprintKey: string,
@@ -78,7 +78,7 @@ export function trendSeries(
   return windowed.map((game) => ({ score: game.verifiedScore, at: game.record.startedAtMs }));
 }
 
-/** Choose the trend rendering for a kept-game count (spec §3.3 thresholds). */
+/** Choose the trend rendering for a kept-game count. */
 export function graphMode(count: number): GraphMode {
   if (count < 5) return 'list';
   if (count < 20) return 'sparkline';
@@ -105,7 +105,7 @@ export function mostPlayedFingerprint(games: readonly StoredGame[]): string | nu
   return best === null ? null : best.fingerprint;
 }
 
-/** Human label for a configuration, e.g. "Default · 120s" / "Custom · 60s" (spec §3.3). */
+/** Human label for a configuration, e.g. "Default · 120s" / "Custom · 60s". */
 export function fingerprintLabel(settings: ZetamacSettings): string {
   const atDefaultDuration = {
     ...settings,

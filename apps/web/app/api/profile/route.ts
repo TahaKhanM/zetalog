@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 const UNIQUE_VIOLATION = '23505';
 
 /**
- * `POST /api/profile` — set or change the display name (spec §7). Core logic
+ * `POST /api/profile` — set or change the display name. Core logic
  * lives in {@link handleProfilePost}; this file wires the real write and maps
  * the citext unique violation to the "taken" result.
  */

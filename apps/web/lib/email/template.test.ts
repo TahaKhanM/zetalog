@@ -15,7 +15,7 @@ const sample = brandedCodeEmail({
 });
 
 describe('mixHex', () => {
-  it('mixes toward white like the CO-2 surface formula', () => {
+  it('mixes toward white like the surface formula', () => {
     expect(mixHex(palette.cream, '#ffffff', 0.3)).toBe('#fefbf2');
   });
 
@@ -42,7 +42,7 @@ describe('brandedCodeEmail', () => {
     expect(sample.html).toContain(palette.navy);
   });
 
-  it('uses desaturated CO-2 surfaces, not solid brand fills', () => {
+  it('uses desaturated surfaces, not solid brand fills', () => {
     expect(sample.html).toContain(mixHex(palette.cream, '#ffffff', 0.3));
     expect(sample.html).not.toMatch(new RegExp(`background[^;"]*:${palette.maroon}`));
   });
@@ -64,7 +64,7 @@ describe('authEmailTemplates', () => {
     'utf8',
   );
 
-  it('carries the three dashboard templates (W8 adds Reset Password)', () => {
+  it('carries the three dashboard templates', () => {
     expect(authEmailTemplates().map((t) => t.name)).toEqual([
       'Magic Link',
       'Confirm signup',

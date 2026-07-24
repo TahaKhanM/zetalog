@@ -4,7 +4,7 @@ import type { EmailEvent, EmailEventLogger, EmailSender } from './types';
 
 /**
  * Wrap an {@link EmailSender} so every send is recorded to `email_events`
- * (spec §7). This decorator is the single audit point: it hashes the recipient
+ *. This decorator is the single audit point: it hashes the recipient
  * before logging (the address itself is never persisted) and records whether
  * the send succeeded or failed. The original {@link SendResult} is returned
  * unchanged, so callers still see typed failures.

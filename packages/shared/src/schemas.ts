@@ -39,7 +39,7 @@ export const gameEventSchema = z.discriminatedUnion('kind', [
 /**
  * A complete recorded game — the unit the extension stores locally and
  * submits for validation. `claimedScore` is what the page displayed; the
- * server never trusts it (spec §5).
+ * server never trusts it.
  */
 export const gameRecordSchema = z.object({
   id: z.uuid(),

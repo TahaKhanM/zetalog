@@ -1,7 +1,7 @@
 import { useEffect, useState, type JSX } from 'react';
 
 /**
- * The popup's light/dark switch, matching the site's sliding pill (CO-12).
+ * The popup's light/dark switch, matching the site's sliding pill.
  * The OS preference is the default; a click pins `html[data-theme]` and
  * persists it in localStorage, which main.tsx re-applies before first paint.
  */

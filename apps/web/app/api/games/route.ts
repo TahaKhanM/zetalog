@@ -7,7 +7,7 @@ import { CORS_HEADERS, handleGamesPost } from './handler';
 export const dynamic = 'force-dynamic';
 
 /**
- * `POST /api/games` — extension game submissions (spec §5). Bearer-only (no
+ * `POST /api/games` — extension game submissions. Bearer-only (no
  * cookies), so it is CORS-open to the extension origin. The claimed score is
  * never trusted; the pipeline recomputes and judges it. Core logic lives in
  * {@link handleGamesPost}; this file only wires real dependencies.

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-static';
 
 /**
- * `/privacy` (CO-12): the public privacy policy. Required as a live URL for the
+ * `/privacy`: the public privacy policy. Required as a live URL for the
  * Chrome Web Store listing because the extension transmits game results when an
  * account is linked. Kept in sync with docs/store/privacy-policy.md.
  */

@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
- * ZetaLog design system — spec §8 as amended by CO-2 (desaturation).
+ * ZetaLog design system.
  *
  * The FIVE brand hexes below are the only 6-digit hex literals allowed in this
  * file; they mirror packages/shared/src/tokens.ts and are enforced by
@@ -23,10 +23,10 @@
   --font-numeric: 'Azeret Mono', ui-monospace, monospace;
 }
 
-/* ── Semantic surfaces: CO-3 "examination paper" ─────────────────────────
+/* ── Semantic surfaces: "examination paper" ─────────────────────────
  * The page IS cream paper; maroon is structural ink (ruling, hairlines,
  * index numerals); navy is the working ink. Dark mode is the blackboard. */
-/* CO-11 "modern neutral" light theme: the paper metaphor is dropped. Cool
+/* "modern neutral" light theme: the paper metaphor is dropped. Cool
  * neutral surfaces mixed from navy over white, white cards, navy ink and
  * maroon as the single accent. Dark mode keeps the navy and steel scheme. */
 :root {
@@ -42,7 +42,7 @@
   --meta-text: color-mix(in srgb, var(--color-zl-navy) 52%, white);
   --ink-index: var(--color-zl-maroon);
   /* Maroon carries the display headings in light, mirroring how cream carries
-   * them on the blackboard (CO-12). */
+   * them on the blackboard. */
   --ink-display: var(--color-zl-maroon);
   --ink-wordmark: var(--color-zl-maroon);
   --accent: var(--color-zl-maroon);
@@ -50,17 +50,17 @@
   --accent-soft: color-mix(in srgb, var(--color-zl-maroon) 7%, transparent);
   --accent-border: color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
   --accent-contrast: white;
-  /* The viewer's own row: a neutral grey wash, never a red tint (CO-12). */
+  /* The viewer's own row: a neutral grey wash, never a red tint. */
   --row-self: color-mix(in srgb, var(--color-zl-navy) 6%, transparent);
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
 }
 
-/* The blackboard (CO-5): a true deep navy — no maroon anywhere; steel takes
+/* The blackboard: a true deep navy — no maroon anywhere; steel takes
  * over every accent role and cream stays the chalk.
  *
- * CO-9 theming: the OS preference applies unless the user chose a theme with
+ * Theming: the OS preference applies unless the user chose a theme with
  * the header toggle (html[data-theme], persisted in localStorage). The token
  * block appears twice — once for the system path, once for the explicit
  * choice — because a media query cannot join a selector list. KEEP IN SYNC. */
@@ -132,7 +132,7 @@ body {
   position: relative;
 }
 
-/* CO-11: no texture overlays. Flat, calm surfaces. */
+/* No texture overlays. Flat, calm surfaces. */
 
 h1,
 h2,
@@ -223,7 +223,7 @@ button {
   line-height: 1;
 }
 
-/* CO-3 brand lockup: the actual mark beside the wordmark. */
+/* Brand lockup: the actual mark beside the wordmark. */
 .brand-lockup {
   display: inline-flex;
   align-items: center;
@@ -323,8 +323,7 @@ button {
   border-bottom-color: var(--accent-strong);
 }
 
-/* The one standing solid-accent element (CO-3 allows fills up to button
- * size): the header's call to action must not whisper. The doubled class
+/* The one standing solid-accent element: the header's call to action must not whisper. The doubled class
  * outranks .btn--primary's outline treatment further down the sheet. */
 /* The one standing solid-accent fill: a branded pill in the display face,
  * with just enough depth to read as the page's call to action. */
@@ -356,7 +355,7 @@ button {
   transform: translateY(-1px);
 }
 
-/* Paper/blackboard switch (CO-10): a sliding pill — stroke-drawn sun and
+/* Paper/blackboard switch: a sliding pill — stroke-drawn sun and
  * moon, an accent thumb that glides to the active side. */
 .theme-toggle {
   position: relative;
@@ -423,7 +422,7 @@ button {
   cursor: default;
 }
 
-/* ── Monogram identity tiles (CO-7: photos removed — moderation liability) ── */
+/* ── Monogram identity tiles ── */
 .avatar {
   display: inline-flex;
   align-items: center;
@@ -546,7 +545,7 @@ button {
     color 0.15s ease;
 }
 
-/* Primary (CO-11): solid accent fill, the one loud element per view. */
+/* Primary: solid accent fill, the one loud element per view. */
 .btn--primary {
   color: var(--accent-contrast);
   background: var(--accent);
@@ -593,7 +592,7 @@ button {
   cursor: not-allowed;
 }
 
-/* ── Auth chip: avatar + name, the account pill (CO-6: prominent) ───────── */
+/* ── Auth chip: avatar + name, the account pill ───────── */
 .auth-chip {
   display: inline-flex;
   align-items: center;
@@ -662,7 +661,7 @@ button {
   font-size: 0.92rem;
 }
 
-/* CO-3 ledger ruling: horizontal maroon rules only, a strong rule under the
+/* Ledger ruling: horizontal maroon rules only, a strong rule under the
  * header row — the table reads as ruled exam paper, not an app grid. */
 .ltable th {
   text-align: left;
@@ -759,7 +758,7 @@ button {
   background-repeat: no-repeat;
 }
 
-/* ── CO-3 masthead: eyebrow + maroon rule + editorial title row ─────────── */
+/* ── Masthead: eyebrow + maroon rule + editorial title row ─────────────── */
 .masthead {
   margin-bottom: 1.5rem;
 }
@@ -797,7 +796,7 @@ button {
 }
 
 /* Top-aligned so the university filter holds one position regardless of how
- * many lines the board title takes (CO-12: no jump between global and uni). */
+ * many lines the board title takes. */
 .masthead__row {
   display: flex;
   align-items: flex-start;
@@ -806,7 +805,7 @@ button {
   flex-wrap: wrap;
 }
 
-/* Duration tabs as a segmented control (CO-11). */
+/* Duration tabs as a segmented control. */
 .index-tabs {
   display: inline-flex;
   gap: 0.25rem;
@@ -919,7 +918,7 @@ button {
 }
 
 /* One control bar on every board: duration tabs left, university filter right.
- * Fixed structure means switching boards never shifts the dropdown (CO-12). */
+ * Fixed structure means switching boards never shifts the dropdown. */
 .board-controls {
   display: flex;
   align-items: center;
@@ -1084,7 +1083,7 @@ th.ltable__rank {
   font-size: 0.85rem;
 }
 
-/* PB tiles as ruled broadsheet figures (CO-3 §2): maroon index, huge numeral. */
+/* PB tiles as ruled broadsheet figures: maroon index, huge numeral. */
 .pb-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
@@ -1410,7 +1409,7 @@ th.ltable__rank {
   border-color: var(--color-zl-red);
 }
 
-/* ── /how-it-works (CO-11) ─────────────────────────────────────────────── */
+/* ── /how-it-works ─────────────────────────────────────────────── */
 .hiw-hero {
   text-align: center;
   padding-block: clamp(2rem, 8vw, 4.5rem) clamp(1.5rem, 5vw, 3rem);
@@ -1429,7 +1428,7 @@ th.ltable__rank {
   line-height: 1.08;
 }
 
-/* Bulleted lists: accent dot markers, generous line spacing (CO-13). */
+/* Bulleted lists: accent dot markers, generous line spacing. */
 .hiw-list {
   list-style: none;
   margin: 1rem 0 0;
@@ -1456,7 +1455,7 @@ th.ltable__rank {
   background: var(--accent);
 }
 
-/* Numbered lists (steps): accent number badges via a counter (CO-13). */
+/* Numbered lists (steps): accent number badges via a counter. */
 .hiw-mini-ol,
 .hiw-ol {
   list-style: none;
@@ -1717,7 +1716,7 @@ th.ltable__rank {
   margin-top: 0.25rem;
 }
 
-/* ── Charts (single steel series, stroke only per CO-2) ─────────────────── */
+/* ── Charts (single steel series, stroke only) ─────────────────── */
 .chart-toolbar {
   display: flex;
   align-items: flex-end;
@@ -1960,7 +1959,7 @@ th.ltable__rank {
   flex-wrap: wrap;
 }
 
-/* ── W8 auth additions (additive only — do not reflow rules above) ──────── */
+/* ── Auth additions (additive only — do not reflow rules above) ─────────── */
 
 /* OAuth brand buttons above the email flow. */
 .auth-oauth {

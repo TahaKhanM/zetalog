@@ -17,7 +17,7 @@ function safeNext(value: string | string[] | undefined): string {
 }
 
 /**
- * `/signin` — email-first auth (W8): password sign-in (uni aliases welcome),
+ * `/signin` — email-first auth: password sign-in (uni aliases welcome),
  * sign-up with a one-time emailed code, Google/GitHub OAuth, and password
  * recovery. Already-signed-in users skip straight on.
  */

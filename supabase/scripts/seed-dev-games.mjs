@@ -3,7 +3,7 @@
  *
  * - Problems come from a faithful replica of Zetamac's generator (uniform
  *   draws, sub = reverse add, div = reverse mul with zero-divisor re-roll), so
- *   the W6 statistical conformity rules pass by construction.
+ *   the statistical conformity rules pass by construction.
  * - Pacing is human: op-dependent solve times (division slowest, 11/12 times
  *   tables painful), jittered keystrokes, occasional typo + backspace
  *   corrections, think-time before the first key.

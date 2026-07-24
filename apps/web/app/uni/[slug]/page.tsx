@@ -11,7 +11,7 @@ import {
 } from '@/lib/public-board';
 
 /**
- * Cacheable public render, revalidated every 30s (spec §6). Reads no cookies —
+ * Cacheable public render, revalidated every 30s. Reads no cookies —
  * the viewer's own-row highlight is applied client-side after hydration (see
  * ViewerRowHighlight) — so the board stays a shared, identity-free server render.
  */

@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Review queue' };
 
 /**
- * `/admin` — the quarantine review queue (spec §5). Gated on the caller's own
+ * `/admin` — the quarantine review queue. Gated on the caller's own
  * `is_admin`; the queue itself is read with the service client because RLS hides
  * other users' games. Each card recomputes per-problem solve times server-side.
  */
