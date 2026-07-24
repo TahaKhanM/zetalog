@@ -3,36 +3,34 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'How it works',
-  description: 'What ZetaLog does, how scores are verified and how to install the extension.',
+  description: 'Track your Zetamac scores and compare them with players worldwide.',
 };
 
-/** Static product page. Revalidation is irrelevant; there is no data here. */
+/** Static product page. There is no data to revalidate here. */
 export const dynamic = 'force-static';
 
 const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
+const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
 
 /**
- * `/how-it-works` (CO-11): the product tour. A static page that explains the
- * whole flow and shows a faithful CSS replica of the extension popup, so the
- * preview always matches the current theme without shipping screenshots.
+ * `/how-it-works` (CO-12): a concise product tour for a first-time visitor.
+ * What ZetaLog is, how the extension records and links, and how badges work.
+ * The popup preview is a theme-following CSS replica, not a screenshot.
  */
 export default function HowItWorksPage(): React.JSX.Element {
   return (
     <div className="hiw board-enter">
-      <section className="hiw-hero" aria-label="ZetaLog in one sentence">
-        <h1 className="display hiw-hero__title">
-          Every Zetamac game, recorded.
-          <br />
-          Every score, proven.
-        </h1>
+      <section className="hiw-hero" aria-label="What ZetaLog is">
+        <p className="hiw-hero__eyebrow display">How it works</p>
+        <h1 className="display hiw-hero__title">Track your Zetamac scores. Compare worldwide.</h1>
         <p className="hiw-hero__lede">
-          ZetaLog is a Chrome extension and a leaderboard for UK university students. It records
-          your games while you play, checks every score on the server and ranks verified personal
-          bests.
+          Zetamac is the mental arithmetic game people use to build speed for quant interviews.
+          ZetaLog is a Chrome extension that records every game you play and a leaderboard that
+          ranks your best against players around the world.
         </p>
         <p className="hiw-hero__actions">
           <a href="#install" className="btn btn--primary">
-            Install the extension
+            Get the extension
           </a>
           <Link href="/" className="btn btn--ghost">
             See the leaderboard
@@ -40,44 +38,18 @@ export default function HowItWorksPage(): React.JSX.Element {
         </p>
       </section>
 
-      <section className="hiw-steps" aria-label="The flow">
-        <div className="hiw-step card card--pad">
-          <span className="hiw-step__n num">1</span>
-          <h2 className="hiw-step__title">Install and play</h2>
-          <p className="meta">
-            Add the extension, then play Zetamac as normal. Nothing changes about the game. Every
-            round is recorded locally, signed in or not.
-          </p>
-        </div>
-        <div className="hiw-step card card--pad">
-          <span className="hiw-step__n num">2</span>
-          <h2 className="hiw-step__title">Scores get checked</h2>
-          <p className="meta">
-            A score is never taken at face value. The server replays the recorded keystrokes,
-            recomputes the score and runs it through statistical checks. Only clean games rank.
-          </p>
-        </div>
-        <div className="hiw-step card card--pad">
-          <span className="hiw-step__n num">3</span>
-          <h2 className="hiw-step__title">Climb the boards</h2>
-          <p className="meta">
-            Link your account once and new games sync on their own. Verify a university email for
-            its badge and board, or play independent on the global board.
-          </p>
-        </div>
-      </section>
-
-      <section className="hiw-split" aria-label="The extension">
+      <section className="hiw-split" aria-label="What the extension does">
         <div className="hiw-split__copy">
-          <h2 className="display hiw-h2">The popup is your logbook</h2>
+          <h2 className="display hiw-h2">The extension is your logbook</h2>
           <p className="meta">
-            Latest score, personal bests per duration, a trend line and a focus hint that names the
-            skill slowing you down. All computed from your own recorded games, on your machine.
+            Install it, then play Zetamac as normal. Nothing about the game changes. Every round is
+            recorded on your machine, so the popup shows your latest score, your best at each
+            duration and a trend line, even before you make an account.
           </p>
           <ul className="hiw-list meta">
-            <li>Works without an account</li>
-            <li>Restore or remove any game</li>
-            <li>Flags capture problems instead of losing data</li>
+            <li>Works straight away, no account needed</li>
+            <li>Best score per 30s, 60s and 120s game</li>
+            <li>A focus hint that names the skill slowing you down</li>
           </ul>
         </div>
         <div className="hiw-popup card" aria-hidden="true">
@@ -116,20 +88,64 @@ export default function HowItWorksPage(): React.JSX.Element {
         </div>
       </section>
 
-      <section className="hiw-split hiw-split--reverse" aria-label="Verification">
-        <div className="hiw-split__copy">
-          <h2 className="display hiw-h2">Cheating does not rank</h2>
+      <section className="hiw-steps" aria-label="Getting on the leaderboard">
+        <div className="hiw-step card card--pad">
+          <span className="hiw-step__n num">1</span>
+          <h2 className="hiw-step__title">Install and play</h2>
           <p className="meta">
-            The server rebuilds every game from its keystroke record. Impossible timings, pasted
-            answers, fabricated streams and statistical outliers are caught before a score touches a
-            board. Flagged games go to review, never silently deleted.
+            Add the extension to Chrome, then play a game on{' '}
+            <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+              Zetamac
+            </a>
+            . The popup fills with your scores right away.
+          </p>
+        </div>
+        <div className="hiw-step card card--pad">
+          <span className="hiw-step__n num">2</span>
+          <h2 className="hiw-step__title">Link your account</h2>
+          <p className="meta">
+            Your games stay on your machine until you connect them. Make a free account, open the
+            popup and press Sync to leaderboard. That links this browser once, and every new game
+            uploads on its own from then on.
+          </p>
+        </div>
+        <div className="hiw-step card card--pad">
+          <span className="hiw-step__n num">3</span>
+          <h2 className="hiw-step__title">Rank worldwide</h2>
+          <p className="meta">
+            Your best score at each duration appears on the global board next to your display name.
+            Beat it and the board updates on its own.
+          </p>
+        </div>
+      </section>
+
+      <section className="hiw-split hiw-split--reverse" aria-label="University badges">
+        <div className="hiw-split__copy">
+          <h2 className="display hiw-h2">Add a university badge</h2>
+          <p className="meta">
+            If you are at a UK university, verify your student email to put your university mark
+            next to your name and unlock a board for your university alone.
+          </p>
+          <ol className="hiw-mini-ol meta">
+            <li>Open your account and choose Verify email.</li>
+            <li>Enter your university email and the code we send it.</li>
+            <li>Your badge appears everywhere your name shows.</li>
+          </ol>
+          <p className="meta">
+            Not at a university, or would rather not say? Choose that in your account and you stay
+            on the global board with no badge. You can change it any time.
           </p>
         </div>
         <div className="hiw-split__copy">
           <h2 className="display hiw-h2">Your numbers, analysed</h2>
           <p className="meta">
-            The progress page breaks solve times down by operation, times table and skill. It names
-            the problems that cost you the most time, from real games only.
+            The progress page breaks your solve times down by operation, times table and skill. It
+            points out the specific problems that cost you the most time, all from your own games.
+          </p>
+          <p className="hiw-inline-link">
+            <Link href="/me" className="btn btn--ghost btn--sm">
+              See my progress
+            </Link>
           </p>
         </div>
       </section>
@@ -137,7 +153,7 @@ export default function HowItWorksPage(): React.JSX.Element {
       <section className="hiw-install card card--pad" id="install" aria-label="Install">
         <h2 className="display hiw-h2">Install the extension</h2>
         <p className="meta">
-          ZetaLog is not on the Chrome Web Store yet. Loading it takes about a minute:
+          ZetaLog is not on the Chrome Web Store yet. Loading it by hand takes about a minute.
         </p>
         <ol className="hiw-ol">
           <li>
@@ -148,18 +164,20 @@ export default function HowItWorksPage(): React.JSX.Element {
             and unzip it.
           </li>
           <li>
-            Open <span className="num">chrome://extensions</span> and turn on Developer mode.
+            Open <span className="num">chrome://extensions</span> and turn on Developer mode, top
+            right.
           </li>
-          <li>Click Load unpacked and pick the unzipped folder.</li>
+          <li>Press Load unpacked and pick the unzipped folder.</li>
           <li>
-            Play a round on{' '}
-            <a href="https://arithmetic.zetamac.com" target="_blank" rel="noreferrer noopener">
-              arithmetic.zetamac.com
-            </a>
-            . The popup shows your score.
+            Play a game on{' '}
+            <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+              Zetamac
+            </a>{' '}
+            and open the popup to see your score.
           </li>
           <li>
-            To rank, open <Link href="/signin">sign in</Link> and link the extension from the popup.
+            To rank, <Link href="/signin">make an account</Link> and press Sync to leaderboard in
+            the popup.
           </li>
         </ol>
       </section>
