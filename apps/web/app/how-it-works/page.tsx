@@ -42,14 +42,14 @@ export default function HowItWorksPage(): React.JSX.Element {
         <div className="hiw-split__copy">
           <h2 className="display hiw-h2">The extension is your logbook</h2>
           <p className="meta">
-            Install it, then play Zetamac as normal. Nothing about the game changes. Every round is
-            recorded on your machine, so the popup shows your latest score, your best at each
-            duration and a trend line, even before you make an account.
+            Install it and play Zetamac as normal. Nothing about the game changes. Every round is
+            recorded on your machine and shown in the popup.
           </p>
-          <ul className="hiw-list meta">
-            <li>Works straight away, no account needed</li>
-            <li>Best score per 30s, 60s and 120s game</li>
-            <li>A focus hint that names the skill slowing you down</li>
+          <ul className="hiw-list">
+            <li>Works straight away, no account needed.</li>
+            <li>Your latest score and a trend line as you improve.</li>
+            <li>Your best score at 30s, 60s and 120s.</li>
+            <li>A focus hint that names the skill slowing you down.</li>
           </ul>
         </div>
         <div className="hiw-popup card" aria-hidden="true">
@@ -123,25 +123,29 @@ export default function HowItWorksPage(): React.JSX.Element {
         <div className="hiw-split__copy">
           <h2 className="display hiw-h2">Add a university badge</h2>
           <p className="meta">
-            If you are at a UK university, verify your student email to put your university mark
-            next to your name and unlock a board for your university alone.
+            At a UK university? Verify your student email to show your university mark next to your
+            name and unlock a board for your university alone.
           </p>
-          <ol className="hiw-mini-ol meta">
+          <ol className="hiw-mini-ol">
             <li>Open your account and choose Verify email.</li>
             <li>Enter your university email and the code we send it.</li>
-            <li>Your badge appears everywhere your name shows.</li>
+            <li>Your badge shows everywhere your name appears.</li>
           </ol>
-          <p className="meta">
-            Not at a university, or would rather not say? Choose that in your account and you stay
-            on the global board with no badge. You can change it any time.
+          <p className="meta hiw-note">
+            Not at a university, or would rather not say? Pick that in your account. You stay on the
+            global board with no badge, and can change it any time.
           </p>
         </div>
         <div className="hiw-split__copy">
           <h2 className="display hiw-h2">Your numbers, analysed</h2>
           <p className="meta">
-            The progress page breaks your solve times down by operation, times table and skill. It
-            points out the specific problems that cost you the most time, all from your own games.
+            The progress page turns your games into a clear read on where to improve:
           </p>
+          <ul className="hiw-list">
+            <li>Solve times broken down by operation and times table.</li>
+            <li>The skills that cost you the most time.</li>
+            <li>The specific problems you are slowest on.</li>
+          </ul>
           <p className="hiw-inline-link">
             <Link href="/me" className="btn btn--ghost btn--sm">
               See my progress
