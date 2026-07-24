@@ -13,7 +13,7 @@ const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
 
 /**
- * `/how-it-works` (CO-12): a concise product tour for a first-time visitor.
+ * `/how-it-works`: a concise product tour for a first-time visitor.
  * What ZetaLog is, how the extension records and links, and how badges work.
  * The popup preview is a theme-following CSS replica, not a screenshot.
  */

@@ -84,7 +84,7 @@ describe('applyOwnRowHighlight', () => {
     expect(badgeMount).toBeNull();
   });
 
-  it('reports no mount when the viewer already has a CO-3 monogram/logo badge', () => {
+  it('reports no mount when the viewer already has a monogram/logo badge', () => {
     const root = board([{ uid: 'a', monogram: true }]);
     const { badgeMount } = applyOwnRowHighlight(root, 'a', true);
     expect(badgeMount).toBeNull();

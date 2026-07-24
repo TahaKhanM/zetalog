@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Pure account-classification rules for the W8 email-first auth flow.
+ * Pure account-classification rules for the email-first auth flow.
  *
  * The server resolves an identifier (primary email or verified uni alias) to
  * an {@link IdentifierMatch} via the service role; these rules then decide
@@ -61,7 +61,7 @@ export const lookupResponseSchema = z.discriminatedUnion('mode', [
 export type AliasClaimVerdict = 'ok' | 'taken' | 'already-verified';
 
 /**
- * Alias integrity (W8): a university email may become a login alias, so an
+ * Alias integrity: a university email may become a login alias, so an
  * address can only ever be claimed by one account. Verifying your own primary
  * email is fine (badge only, alias is a no-op); anyone else's primary email or
  * verified alias is taken; your own verified alias needs no second pass.

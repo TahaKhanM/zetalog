@@ -9,7 +9,7 @@ import { judge } from './verdict';
 import { mulberry32, simulateGame } from './zetamac-generator.testkit';
 
 /**
- * The W6 threat model in one place: a cheater who rewrites the DISPLAYED
+ * The threat model in one place: a cheater who rewrites the DISPLAYED
  * problems produces a stream where every answer matches its problem and every
  * physiological/consistency check passes — yet the game was never Zetamac's.
  * These fixtures therefore use CLEAN, human-paced timing so the only thing that
@@ -90,7 +90,7 @@ describe('attack battery — never accepted', () => {
   });
 
   it('(a2) trivial-swap to in-range small mul products is quarantined, never accepted', () => {
-    // The brief\'s "all 2×2..3×3, default settings claimed": in range, so caught
+    // "all 2×2..3×3, default settings claimed": in range, so caught
     // statistically (heavy repetition + only mul appears), never accepted.
     const cycle = ['2 × 2', '2 × 3', '3 × 2', '3 × 3'];
     const record = attackRecord(Array.from({ length: 40 }, (_u, i) => cycle[i % 4] ?? ''));

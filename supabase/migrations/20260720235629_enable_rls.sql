@@ -1,6 +1,6 @@
 -- ZetaLog Row-Level Security: default-deny across all five tables.
 --
--- Model (spec §4): the anon/authenticated roles reach these tables only through
+-- Model: the anon/authenticated roles reach these tables only through
 -- the Data API, so RLS is the boundary between the public internet and users'
 -- telemetry. Every table has RLS enabled; only the minimal read/update surface
 -- is opened. All game writes and every OTP/email row are service-role only, and
@@ -54,7 +54,7 @@ create policy profiles_update_own
 -- games --------------------------------------------------------------------
 -- A user may read only their own games. There is intentionally NO client
 -- INSERT/UPDATE/DELETE policy: all writes go through the validation API using
--- the service role (spec §4, product invariant 2).
+-- the service role.
 alter table public.games enable row level security;
 
 revoke all on public.games from anon, authenticated;

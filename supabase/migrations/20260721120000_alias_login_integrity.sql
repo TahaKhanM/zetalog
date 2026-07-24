@@ -1,4 +1,4 @@
--- W8 alias login: a university email verified for the badge becomes a LOGIN
+-- Alias login: a university email verified for the badge becomes a LOGIN
 -- alias for the account. Two pieces make that safe:
 --
 --   1. an address can only ever be a verified alias of ONE account (partial

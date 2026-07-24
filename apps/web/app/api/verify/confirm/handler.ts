@@ -5,7 +5,7 @@ import { findUniversityForEmail } from '@/lib/uni';
 import { verifyCode } from '@/lib/verification';
 
 /**
- * The testable core of `POST /api/verify/confirm` (spec §7): find the latest
+ * The testable core of `POST /api/verify/confirm`: find the latest
  * pending code, adjudicate the submitted digits (constant-time, attempt-capped,
  * expiry-aware), and on success stamp the profile's university.
  */
@@ -23,7 +23,7 @@ export interface PendingVerification {
 
 /**
  * Outcome of persisting a verification. `alias-conflict` is the lost race on
- * the verified-alias unique index (W8): someone else claimed the address
+ * the verified-alias unique index: someone else claimed the address
  * between the request-time ownership check and this confirm.
  */
 export type ApplyVerificationResult =

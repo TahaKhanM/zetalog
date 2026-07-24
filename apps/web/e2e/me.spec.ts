@@ -5,7 +5,7 @@ import { createServerClient } from '@supabase/ssr';
 import { expect, test, type Cookie } from '@playwright/test';
 
 /**
- * W7 bug 3 regression: a signed-in browser session must render `/me` with the
+ * Regression: a signed-in browser session must render `/me` with the
  * user's personal bests and history — it must NOT bounce to `/signin`.
  *
  * The reported failure implicated "browser-set cookies vs @supabase/ssr server
