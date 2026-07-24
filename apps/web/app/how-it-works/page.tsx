@@ -234,25 +234,27 @@ export default function HowItWorksPage(): React.JSX.Element {
               your name and open a board for your university alone. In your account, choose Verify
               email and enter the code sent to your student address.
             </p>
-            <p className="meta hiw-block__sub">
-              The code has not arrived? University mail systems often hold outside senders:
-            </p>
-            <ul className="hiw-checks">
-              <li>Check your junk or spam folder and mark the message as safe.</li>
-              <li>
-                On a Microsoft or Outlook account, open the{' '}
-                <a href={MS_QUARANTINE_URL} target="_blank" rel="noreferrer noopener">
-                  Microsoft quarantine page
-                </a>{' '}
-                and press Release next to the code.
-              </li>
-              <li>Still nothing after a minute? Request a fresh code and try again.</li>
-            </ul>
-            <p className="meta hiw-block__note">
-              Not at a university, or would rather not say? Choose that in your account. You stay on
-              the global board with no badge, and can change it any time.
+            <p className="meta hiw-block__aside">
+              Not at a university, or would rather not say? Choose that in your account instead. You
+              stay on the global board with no badge, and can change it any time.
             </p>
           </div>
+        </div>
+
+        <div className="hiw-callout card card--pad">
+          <h3 className="hiw-callout__title display">The verification code has not arrived?</h3>
+          <p className="meta">University mail often holds mail from outside senders. Try these:</p>
+          <ul className="hiw-checks hiw-checks--row">
+            <li>Check your junk or spam folder and mark the message as safe.</li>
+            <li>
+              On a Microsoft or Outlook account, open the{' '}
+              <a href={MS_QUARANTINE_URL} target="_blank" rel="noreferrer noopener">
+                Microsoft quarantine page
+              </a>{' '}
+              and press Release next to the code.
+            </li>
+            <li>Still nothing after a minute? Request a fresh code and try again.</li>
+          </ul>
         </div>
       </section>
     </div>
