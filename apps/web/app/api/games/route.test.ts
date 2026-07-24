@@ -2,7 +2,7 @@ import { ZETAMAC_DEFAULT_SETTINGS, type GameRecord } from '@zetalog/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { GameToInsert, SubmitPort } from '@/lib/games/submit';
-import { handleGamesPost, type GamesPostDeps } from './handler';
+import { handleGamesGet, handleGamesPost, type GamesPostDeps } from './handler';
 import { OPTIONS } from './route';
 
 const record: GameRecord = {
@@ -82,5 +82,52 @@ describe('POST /api/games', () => {
     const response = OPTIONS();
     expect(response.status).toBe(204);
     expect(response.headers.get('access-control-allow-methods')).toContain('POST');
+    expect(response.headers.get('access-control-allow-methods')).toContain('GET');
+  });
+});
+
+describe('GET /api/games', () => {
+  function getRequest(token?: string): Request {
+    return new Request('http://localhost/api/games', {
+      method: 'GET',
+      headers: token !== undefined ? { authorization: `Bearer ${token}` } : {},
+    });
+  }
+
+  const sample = {
+    clientGameId: '44444444-4444-4444-8444-444444444444',
+    playedAt: '2026-07-01T00:00:00.000Z',
+    settingsFingerprint: 'add:2-100x2-100|sub:on|mul:2-12x2-100|div:on|t:120',
+    rankableDuration: 120,
+    claimedScore: 40,
+    serverScore: 40,
+    status: 'accepted',
+  };
+
+  it('401s without a bearer token', async () => {
+    const response = await handleGamesGet(getRequest(), {
+      authenticateBearer: vi.fn(async () => Promise.resolve('u1')),
+      listGames: vi.fn(async () => Promise.resolve([])),
+    });
+    expect(response.status).toBe(401);
+  });
+
+  it('401s for an invalid token', async () => {
+    const response = await handleGamesGet(getRequest('bad'), {
+      authenticateBearer: vi.fn(async () => Promise.resolve(null)),
+      listGames: vi.fn(async () => Promise.resolve([])),
+    });
+    expect(response.status).toBe(401);
+  });
+
+  it("returns the caller's games", async () => {
+    const listGames = vi.fn(async () => Promise.resolve([sample]));
+    const response = await handleGamesGet(getRequest('tok'), {
+      authenticateBearer: vi.fn(async () => Promise.resolve('u1')),
+      listGames,
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ games: [sample] });
+    expect(listGames).toHaveBeenCalledWith('u1');
   });
 });

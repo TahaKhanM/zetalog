@@ -308,3 +308,42 @@ describe('createApiClient.setLeaderboardOptOut', () => {
     expect(calls).toHaveLength(0);
   });
 });
+
+describe('createApiClient.listGames', () => {
+  const remote = {
+    clientGameId: '11111111-1111-4111-8111-111111111111',
+    playedAt: '2026-07-01T00:00:00.000Z',
+    settingsFingerprint: 'add:2-100x2-100|sub:on|mul:2-12x2-100|div:on|t:120',
+    rankableDuration: 120 as const,
+    claimedScore: 40,
+    serverScore: 42,
+    status: 'accepted' as const,
+  };
+
+  it('GETs and parses the games array', async () => {
+    const { fetch, calls } = scriptedFetch([{ status: 200, body: { games: [remote] } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.listGames()).toEqual({ ok: true, value: [remote] });
+    expect(calls[0]?.url).toBe('https://app.test/api/games');
+    expect(calls[0]?.method).toBe('GET');
+  });
+
+  it('reports a network error when the body is malformed', async () => {
+    const { fetch } = scriptedFetch([{ status: 200, body: { games: [{ clientGameId: 'x' }] } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.listGames()).toEqual({ ok: false, error: { kind: 'network' } });
+  });
+
+  it('maps an unexpected status to a server error', async () => {
+    const { fetch } = scriptedFetch([{ status: 500, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.listGames()).toEqual({ ok: false, error: { kind: 'server', status: 500 } });
+  });
+
+  it('propagates the auth error without a network call when signed out', async () => {
+    const { fetch, calls } = scriptedFetch([]);
+    const client = createApiClient({ fetch, auth: fakeAuth(null), baseUrl: 'https://app.test' });
+    expect(await client.listGames()).toEqual({ ok: false, error: { kind: 'auth' } });
+    expect(calls).toHaveLength(0);
+  });
+});

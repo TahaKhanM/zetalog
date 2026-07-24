@@ -14,6 +14,7 @@ export {
   ZETAMAC_DEFAULT_SETTINGS,
   fingerprint,
   rankableDuration,
+  settingsFromFingerprint,
   type RankableDuration,
 } from './zetamac';
 export { err, ok, type Result } from './result';

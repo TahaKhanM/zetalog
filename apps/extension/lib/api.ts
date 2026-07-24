@@ -1,12 +1,12 @@
 import { err, ok, type GameRecord, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
+import { type FetchLike } from './auth.js';
+import { WEB_APP_URL } from './config.js';
+
 /** The subset of `GET /api/profile` the extension reads (extra fields ignored). */
 export const profileViewSchema = z.object({ leaderboardOptOut: z.boolean() });
 export type ProfileView = z.infer<typeof profileViewSchema>;
-
-import { type FetchLike } from './auth.js';
-import { WEB_APP_URL } from './config.js';
 
 /**
  * Typed client for the game API.
@@ -27,6 +27,20 @@ export const submitSuccessSchema = z.object({
   serverScore: z.number().int().nonnegative(),
 });
 export type SubmitSuccess = z.infer<typeof submitSuccessSchema>;
+
+/** One game as `GET /api/games` returns it, for backfilling the popup history. */
+export const remoteGameSchema = z.object({
+  clientGameId: z.string().min(1),
+  playedAt: z.string().min(1),
+  settingsFingerprint: z.string().min(1),
+  rankableDuration: z.union([z.literal(30), z.literal(60), z.literal(120), z.null()]),
+  claimedScore: z.number().int().nonnegative(),
+  serverScore: z.number().int().nonnegative(),
+  status: submitOutcomeSchema,
+});
+export type RemoteGame = z.infer<typeof remoteGameSchema>;
+
+const listGamesResponseSchema = z.object({ games: z.array(remoteGameSchema) });
 
 /**
  * A typed API failure. `auth` means the session is invalid even after a refresh
@@ -64,6 +78,8 @@ export interface ApiClient {
   getProfile(): Promise<Result<ProfileView, ApiError>>;
   /** Set the leaderboard opt-out (true keeps the account off the public boards). */
   setLeaderboardOptOut(optOut: boolean): Promise<Result<null, ApiError>>;
+  /** The account's recent games, to backfill the popup history after linking. */
+  listGames(): Promise<Result<RemoteGame[], ApiError>>;
 }
 
 /** A completed request: HTTP status and best-effort parsed JSON body. */
@@ -189,6 +205,15 @@ export function createApiClient(deps: ApiDeps): ApiClient {
         default:
           return err({ kind: 'server', status });
       }
+    },
+
+    async listGames() {
+      const response = await authed('GET', '/api/games', undefined);
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      if (status !== 200) return err({ kind: 'server', status });
+      const body = listGamesResponseSchema.safeParse(parsed);
+      return body.success ? ok(body.data.games) : err({ kind: 'network' });
     },
   };
 }

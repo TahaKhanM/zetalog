@@ -3,8 +3,9 @@ import { z } from 'zod';
 /**
  * The runtime message protocol between the extension's surfaces and its
  * background service worker. The link content script sends `zl-link`; the popup
- * sends `zl-drain` (sync now), `zl-unlink`, and the leaderboard-privacy
- * `zl-get-profile` / `zl-set-privacy`; the Zetamac content script sends
+ * sends `zl-drain` (sync now), `zl-unlink`, the leaderboard-privacy
+ * `zl-get-profile` / `zl-set-privacy`, and `zl-backfill` (pull the account's
+ * game history); the Zetamac content script sends
  * `zl-drain` after saving a game. Profile requests are routed through the
  * background because it owns token refresh. The background validates every
  * message with {@link bgRequestSchema} before acting — tokens travel only over
@@ -20,6 +21,7 @@ export const bgRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('zl-unlink') }),
   z.object({ type: z.literal('zl-get-profile') }),
   z.object({ type: z.literal('zl-set-privacy'), optOut: z.boolean() }),
+  z.object({ type: z.literal('zl-backfill') }),
 ]);
 
 /** A message the background handles. */
