@@ -11,6 +11,8 @@ import { createServiceClient } from '@/lib/supabase/service';
 import { UniBadge } from '../_components/UniBadge';
 import { DisplayNameForm } from '../me/_components/DisplayNameForm';
 import { ChangePasswordForm } from './_components/ChangePasswordForm';
+import { IndependentToggle } from './_components/IndependentToggle';
+import { RemoveAliasButton } from './_components/RemoveAliasButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,7 +75,7 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
         <h2 className="me__h2">Identity</h2>
         <DisplayNameForm current={displayName} />
         <p className="meta analysis-note">
-          3–15 characters: letters, digits, and underscores. This is the name on the boards.
+          3 to 15 characters: letters, digits and underscores. This is the name on the boards.
         </p>
       </section>
 
@@ -85,7 +87,7 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
               <li className="conn">
                 <div className="conn__body">
                   <span className="conn__name">{primaryEmail}</span>
-                  <span className="meta">Primary email — receives codes and recovery.</span>
+                  <span className="meta">Primary email. Receives sign in codes.</span>
                 </div>
                 <span className="chip chip--badge">Primary</span>
               </li>
@@ -94,9 +96,22 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
               <li className="conn">
                 <div className="conn__body">
                   <span className="conn__name">{aliasEmail}</span>
-                  <span className="meta">Verified university email — also signs you in.</span>
+                  <span className="meta">University email. Also works for signing in.</span>
                 </div>
-                <span className="chip chip--badge">Alias</span>
+                <RemoveAliasButton />
+              </li>
+            ) : null}
+            {aliasEmail === null ? (
+              <li className="conn">
+                <div className="conn__body">
+                  <span className="conn__name">University email</span>
+                  <span className="meta">
+                    Add one to get your badge and a second sign in email.
+                  </span>
+                </div>
+                <Link href="/verify" className="btn btn--ghost btn--sm">
+                  Add
+                </Link>
               </li>
             ) : null}
             <li className="conn">
@@ -144,14 +159,24 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
                 Change
               </Link>
             </>
+          ) : profile?.independent === true ? (
+            <>
+              <p className="meta" style={{ margin: 0 }}>
+                No university set. You appear on the global board.
+              </p>
+              <IndependentToggle independent={true} />
+            </>
           ) : (
             <>
               <p className="meta" style={{ margin: 0 }}>
-                No university badge yet. Verify a UK university email to earn one.
+                Verify a UK university email to get its badge and board.
               </p>
-              <Link href="/verify" className="btn btn--primary btn--sm">
-                Verify email
-              </Link>
+              <span className="conn__chips">
+                <Link href="/verify" className="btn btn--primary btn--sm">
+                  Verify email
+                </Link>
+                <IndependentToggle independent={false} />
+              </span>
             </>
           )}
         </div>
@@ -160,7 +185,7 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
       <section className="me__section" aria-label="Session">
         <h2 className="me__h2">Session</h2>
         <form action="/auth/signout" method="post">
-          <button type="submit" className="btn btn--ghost btn--sm">
+          <button type="submit" className="btn btn--signout">
             Sign out
           </button>
         </form>

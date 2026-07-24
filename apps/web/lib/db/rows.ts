@@ -105,6 +105,8 @@ export const profileRowSchema = z.object({
   uni_verified_at: z.string().nullable(),
   is_admin: z.boolean(),
   created_at: z.string(),
+  /** CO-11: the user chose "not at a university"; the UI stops offering the badge flow. */
+  independent: z.boolean(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;
 
