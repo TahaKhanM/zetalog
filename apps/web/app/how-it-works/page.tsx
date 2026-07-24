@@ -11,6 +11,7 @@ export const dynamic = 'force-static';
 
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
 const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
+const MS_QUARANTINE_URL = 'https://security.microsoft.com/quarantine';
 const EXTENSION_ZIP = '/zetalog-chrome-1.0.0.zip';
 const EXTENSION_VERSION = '1.0.0';
 
@@ -240,8 +241,11 @@ export default function HowItWorksPage(): React.JSX.Element {
             <ul className="hiw-checks">
               <li>Check your junk or spam folder and mark the message as safe.</li>
               <li>
-                On Microsoft or Outlook accounts, look in quarantine, either a held-messages notice
-                you were sent or the security portal your university uses, and choose Release.
+                On a Microsoft or Outlook account, open the{' '}
+                <a href={MS_QUARANTINE_URL} target="_blank" rel="noreferrer noopener">
+                  Microsoft quarantine page
+                </a>{' '}
+                and press Release next to the code.
               </li>
               <li>Still nothing after a minute? Request a fresh code and try again.</li>
             </ul>
