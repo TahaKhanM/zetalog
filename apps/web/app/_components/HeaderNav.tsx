@@ -76,24 +76,30 @@ export function HeaderNav(): React.JSX.Element {
   const isActive = (href: string): boolean =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
+  // Two siblings so the mobile header can keep the account cluster on the top
+  // row with the brand and drop the links to their own row (see globals.css).
   return (
-    <nav className="nav">
-      <Link href="/" className="nav__link" aria-current={isActive('/') ? 'page' : undefined}>
-        Leaderboard
-      </Link>
-      <Link href="/me" className="nav__link" aria-current={isActive('/me') ? 'page' : undefined}>
-        My progress
-      </Link>
-      <Link
-        href="/how-it-works"
-        className="nav__link"
-        aria-current={isActive('/how-it-works') ? 'page' : undefined}
-      >
-        How it works
-      </Link>
-      <AuthChip auth={auth} active={isActive('/account')} />
-      <ThemeToggle />
-    </nav>
+    <>
+      <nav className="nav" aria-label="Primary">
+        <Link href="/" className="nav__link" aria-current={isActive('/') ? 'page' : undefined}>
+          Leaderboard
+        </Link>
+        <Link href="/me" className="nav__link" aria-current={isActive('/me') ? 'page' : undefined}>
+          My progress
+        </Link>
+        <Link
+          href="/how-it-works"
+          className="nav__link"
+          aria-current={isActive('/how-it-works') ? 'page' : undefined}
+        >
+          How it works
+        </Link>
+      </nav>
+      <div className="nav__cluster">
+        <AuthChip auth={auth} active={isActive('/account')} />
+        <ThemeToggle />
+      </div>
+    </>
   );
 }
 
