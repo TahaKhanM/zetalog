@@ -1842,6 +1842,11 @@ th.ltable__rank {
   background: var(--accent);
 }
 
+.hiw-checks a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent-border);
+}
+
 .hiw-block__note {
   margin-top: 1rem;
   padding-top: 1rem;
