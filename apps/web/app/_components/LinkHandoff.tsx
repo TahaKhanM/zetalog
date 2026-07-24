@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { isLinkAck, linkSessionMessage } from '@/lib/link';
+import { isLinkAck, isLinkReady, linkPingMessage, linkSessionMessage } from '@/lib/link';
 import { createClient } from '@/lib/supabase/browser';
 
 /**
@@ -23,16 +23,24 @@ type Phase = 'idle' | 'waiting' | 'linked' | 'not-detected' | 'error';
 
 export function LinkHandoff(): React.JSX.Element {
   const [phase, setPhase] = useState<Phase>('idle');
+  const [present, setPresent] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     function onMessage(event: MessageEvent): void {
       if (event.origin !== window.location.origin || event.source !== window) return;
+      if (isLinkReady(event.data)) {
+        setPresent(true);
+        return;
+      }
       if (!isLinkAck(event.data)) return;
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       setPhase('linked');
     }
     window.addEventListener('message', onMessage);
+    // Presence handshake: the content script answers this ping (and announces
+    // itself unprompted on load), so either mount order lights the chip.
+    window.postMessage(linkPingMessage(), window.location.origin);
     return () => {
       window.removeEventListener('message', onMessage);
       if (timerRef.current !== null) clearTimeout(timerRef.current);
@@ -85,10 +93,17 @@ export function LinkHandoff(): React.JSX.Element {
           Link the ZetaLog extension
         </button>
       </p>
-      {phase === 'not-detected' ? (
-        <p className="meta" role="status" style={{ marginTop: '0.75rem' }}>
-          Extension not detected. Make sure the ZetaLog extension is installed and enabled, then try
-          again.
+      <p className="meta" role="status" style={{ marginTop: '0.75rem' }}>
+        {present ? (
+          <span className="chip chip--accepted">Extension detected</span>
+        ) : (
+          <>Extension not detected yet — if you just installed or updated it, refresh this page.</>
+        )}
+      </p>
+      {phase === 'not-detected' && !present ? (
+        <p className="meta" role="status" style={{ marginTop: '0.5rem' }}>
+          Still nothing after clicking: check the ZetaLog extension is installed and enabled in your
+          browser, then refresh this page and try again.
         </p>
       ) : null}
       {phase === 'error' ? (
