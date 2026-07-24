@@ -1,7 +1,7 @@
 import { browser, defineContentScript } from '#imports';
 
 import { LINK_ORIGINS } from '../lib/config.js';
-import { LINK_ACK, parseLinkMessage } from '../lib/link.js';
+import { LINK_ACK, LINK_READY, isLinkPing, parseLinkMessage } from '../lib/link.js';
 import { type BgRequest, type BgResponse } from '../lib/messages.js';
 
 /**
@@ -25,6 +25,13 @@ export default defineContentScript({
   matches: ['https://www.zetalog.co.uk/link*', 'http://localhost:3000/link*'],
   main() {
     window.addEventListener('message', (event) => {
+      // Presence handshake: answer the page's ping so it can show that the
+      // extension is reachable before the user clicks Link.
+      if (isLinkPing(event, window, LINK_ORIGINS)) {
+        window.postMessage(LINK_READY, event.origin);
+        return;
+      }
+
       const parsed = parseLinkMessage(event, window, LINK_ORIGINS);
       if (!parsed.ok) return;
 
@@ -39,5 +46,11 @@ export default defineContentScript({
         }
       });
     });
+
+    // Announce unprompted too — if the page mounted first its ping is already
+    // gone, and if this script loads first the announce covers that ordering.
+    if (LINK_ORIGINS.includes(window.location.origin as (typeof LINK_ORIGINS)[number])) {
+      window.postMessage(LINK_READY, window.location.origin);
+    }
   },
 });

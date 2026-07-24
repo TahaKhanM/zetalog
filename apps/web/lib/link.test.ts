@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isLinkAck, linkSessionMessage } from './link';
+import { isLinkAck, isLinkReady, linkPingMessage, linkSessionMessage } from './link';
 
 describe('linkSessionMessage', () => {
   it('wraps the tokens in the handoff envelope', () => {
@@ -21,5 +21,22 @@ describe('isLinkAck', () => {
     expect(isLinkAck(null)).toBe(false);
     expect(isLinkAck('zl-link-ack')).toBe(false);
     expect(isLinkAck(undefined)).toBe(false);
+  });
+});
+
+describe('presence handshake', () => {
+  it('builds the ping the page posts on mount', () => {
+    expect(linkPingMessage()).toEqual({ type: 'zl-link-ping' });
+  });
+
+  it('recognises the extension ready signal', () => {
+    expect(isLinkReady({ type: 'zl-link-ready' })).toBe(true);
+  });
+
+  it('rejects non-ready payloads', () => {
+    expect(isLinkReady({ type: 'zl-link-ack' })).toBe(false);
+    expect(isLinkReady(null)).toBe(false);
+    expect(isLinkReady(undefined)).toBe(false);
+    expect(isLinkReady('zl-link-ready')).toBe(false);
   });
 });
