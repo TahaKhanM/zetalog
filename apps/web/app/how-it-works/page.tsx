@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 export const dynamic = 'force-static';
 
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
-const GITHUB_URL = 'https://github.com/TahaKhanM/zetalog';
 const MS_QUARANTINE_URL = 'https://security.microsoft.com/quarantine';
 const EXTENSION_ZIP = '/zetalog-chrome-1.0.0.zip';
 const EXTENSION_VERSION = '1.0.0';
@@ -256,14 +255,6 @@ export default function HowItWorksPage(): React.JSX.Element {
           </div>
         </div>
       </section>
-
-      <p className="hiw-foot meta">
-        Prefer to read the source first? It is on{' '}
-        <a href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
-          GitHub
-        </a>
-        .
-      </p>
     </div>
   );
 }
