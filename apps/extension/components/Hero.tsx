@@ -30,7 +30,7 @@ export function Hero(props: HeroProps): JSX.Element {
         <div className="zl-hero__label">
           <span className="zl-eyebrow">Latest</span>
         </div>
-        <p className="zl-hero__empty">No games yet — play a round on Zetamac to begin.</p>
+        <p className="zl-hero__empty">No games yet. Play a round on Zetamac to begin.</p>
       </div>
     );
   }

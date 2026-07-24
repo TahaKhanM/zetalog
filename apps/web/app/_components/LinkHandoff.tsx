@@ -70,7 +70,7 @@ export function LinkHandoff(): React.JSX.Element {
       <div className="auth-sent">
         <p className="auth-sent__title num">Linked</p>
         <p className="meta">
-          Your extension is connected. You can close this tab — future games sync automatically.
+          Extension connected. New games sync on their own. You can close this tab.
         </p>
         <p style={{ marginTop: '1.25rem' }}>
           <Link href="/me" className="btn btn--ghost btn--sm">
@@ -97,7 +97,7 @@ export function LinkHandoff(): React.JSX.Element {
         {present ? (
           <span className="chip chip--accepted">Extension detected</span>
         ) : (
-          <>Extension not detected yet — if you just installed or updated it, refresh this page.</>
+          <>No extension detected yet. If you just installed or updated it, refresh this page.</>
         )}
       </p>
       {phase === 'not-detected' && !present ? (

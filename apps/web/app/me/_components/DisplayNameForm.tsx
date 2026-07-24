@@ -32,7 +32,7 @@ export function DisplayNameForm({ current }: { current: string | null }): React.
         body: JSON.stringify({ displayName: value }),
       });
       if (response.status === 409) {
-        setError('That name is already taken — try another.');
+        setError('That name is taken. Try another.');
         return;
       }
       if (!response.ok) {
@@ -57,7 +57,7 @@ export function DisplayNameForm({ current }: { current: string | null }): React.
           value={value}
           maxLength={15}
           autoComplete="off"
-          placeholder="3–15 chars: letters, digits, _"
+          placeholder="3 to 15 characters"
           onChange={(event) => {
             setValue(event.target.value);
             setSaved(false);

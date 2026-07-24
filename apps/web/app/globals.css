@@ -26,26 +26,28 @@
 /* ── Semantic surfaces: CO-3 "examination paper" ─────────────────────────
  * The page IS cream paper; maroon is structural ink (ruling, hairlines,
  * index numerals); navy is the working ink. Dark mode is the blackboard. */
+/* CO-11 "modern neutral" light theme: the paper metaphor is dropped. Cool
+ * neutral surfaces mixed from navy over white, white cards, navy ink and
+ * maroon as the single accent. Dark mode keeps the navy and steel scheme. */
 :root {
-  --surface-page: color-mix(in srgb, var(--color-zl-cream) 38%, white);
-  --surface-card: color-mix(in srgb, var(--color-zl-cream) 14%, white);
-  --surface-raised: color-mix(in srgb, var(--color-zl-cream) 26%, white);
-  --surface-border: color-mix(in srgb, var(--color-zl-maroon) 13%, transparent);
-  --surface-hairline: color-mix(in srgb, var(--color-zl-maroon) 10%, transparent);
-  --rule-strong: color-mix(in srgb, var(--color-zl-maroon) 36%, transparent);
-  --surface-text: color-mix(in srgb, var(--color-zl-navy) 86%, white);
+  --surface-page: color-mix(in srgb, var(--color-zl-navy) 6%, white);
+  --surface-card: white;
+  --surface-raised: color-mix(in srgb, var(--color-zl-navy) 8%, white);
+  --surface-border: color-mix(in srgb, var(--color-zl-navy) 13%, transparent);
+  --surface-hairline: color-mix(in srgb, var(--color-zl-navy) 9%, transparent);
+  --rule-strong: color-mix(in srgb, var(--color-zl-navy) 16%, transparent);
+  --surface-text: color-mix(in srgb, var(--color-zl-navy) 88%, white);
   --surface-heading: var(--color-zl-navy);
-  --surface-shadow: color-mix(in srgb, var(--color-zl-maroon) 6%, transparent);
-  --meta-text: color-mix(in srgb, var(--color-zl-steel) 44%, var(--surface-text));
+  --surface-shadow: color-mix(in srgb, var(--color-zl-navy) 8%, transparent);
+  --meta-text: color-mix(in srgb, var(--color-zl-navy) 52%, white);
   --ink-index: var(--color-zl-maroon);
-  --ink-display: var(--color-zl-maroon);
-  /* Accent ink: maroon is the ink of authority on paper, but unreadable on the
-   * blackboard — dark mode swaps every accent role to steel (see below). */
+  --ink-display: var(--color-zl-navy);
+  --ink-wordmark: var(--color-zl-maroon);
   --accent: var(--color-zl-maroon);
   --accent-strong: color-mix(in srgb, var(--color-zl-maroon) 62%, transparent);
-  --accent-soft: color-mix(in srgb, var(--color-zl-maroon) 8%, transparent);
+  --accent-soft: color-mix(in srgb, var(--color-zl-maroon) 7%, transparent);
   --accent-border: color-mix(in srgb, var(--color-zl-maroon) 22%, transparent);
-  --accent-contrast: var(--color-zl-cream);
+  --accent-contrast: white;
   --chart-stroke: var(--color-zl-steel);
   --chart-stroke-opacity: 0.85;
   color-scheme: light;
@@ -72,6 +74,7 @@
     --meta-text: color-mix(in srgb, var(--color-zl-steel) 52%, var(--surface-text));
     --ink-index: var(--color-zl-steel);
     --ink-display: var(--color-zl-cream);
+    --ink-wordmark: var(--color-zl-cream);
     --accent: var(--color-zl-steel);
     --accent-strong: color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
     --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
@@ -95,6 +98,7 @@
   --meta-text: color-mix(in srgb, var(--color-zl-steel) 52%, var(--surface-text));
   --ink-index: var(--color-zl-steel);
   --ink-display: var(--color-zl-cream);
+  --ink-wordmark: var(--color-zl-cream);
   --accent: var(--color-zl-steel);
   --accent-strong: color-mix(in srgb, var(--color-zl-steel) 70%, transparent);
   --accent-soft: color-mix(in srgb, var(--color-zl-steel) 12%, transparent);
@@ -122,32 +126,7 @@ body {
   position: relative;
 }
 
-/* CO-3 paper grain: a faint woven texture from crossed 1px gradients — no
- * images, ≤3% presence, fixed so it doesn't swim under scroll. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      color-mix(in srgb, var(--surface-heading) 3%, transparent) 0 1px,
-      transparent 1px 3px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--surface-heading) 2%, transparent) 0 1px,
-      transparent 1px 4px
-    );
-  opacity: 0.5;
-}
-
-body > * {
-  position: relative;
-  z-index: 1;
-}
+/* CO-11: no texture overlays. Flat, calm surfaces. */
 
 h1,
 h2,
@@ -211,14 +190,13 @@ button {
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
-/* CO-5: the header carries the exam-paper's strong top rule. */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 20;
   backdrop-filter: saturate(1.1) blur(8px);
-  background: color-mix(in srgb, var(--surface-page) 86%, transparent);
-  border-bottom: 2px solid var(--rule-strong);
+  background: color-mix(in srgb, var(--surface-card) 88%, transparent);
+  border-bottom: 1px solid var(--surface-hairline);
 }
 
 .site-header__row {
@@ -234,7 +212,7 @@ button {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--ink-display);
+  color: var(--ink-wordmark);
   font-size: 1.55rem;
   line-height: 1;
 }
@@ -313,7 +291,6 @@ button {
   background: white;
 }
 
-/* Nav as an exam index: small accent numerals before quiet titles. */
 .nav {
   display: flex;
   gap: 1.5rem;
@@ -324,7 +301,6 @@ button {
 .nav__link {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.4rem;
   color: var(--meta-text);
   font-size: 0.9rem;
   font-weight: 500;
@@ -335,21 +311,10 @@ button {
     border-color 0.15s ease;
 }
 
-.nav__index {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--ink-index) 55%, var(--meta-text));
-  letter-spacing: 0.04em;
-}
-
 .nav__link:hover,
 .nav__link[aria-current='page'] {
   color: var(--surface-heading);
   border-bottom-color: var(--accent-strong);
-}
-
-.nav__link[aria-current='page'] .nav__index {
-  color: var(--ink-index);
 }
 
 /* The one standing solid-accent element (CO-3 allows fills up to button
@@ -485,6 +450,11 @@ button {
   flex-wrap: wrap;
 }
 
+.site-footer__links {
+  display: inline-flex;
+  gap: 1.1rem;
+}
+
 .site-footer a {
   color: var(--meta-text);
   border-bottom: 1px solid color-mix(in srgb, var(--color-zl-steel) 40%, transparent);
@@ -570,18 +540,17 @@ button {
     color 0.15s ease;
 }
 
-/* Primary, CO-3/CO-5: accent outline + accent ink (maroon on paper, steel on
- * the blackboard); fills only on hover/press (small elements — never banners). */
+/* Primary (CO-11): solid accent fill, the one loud element per view. */
 .btn--primary {
-  color: var(--accent);
-  background: transparent;
-  border: 1.5px solid var(--accent-strong);
+  color: var(--accent-contrast);
+  background: var(--accent);
+  border: 1.5px solid var(--accent);
 }
 
 .btn--primary:hover:not(:disabled),
 .btn--primary:active:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
+  border-color: color-mix(in srgb, var(--accent) 86%, var(--surface-heading));
   color: var(--accent-contrast);
 }
 
@@ -695,9 +664,9 @@ button {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: color-mix(in srgb, var(--ink-index) 78%, var(--meta-text));
+  color: var(--meta-text);
   padding: 0.6rem 0.75rem;
-  border-bottom: 1.5px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .ltable td {
@@ -711,7 +680,7 @@ button {
 }
 
 .ltable tbody tr:hover td {
-  background: color-mix(in srgb, var(--color-zl-cream) 22%, transparent);
+  background: color-mix(in srgb, var(--surface-heading) 3%, transparent);
 }
 
 .ltable__num {
@@ -722,7 +691,7 @@ button {
 }
 
 .row-self {
-  background: color-mix(in srgb, var(--color-zl-steel) 7%, transparent);
+  background: var(--accent-soft);
 }
 
 /* Inputs */
@@ -792,9 +761,33 @@ button {
 .masthead__eyebrow {
   font-size: 0.72rem;
   letter-spacing: 0.14em;
-  border-bottom: 2px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
   padding-bottom: 0.45rem;
   margin-bottom: 1rem;
+}
+
+/* One shared entrance for every board view. Both the global and the
+ * university page render the same component with this class, so the motion
+ * is identical by construction. */
+@keyframes board-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.board-enter {
+  animation: board-enter 0.28s cubic-bezier(0.3, 0.9, 0.4, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-enter {
+    animation: none;
+  }
 }
 
 .masthead__row {
@@ -805,32 +798,34 @@ button {
   flex-wrap: wrap;
 }
 
-/* Duration tabs as large index numerals, not pills (CO-3 §2). */
+/* Duration tabs as a segmented control (CO-11). */
 .index-tabs {
-  display: flex;
-  gap: 1.6rem;
-  align-items: baseline;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--surface-hairline);
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin-bottom: 1.1rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-hairline);
+  border-radius: 12px;
 }
 
 .index-tab {
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   line-height: 1;
-  padding: 0.2rem 0.1rem 0.55rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: 9px;
   color: var(--meta-text);
-  border-bottom: 3px solid transparent;
-  margin-bottom: -1px;
   transition:
     color 0.15s ease,
-    border-color 0.15s ease;
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .index-tab__unit {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  margin-left: 0.1rem;
+  margin-left: 0.05rem;
 }
 
 .index-tab:hover {
@@ -838,8 +833,9 @@ button {
 }
 
 .index-tab[aria-selected='true'] {
-  color: var(--ink-index);
-  border-bottom-color: var(--ink-index);
+  color: var(--surface-heading);
+  background: var(--surface-card);
+  box-shadow: 0 1px 2px var(--surface-shadow);
 }
 
 /* Board + quiet right stat rail (stacks on narrow viewports). */
@@ -1360,6 +1356,216 @@ th.ltable__rank {
 
 .conn__actions {
   padding-top: 0.9rem;
+}
+
+.conn__confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Sign out reads as the page's one deliberate destructive action. */
+.btn--signout {
+  color: var(--color-zl-red);
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--color-zl-red) 45%, transparent);
+  font-size: 0.95rem;
+  padding: 0.65rem 1.6rem;
+}
+
+.btn--signout:hover {
+  background: color-mix(in srgb, var(--color-zl-red) 8%, transparent);
+  border-color: var(--color-zl-red);
+}
+
+/* ── /how-it-works (CO-11) ─────────────────────────────────────────────── */
+.hiw-hero {
+  text-align: center;
+  padding-block: clamp(2rem, 8vw, 4.5rem) clamp(1.5rem, 5vw, 3rem);
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.hiw-hero__title {
+  font-size: clamp(1.9rem, 5.4vw, 3rem);
+  line-height: 1.08;
+}
+
+.hiw-hero__lede {
+  margin: 1.1rem auto 0;
+  max-width: 36rem;
+  color: var(--meta-text);
+  font-size: 1.02rem;
+}
+
+.hiw-hero__actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 1.6rem;
+  flex-wrap: wrap;
+}
+
+.hiw-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-block: 2rem 3rem;
+}
+
+.hiw-step__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  margin-bottom: 0.7rem;
+}
+
+.hiw-step__title {
+  font-size: 1.02rem;
+  margin-bottom: 0.35rem;
+}
+
+.hiw-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: clamp(1.2rem, 4vw, 2.5rem);
+  align-items: center;
+  margin-block: 3rem;
+}
+
+.hiw-h2 {
+  font-size: 1.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.hiw-list {
+  margin: 0.8rem 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* A faithful, theme-following replica of the popup. No screenshots. */
+.hiw-popup {
+  max-width: 320px;
+  justify-self: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hiw-popup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem 0.7rem;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.hiw-popup__wordmark {
+  font-size: 1.05rem;
+  color: var(--ink-wordmark);
+}
+
+.hiw-popup__tag {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--meta-text);
+}
+
+.hiw-popup__body {
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem 1rem 1rem;
+}
+
+.hiw-popup__label {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--meta-text);
+}
+
+.hiw-popup__score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--surface-heading);
+}
+
+.hiw-popup__meta {
+  font-size: 0.75rem;
+}
+
+.hiw-popup__pbs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+.hiw-popup__pb {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.35rem;
+  border-top: 2px solid var(--rule-strong);
+  font-size: 0.72rem;
+}
+
+.hiw-popup__pb .num {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--surface-heading);
+}
+
+.hiw-popup__spark {
+  width: 100%;
+  height: 44px;
+  margin-top: 0.9rem;
+}
+
+.hiw-popup__line {
+  fill: none;
+  stroke: var(--chart-stroke);
+  stroke-opacity: var(--chart-stroke-opacity);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hiw-popup__focus {
+  margin-top: 0.7rem;
+  font-size: 0.75rem;
+}
+
+.hiw-install {
+  margin-block: 2rem 1rem;
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.hiw-ol {
+  margin: 0.9rem 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  color: var(--surface-text);
+}
+
+.hiw-ol a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent-border);
 }
 
 .history-reasons {

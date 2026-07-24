@@ -79,16 +79,17 @@ export function HeaderNav(): React.JSX.Element {
   return (
     <nav className="nav">
       <Link href="/" className="nav__link" aria-current={isActive('/') ? 'page' : undefined}>
-        <span className="nav__index num" aria-hidden="true">
-          01
-        </span>
         Leaderboard
       </Link>
       <Link href="/me" className="nav__link" aria-current={isActive('/me') ? 'page' : undefined}>
-        <span className="nav__index num" aria-hidden="true">
-          02
-        </span>
         My progress
+      </Link>
+      <Link
+        href="/how-it-works"
+        className="nav__link"
+        aria-current={isActive('/how-it-works') ? 'page' : undefined}
+      >
+        How it works
       </Link>
       <AuthChip auth={auth} active={isActive('/account')} />
       <ThemeToggle />

@@ -36,7 +36,7 @@ export function Footer({ linked, onSync, onUnlink }: FooterProps): JSX.Element {
       <button className="zl-sync" type="button" onClick={onSync}>
         Sync to leaderboard
       </button>
-      <p className="zl-footer__note">Local-first — no account needed</p>
+      <p className="zl-footer__note">Works without an account</p>
     </footer>
   );
 }
