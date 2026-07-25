@@ -5,7 +5,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts'],
+      // `*.testkit.ts` files are test-only fixtures (e.g. the faithful Zetamac
+      // generator port), never shipped and never imported by `index.ts`.
+      exclude: ['src/**/*.test.ts', 'src/**/*.testkit.ts'],
       thresholds: {
         branches: 100,
         functions: 100,
