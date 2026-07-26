@@ -178,9 +178,17 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     if (!parsed.success) return err({ reason: 'corrupt-games', detail: parsed.error.message });
     // Backfill verifiedScore for legacy rows: recompute the verified score from
     // the event stream, so every StoredGame the popup reads carries the truth.
+    // A legacy PRUNED row (pruneStoredGames stripped its events before this
+    // field existed) has nothing to recompute from — recomputing [] would
+    // clobber its score to 0 — so its stored claimed score is the best
+    // remaining truth and is used verbatim.
     const games: StoredGame[] = parsed.data.map((game) => ({
       ...game,
-      verifiedScore: game.verifiedScore ?? recomputeScore(game.record.events).score,
+      verifiedScore:
+        game.verifiedScore ??
+        (game.record.events.length === 0
+          ? game.record.claimedScore
+          : recomputeScore(game.record.events).score),
     }));
     return ok(games);
   }
