@@ -64,7 +64,7 @@ export function RecentGames(props: RecentGamesProps): JSX.Element {
             data-status={game.status}
           >
             <span className="zl-num zl-game__score">
-              {game.status === 'capture_failed' ? '—' : game.record.claimedScore}
+              {game.status === 'capture_failed' ? '—' : game.verifiedScore}
             </span>
             <div className="zl-game__body">
               <div className="zl-game__config">{fingerprintLabel(game.record.settings)}</div>
