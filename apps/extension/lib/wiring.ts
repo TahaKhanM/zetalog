@@ -99,21 +99,48 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
 
   let finished = false;
 
-  const onInput = (): void => {
+  // CAPTURE-phase listener on the document, NOT a plain listener on the input.
+  // Zetamac's own `input` handler (registered on the element at page init, so
+  // before this content script's document_idle registration) accepts a correct
+  // answer inside the same dispatch and clears the field synchronously via
+  // jQuery `.val('')` — which fires no further input event. A same-target
+  // listener registered after Zetamac's would therefore read "" on every
+  // ACCEPTING keystroke, corrupting the final snapshot of every problem. The
+  // document-level capture listener runs in the capture phase — strictly before
+  // any target-phase handler regardless of registration order — so the
+  // snapshot always sees the value the player actually typed.
+  const onInput = (event: Event): void => {
+    if (event.target !== answerEl) return;
     recorder.inputChanged(answerEl.value, at());
   };
 
+  // Ordering audit (same hazard class as the input snapshot above): Zetamac
+  // mutates the score text, problem text, and field — all synchronously —
+  // inside its own `input` handler, but MutationObserver callbacks run as a
+  // microtask AFTER that dispatch completes. By then the capture-phase snapshot
+  // above has already recorded the accepting keystroke, so the derived
+  // `accepted` event always FOLLOWS its `input` snapshot in the stream; and
+  // within one callback the score check runs before the problem check, so the
+  // accept also precedes the next `problem`. No ordering fix needed here.
   const observer = new MutationObserver(() => {
     if (finished) return;
     // Score before problem: the accepted event must precede the next problem
     // so the server can recompute the stream in order (spec §5).
     const nextScore = readScore(scoreEl.textContent);
-    if (nextScore !== null && nextScore > lastScore) {
+    const accepted = nextScore !== null && nextScore > lastScore;
+    if (accepted) {
       recorder.scoreIncremented(at());
       lastScore = nextScore;
     }
+    // Record the next problem whenever one is present. A score increment means
+    // Zetamac accepted the answer and advanced to a fresh problem — detect that
+    // via the accept/input-clear cycle, NOT text inequality, because Zetamac
+    // legitimately repeats the same problem text back-to-back (~0.7% of default
+    // 120s games). Gating on `!==` alone would drop the repeat's `problem`
+    // event, leaving its accept an `accepted-without-problem` anomaly and
+    // undercounting the recomputed score by one.
     const nextProblem = problemEl.textContent.trim();
-    if (nextProblem.length > 0 && nextProblem !== lastProblem) {
+    if (nextProblem.length > 0 && (accepted || nextProblem !== lastProblem)) {
       recorder.problemShown(nextProblem, at());
       lastProblem = nextProblem;
     }
@@ -122,7 +149,7 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
 
   function teardown(): void {
     observer.disconnect();
-    answerEl.removeEventListener('input', onInput);
+    doc.removeEventListener('input', onInput, true);
     win.removeEventListener('pagehide', onPageHide);
   }
 
@@ -137,7 +164,7 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
     finish();
   }
 
-  answerEl.addEventListener('input', onInput);
+  doc.addEventListener('input', onInput, true);
   win.addEventListener('pagehide', onPageHide);
   observer.observe(gameRoot, {
     subtree: true,

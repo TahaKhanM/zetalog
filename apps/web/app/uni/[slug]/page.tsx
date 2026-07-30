@@ -2,12 +2,19 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { LeaderboardView } from '@/app/_components/LeaderboardView';
-import { userIdFromCookies } from '@/lib/auth';
-import { getLeaderboard, getUniversityBySlug, getUniversityOptions } from '@/lib/db/queries';
 import { parseDuration } from '@/lib/leaderboard';
-import { createClient } from '@/lib/supabase/server';
+import {
+  getCachedLeaderboard,
+  getCachedUniversityBySlug,
+  getCachedUniversityOptions,
+} from '@/lib/public-board';
 
-export const dynamic = 'force-dynamic';
+/**
+ * Cacheable public render, revalidated every 30s (spec §6). Reads no cookies —
+ * the viewer's own-row highlight is applied client-side after hydration (see
+ * ViewerRowHighlight) — so the board stays a shared, identity-free server render.
+ */
+export const revalidate = 30;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 interface Params {
@@ -16,8 +23,7 @@ interface Params {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
-  const university = await getUniversityBySlug(supabase, slug);
+  const university = await getCachedUniversityBySlug(slug);
   return { title: university?.name ?? 'University leaderboard' };
 }
 
@@ -31,15 +37,13 @@ export default async function UniversityPage({
 }): Promise<React.JSX.Element> {
   const { slug } = await params;
   const duration = parseDuration((await searchParams).d);
-  const supabase = await createClient();
 
-  const university = await getUniversityBySlug(supabase, slug);
+  const university = await getCachedUniversityBySlug(slug);
   if (university === null) notFound();
 
-  const [entries, uniOptions, viewerId] = await Promise.all([
-    getLeaderboard(supabase, { duration, universitySlug: slug }),
-    getUniversityOptions(supabase),
-    userIdFromCookies(supabase),
+  const [entries, uniOptions] = await Promise.all([
+    getCachedLeaderboard(duration, slug),
+    getCachedUniversityOptions(),
   ]);
 
   return (
@@ -50,7 +54,6 @@ export default async function UniversityPage({
       duration={duration}
       uniOptions={uniOptions}
       currentSlug={slug}
-      viewerId={viewerId}
       showBadges={false}
     />
   );
