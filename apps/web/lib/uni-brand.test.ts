@@ -1,10 +1,11 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 import {
   CURATED_BRANDS,
+  CURATED_LOGOS,
   FALLBACK_DUOTONES,
   badgeFor,
   contrastRatio,
@@ -44,9 +45,11 @@ describe('accessibility of the whole badge system', () => {
 });
 
 describe('badgeFor', () => {
-  it('returns the curated brand for a known slug', () => {
-    const badge = badgeFor('university-of-warwick', 'University of Warwick');
-    expect(badge).toEqual(CURATED_BRANDS['university-of-warwick']);
+  it('returns curated colours plus the mapped logo for a fully-curated slug', () => {
+    const badge = badgeFor('university-of-manchester', 'The University of Manchester');
+    expect(badge.bg).toBe(CURATED_BRANDS['university-of-manchester']?.bg);
+    expect(badge.monogram).toBe('M');
+    expect(badge.logo).toBe(CURATED_LOGOS['university-of-manchester']);
   });
 
   it('falls back deterministically for unknown slugs', () => {
@@ -84,5 +87,63 @@ describe('curated map integrity', () => {
     for (const slug of Object.keys(CURATED_BRANDS)) {
       expect(seed, `curated slug not in seed: ${slug}`).toContain(`'${slug}'`);
     }
+  });
+});
+
+describe('curated logos', () => {
+  it('every logo slug exists in the university seed', () => {
+    const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+    for (const slug of Object.keys(CURATED_LOGOS)) {
+      expect(seed, `logo slug not in seed: ${slug}`).toContain(`'${slug}'`);
+    }
+  });
+
+  it('every logo path points at an existing file under public/uni-logos', () => {
+    for (const [slug, logo] of Object.entries(CURATED_LOGOS)) {
+      expect(logo, `${slug}: logo must be served from /uni-logos/`).toMatch(
+        /^\/uni-logos\/[\w.-]+\.(?:png|svg)$/,
+      );
+      const file = join(import.meta.dirname, '../public', logo);
+      expect(existsSync(file), `${slug}: missing asset ${file}`).toBe(true);
+    }
+  });
+
+  it('badgeFor attaches the logo to a mapped slug with curated colours', () => {
+    const badge = badgeFor('university-of-oxford', 'University of Oxford');
+    expect(badge.logo).toBe(CURATED_LOGOS['university-of-oxford']);
+    expect(badge.bg).toBe(CURATED_BRANDS['university-of-oxford']?.bg);
+  });
+
+  it('carries the round-2 collected mark (Edinburgh, vector kept over raster)', () => {
+    expect(CURATED_LOGOS['university-of-edinburgh']).toBe('/uni-logos/university-of-edinburgh.svg');
+  });
+
+  it('carries the six owner-supplied marks (incl. the Nottingham owner override)', () => {
+    for (const [slug, file] of [
+      ['university-of-manchester', 'university-of-manchester.png'],
+      [
+        'king-s-college-london-university-of-london',
+        'king-s-college-london-university-of-london.png',
+      ],
+      ['queen-mary-university-of-london', 'queen-mary-university-of-london.png'],
+      ['university-of-nottingham', 'university-of-nottingham.png'],
+      ['university-of-southampton', 'university-of-southampton.png'],
+      ['cardiff-university', 'cardiff-university.png'],
+    ] as const) {
+      expect(CURATED_LOGOS[slug], slug).toBe(`/uni-logos/${file}`);
+    }
+  });
+
+  it('badgeFor attaches the logo to a mapped slug without a colour entry', () => {
+    const slug = 'university-of-bath';
+    expect(CURATED_BRANDS[slug]).toBeUndefined();
+    const badge = badgeFor(slug, 'University of Bath');
+    expect(badge.logo).toBe(CURATED_LOGOS[slug]);
+    expect(FALLBACK_DUOTONES.map((duotone) => duotone.bg)).toContain(badge.bg);
+    expect(badge.monogram).toBe('B');
+  });
+
+  it('badgeFor returns no logo for unmapped slugs', () => {
+    expect(badgeFor('unknown-college', 'Unknown College').logo).toBeUndefined();
   });
 });
