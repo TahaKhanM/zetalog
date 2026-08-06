@@ -33,7 +33,7 @@ export default async function HomePage({
   return (
     <LeaderboardView
       title="Global leaderboard"
-      subtitle="Personal-best Zetamac scores, recomputed and validated server-side."
+      subtitle="Everyone's best scores from real games — each one checked before it counts."
       entries={entries}
       duration={duration}
       uniOptions={uniOptions}
