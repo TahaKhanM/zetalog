@@ -20,15 +20,19 @@ values
    'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'authenticated', 'authenticated',
    'b@nomatch.example');
 
--- display_name CHECK: valid names accepted ---------------------------------
+-- display_name CHECK (CO-5 handle rule): valid names accepted ---------------
 select lives_ok(
   $$ update public.profiles set display_name = 'abc'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
   'accepts a minimal 3-char name');
 select lives_ok(
-  $$ update public.profiles set display_name = 'al ice_99'
+  $$ update public.profiles set display_name = 'alice_99'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
-  'accepts internal spaces, digits and underscores');
+  'accepts digits and underscores');
+select lives_ok(
+  $$ update public.profiles set display_name = 'abcdefghijklmno'
+      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  'accepts a maximal 15-char name');
 select lives_ok(
   $$ update public.profiles set display_name = null
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
@@ -42,21 +46,17 @@ select throws_ok(
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
   '23514', null, 'rejects names shorter than 3 chars');
 select throws_ok(
-  $$ update public.profiles set display_name = ' abc'
+  $$ update public.profiles set display_name = 'al ice'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
-  '23514', null, 'rejects a leading space');
-select throws_ok(
-  $$ update public.profiles set display_name = 'abc '
-      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
-  '23514', null, 'rejects a trailing space');
+  '23514', null, 'rejects spaces anywhere in the name');
 select throws_ok(
   $$ update public.profiles set display_name = 'bad!name'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
   '23514', null, 'rejects disallowed characters');
 select throws_ok(
-  $$ update public.profiles set display_name = 'abcdefghijklmnopqrstu'
+  $$ update public.profiles set display_name = 'abcdefghijklmnop'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
-  '23514', null, 'rejects names longer than 20 chars');
+  '23514', null, 'rejects names longer than 15 chars');
 
 -- Idempotent uploads: (user_id, client_game_id) is unique per user ---------
 insert into public.games

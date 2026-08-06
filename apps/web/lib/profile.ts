@@ -2,18 +2,20 @@ import { z } from 'zod';
 
 /**
  * Display-name rules, mirroring the `profiles.display_name` CHECK constraint
- * (W2): 3–20 characters drawn from letters, digits, underscore, and spaces,
- * with no leading or trailing space. Uniqueness is enforced by the database
- * (citext unique) and surfaced as a 409 by the profile route.
+ * (W2, tightened by CO-5): 3–15 characters drawn from letters, digits, and
+ * underscore — no spaces, so names read as handles and can never collide on
+ * invisible whitespace. Uniqueness is enforced by the database (citext unique)
+ * and surfaced as a 409 by the profile route. Legacy spaced names remain valid
+ * in the database (the new CHECK is NOT VALID) but cannot be saved anew.
  */
-export const DISPLAY_NAME_PATTERN = /^[A-Za-z0-9_ ]{3,20}$/;
+export const DISPLAY_NAME_PATTERN = /^[A-Za-z0-9_]{3,15}$/;
 
 /** True iff `name` satisfies the display-name constraint. */
 export function isValidDisplayName(name: string): boolean {
-  return DISPLAY_NAME_PATTERN.test(name) && name.trim() === name;
+  return DISPLAY_NAME_PATTERN.test(name);
 }
 
-/** Zod schema for a display name — the trimmed, constraint-satisfying string. */
+/** Zod schema for a display name — the constraint-satisfying handle. */
 export const displayNameSchema = z.string().refine(isValidDisplayName, {
-  message: '3–20 characters: letters, digits, underscores, and spaces (no leading/trailing space).',
+  message: '3–15 characters: letters, digits, and underscores.',
 });

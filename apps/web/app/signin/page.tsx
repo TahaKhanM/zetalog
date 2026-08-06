@@ -38,9 +38,10 @@ export default async function SignInPage({
         <div className="auth-card__mark">
           <BrandMark variant="mark" size={32} />
         </div>
-        <h1 className="display auth-card__title">Sign in</h1>
+        <h1 className="display auth-card__title">Sign in or sign up</h1>
         <p className="meta auth-card__lede">
-          Sync your Zetamac scores to the leaderboard. New here? The same form creates your account.
+          Type your email and we&apos;ll take you to the right place — existing accounts sign in,
+          new ones get created.
         </p>
         {sp.error !== undefined ? (
           <p className="notice" role="alert" style={{ marginBottom: '1rem' }}>
