@@ -17,6 +17,7 @@ describe('proxy config.matcher', () => {
   it('covers exactly the session-bearing routes and no public board', () => {
     expect(config.matcher).toEqual([
       '/me/:path*',
+      '/account/:path*',
       '/admin/:path*',
       '/link/:path*',
       '/verify/:path*',

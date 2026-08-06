@@ -79,6 +79,9 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
                       #
                     </th>
                     <th scope="col">Player</th>
+                    <th className="ltable__games-h" scope="col">
+                      Games
+                    </th>
                     <th className="ltable__score-h" scope="col">
                       Best
                     </th>
@@ -143,6 +146,7 @@ function LeaderboardRow({
           <span className="player__name">{entry.display_name}</span>
         </span>
       </td>
+      <td className="num ltable__games meta">{entry.games_counted}</td>
       <td className="ltable__num ltable__score">{entry.best_score}</td>
     </tr>
   );

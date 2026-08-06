@@ -96,14 +96,9 @@ function AuthChip({ auth }: { auth: AuthState }): React.JSX.Element {
   }
   return (
     <span className="auth-chip">
-      <Link href="/me" className="auth-chip__name">
+      <Link href="/account" className="auth-chip__name" title="Account settings">
         {auth.displayName ?? 'Set a name'}
       </Link>
-      <form action="/auth/signout" method="post">
-        <button type="submit" className="auth-chip__signout">
-          Sign out
-        </button>
-      </form>
     </span>
   );
 }
