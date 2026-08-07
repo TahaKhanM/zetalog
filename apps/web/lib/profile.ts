@@ -5,8 +5,8 @@ import { z } from 'zod';
  * (W2, tightened by CO-5): 3–15 characters drawn from letters, digits, and
  * underscore — no spaces, so names read as handles and can never collide on
  * invisible whitespace. Uniqueness is enforced by the database (citext unique)
- * and surfaced as a 409 by the profile route. Legacy spaced names remain valid
- * in the database (the new CHECK is NOT VALID) but cannot be saved anew.
+ * and surfaced as a 409 by the profile route. Legacy spaced names were
+ * conformed by the CO-6 backfill migration, so the CHECK is fully validated.
  */
 export const DISPLAY_NAME_PATTERN = /^[A-Za-z0-9_]{3,15}$/;
 

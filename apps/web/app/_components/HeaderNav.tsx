@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 
 import { createClient } from '@/lib/supabase/browser';
 
+import { Avatar } from './Avatar';
+
 /**
  * Header nav + auth chip. Client-side on purpose: it reads the session in an
  * effect (never during render), so the root layout stays static-safe and the
@@ -17,10 +19,14 @@ import { createClient } from '@/lib/supabase/browser';
 type AuthState =
   | { readonly status: 'loading' }
   | { readonly status: 'signed-out' }
-  | { readonly status: 'signed-in'; readonly displayName: string | null };
+  | {
+      readonly status: 'signed-in';
+      readonly displayName: string | null;
+      readonly avatarUrl: string | null;
+    };
 
-function displayNameOf(row: Record<string, unknown> | null): string | null {
-  const value = row?.display_name;
+function stringOf(row: Record<string, unknown> | null, key: string): string | null {
+  const value = row?.[key];
   return typeof value === 'string' ? value : null;
 }
 
@@ -37,10 +43,16 @@ export function HeaderNav(): React.JSX.Element {
     async function loadProfile(userId: string): Promise<void> {
       const { data } = await supabase
         .from('profiles')
-        .select('display_name')
+        .select('display_name, avatar_url')
         .eq('id', userId)
         .maybeSingle();
-      if (active) setAuth({ status: 'signed-in', displayName: displayNameOf(data) });
+      if (active) {
+        setAuth({
+          status: 'signed-in',
+          displayName: stringOf(data, 'display_name'),
+          avatarUrl: stringOf(data, 'avatar_url'),
+        });
+      }
     }
 
     async function init(): Promise<void> {
@@ -73,13 +85,13 @@ export function HeaderNav(): React.JSX.Element {
 
   return (
     <nav className="nav">
-      <Link href="/" aria-current={isActive('/') ? 'page' : undefined}>
+      <Link href="/" className="nav__link" aria-current={isActive('/') ? 'page' : undefined}>
         <span className="nav__index num" aria-hidden="true">
           01
         </span>
         Leaderboard
       </Link>
-      <Link href="/me" aria-current={isActive('/me') ? 'page' : undefined}>
+      <Link href="/me" className="nav__link" aria-current={isActive('/me') ? 'page' : undefined}>
         <span className="nav__index num" aria-hidden="true">
           02
         </span>
@@ -102,16 +114,13 @@ function AuthChip({ auth, active }: { auth: AuthState; active: boolean }): React
     );
   }
   const name = auth.displayName ?? 'Set a name';
-  const initial = (auth.displayName ?? '?').charAt(0).toUpperCase();
   return (
     <Link
       href="/account"
       className={`auth-chip${active ? ' auth-chip--active' : ''}`}
       title="Account settings"
     >
-      <span className="auth-chip__avatar num" aria-hidden="true">
-        {initial}
-      </span>
+      <Avatar url={auth.avatarUrl} name={auth.displayName ?? '?'} size={26} />
       <span className="auth-chip__name">{name}</span>
     </Link>
   );
