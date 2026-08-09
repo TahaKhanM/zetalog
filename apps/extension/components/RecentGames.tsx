@@ -13,6 +13,7 @@ interface RecentGamesProps {
 
 /** A short status/quarantine flag, or null for a plain kept game. */
 function flagLabel(game: StoredGame): string | null {
+  if (game.telemetryPruned === true) return 'Archived locally';
   if (game.quarantineReason === 'restart') return 'Restart';
   if (game.quarantineReason === 'outlier') return 'Outlier';
   if (game.status === 'capture_failed') return 'Capture failed';
@@ -35,6 +36,8 @@ export function syncTag(
       return { label: 'Under review', tone: 'ok' };
     case 'rejected':
       return { label: 'Rejected', tone: 'fail' };
+    case 'user_removed':
+      return { label: 'Removed', tone: 'muted' };
     default:
       return { label: 'Synced', tone: 'ok' };
   }
@@ -55,7 +58,10 @@ export function RecentGames(props: RecentGamesProps): JSX.Element {
         const inactive = game.status !== 'kept';
         const flag = flagLabel(game);
         const tag = syncTag(game);
-        const showRestore = game.status === 'quarantined' || game.status === 'removed';
+        const serverModerated =
+          game.sync?.outcome === 'quarantined' || game.sync?.outcome === 'rejected';
+        const showRestore =
+          game.status === 'removed' || (game.status === 'quarantined' && !serverModerated);
         const showRemove = game.status !== 'removed';
         return (
           <div

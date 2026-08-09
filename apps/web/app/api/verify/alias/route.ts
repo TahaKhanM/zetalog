@@ -16,21 +16,8 @@ export async function DELETE(): Promise<Response> {
   return handleAliasDelete({
     authenticate: async () => userIdFromCookies(await createClient()),
     removeAlias: async (userId) => {
-      const verifications = await service
-        .from('uni_verifications')
-        .delete()
-        .eq('user_id', userId)
-        .not('verified_at', 'is', null);
-      if (verifications.error !== null) {
-        throw new Error(`removeAlias(verifications): ${verifications.error.message}`);
-      }
-      const profile = await service
-        .from('profiles')
-        .update({ university_id: null, uni_verified_at: null })
-        .eq('id', userId);
-      if (profile.error !== null) {
-        throw new Error(`removeAlias(profile): ${profile.error.message}`);
-      }
+      const { error } = await service.rpc('remove_verified_alias', { p_user_id: userId });
+      if (error !== null) throw new Error(`remove_verified_alias: ${error.message}`);
     },
   });
 }

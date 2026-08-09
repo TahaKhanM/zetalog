@@ -1,4 +1,4 @@
-import { apiError, apiJson } from '@/lib/http';
+import { apiError, apiJson, readJsonBody } from '@/lib/http';
 import { displayNameSchema } from '@/lib/profile';
 import { z } from 'zod';
 
@@ -32,9 +32,6 @@ const bodySchema = z
     { message: 'Nothing to change.' },
   );
 
-/** The result of attempting to persist a display name. */
-export type SetNameResult = 'ok' | 'taken';
-
 /** The profile flags the account page and the extension popup read back. */
 export interface ProfileView {
   readonly displayName: string | null;
@@ -45,9 +42,15 @@ export interface ProfileView {
 /** Injected dependencies for the POST handler. */
 export interface ProfilePostDeps {
   authenticate: () => Promise<string | null>;
-  setDisplayName: (userId: string, displayName: string) => Promise<SetNameResult>;
-  setIndependent: (userId: string, independent: boolean) => Promise<void>;
-  setLeaderboardOptOut: (userId: string, optOut: boolean) => Promise<void>;
+  /** Persist all requested fields in one database transaction. */
+  updateProfile: (
+    userId: string,
+    changes: {
+      displayName?: string | undefined;
+      independent?: boolean | undefined;
+      leaderboardOptOut?: boolean | undefined;
+    },
+  ) => Promise<'ok' | 'taken'>;
 }
 
 /** Injected dependencies for the GET handler. */
@@ -77,13 +80,14 @@ export async function handleProfilePost(
     return apiError(401, 'unauthorized', 'Sign in to change your profile.', CORS_HEADERS);
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Request body is too large.', CORS_HEADERS);
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.', CORS_HEADERS);
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(
       400,
@@ -93,17 +97,9 @@ export async function handleProfilePost(
     );
   }
 
-  if (parsed.data.displayName !== undefined) {
-    const result = await deps.setDisplayName(userId, parsed.data.displayName);
-    if (result === 'taken') {
-      return apiError(409, 'name-taken', 'That display name is already taken.', CORS_HEADERS);
-    }
-  }
-  if (parsed.data.independent !== undefined) {
-    await deps.setIndependent(userId, parsed.data.independent);
-  }
-  if (parsed.data.leaderboardOptOut !== undefined) {
-    await deps.setLeaderboardOptOut(userId, parsed.data.leaderboardOptOut);
+  const result = await deps.updateProfile(userId, parsed.data);
+  if (result === 'taken') {
+    return apiError(409, 'name-taken', 'That display name is already taken.', CORS_HEADERS);
   }
   return apiJson(200, { ok: true, ...parsed.data }, CORS_HEADERS);
 }

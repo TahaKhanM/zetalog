@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Link the extension' };
 
 /**
- * `/link` — the extension opens this to link an account. Signed-out users see
- * the sign-in form (returning here); signed-in users see the handoff state that
- * the extension picks up (its internals live in LinkHandoff).
+ * `/link` — the extension opens this explicit user-gesture page. The extension
+ * owns every OAuth/PKCE value and starts the authorization flow only after the
+ * trusted click exposed by LinkHandoff.
  */
 export default async function LinkPage(): Promise<React.JSX.Element> {
   const supabase = await createClient();

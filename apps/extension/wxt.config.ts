@@ -5,10 +5,15 @@ export default defineConfig({
   manifest: {
     name: 'ZetaLog',
     description: 'Track your Zetamac scores and compare them on a worldwide leaderboard.',
-    // `alarms` powers the background sync-retry drain (exponential backoff); the
+    // `launchWebAuthFlow` keeps an MV3 worker alive reliably from Chrome 116.
+    minimum_chrome_version: '116',
+    // `alarms` powers retry drains; `unlimitedStorage` prevents legitimate
+    // offline telemetry from hitting Chrome's 10 MB local quota (it carries no
+    // permission warning); `identity` owns the browser redirect and likewise
+    // carries no install warning. The
     // content-script origins (Zetamac + the /link pages) are declared per
     // entrypoint, so no host_permissions are needed.
-    permissions: ['storage', 'alarms'],
+    permissions: ['storage', 'alarms', 'unlimitedStorage', 'identity'],
     icons: {
       16: '/icon-16.png',
       32: '/icon-32.png',
@@ -19,7 +24,7 @@ export default defineConfig({
   },
   hooks: {
     // The link content script declares a localhost match so the account-link
-    // handoff is testable against a local web app (`wxt dev` / `wxt build
+    // button is testable against a local web app (`wxt dev` / `wxt build
     // --mode development`). The PUBLISHED build must ship only the production
     // origin, so every localhost match is stripped from the generated manifest
     // outside development mode.

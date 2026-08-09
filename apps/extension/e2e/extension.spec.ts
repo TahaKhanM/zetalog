@@ -1,6 +1,8 @@
-import { execSync } from 'node:child_process';
-import { createServer, type Server } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { execFileSync, execSync } from 'node:child_process';
+import { type Server } from 'node:http';
+import { createServer } from 'node:https';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,7 +21,7 @@ import {
  * through the actual popup.
  *
  * How the content script fires against the replica: the Zetamac content script
- * matches `*://arithmetic.zetamac.com/*`, so we launch Chromium with
+ * matches `https://arithmetic.zetamac.com/*`, so we launch Chromium with
  * `--host-resolver-rules="MAP arithmetic.zetamac.com 127.0.0.1:<port>"`. The
  * browser keeps the real hostname in the URL (the match pattern fires) but
  * resolves it to our local replica server — no live network, no Docker.
@@ -27,23 +29,52 @@ import {
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extensionRoot = path.resolve(dirname, '..');
-const extensionOutput = path.join(extensionRoot, '.output', 'chrome-mv3');
+// Release CI points this at the directory extracted from the final ZIP. Local
+// runs leave it unset and exercise a fresh WXT build in the normal output dir.
+const suppliedExtensionOutput = process.env.ZL_EXTENSION_OUTPUT;
+const extensionOutput =
+  suppliedExtensionOutput === undefined
+    ? path.join(extensionRoot, '.output', 'chrome-mv3')
+    : path.resolve(suppliedExtensionOutput);
 const replicaDir = path.join(extensionRoot, 'test', 'replica');
 
-const GAME_URL = 'http://arithmetic.zetamac.com/game';
+const GAME_URL = 'https://arithmetic.zetamac.com/game';
+const ABORT_GAME_URL = `${GAME_URL}?duration=10`;
 
 let server: Server;
 let context: BrowserContext;
 let extensionId: string;
+let tlsDir: string;
 
 /** Serve the offline replica; `/game*` -> game.html, plus its module + css. */
-function startReplica(): Promise<{ server: Server; port: number }> {
+async function startReplica(): Promise<{ server: Server; port: number }> {
+  tlsDir = await mkdtemp(path.join(tmpdir(), 'zetalog-extension-e2e-'));
+  const keyPath = path.join(tlsDir, 'key.pem');
+  const certPath = path.join(tlsDir, 'cert.pem');
+  execFileSync('openssl', [
+    'req',
+    '-x509',
+    '-newkey',
+    'rsa:2048',
+    '-nodes',
+    '-keyout',
+    keyPath,
+    '-out',
+    certPath,
+    '-days',
+    '1',
+    '-subj',
+    '/CN=arithmetic.zetamac.com',
+  ]);
+  const [key, cert] = await Promise.all([readFile(keyPath), readFile(certPath)]);
   const routes: Record<string, { file: string; type: string }> = {
     '/dist/app.js': { file: 'app.js', type: 'text/javascript' },
     '/app.css': { file: 'app.css', type: 'text/css' },
+    '/left': { file: 'left.html', type: 'text/html' },
   };
-  const srv = createServer((req, res) => {
-    const pathname = new URL(req.url ?? '/', 'http://replica').pathname;
+  const srv = createServer({ key, cert }, (req, res) => {
+    const requestUrl = new URL(req.url ?? '/', 'http://replica');
+    const pathname = requestUrl.pathname;
     const route =
       routes[pathname] ??
       (pathname.startsWith('/game') ? { file: 'game.html', type: 'text/html' } : null);
@@ -54,8 +85,15 @@ function startReplica(): Promise<{ server: Server; port: number }> {
     }
     readFile(path.join(replicaDir, route.file))
       .then((body) => {
+        // Completed-game coverage stays fast at two seconds. The navigation
+        // case gets a ten-second settings fixture so CI slowness cannot let it
+        // accidentally cross the 80% completion threshold and become kept.
+        const responseBody =
+          route.file === 'game.html' && requestUrl.searchParams.get('duration') === '10'
+            ? Buffer.from(body.toString('utf8').replace('"duration":2', '"duration":10'))
+            : body;
         res.writeHead(200, { 'content-type': route.type });
-        res.end(body);
+        res.end(responseBody);
       })
       .catch(() => {
         res.writeHead(500);
@@ -120,22 +158,26 @@ async function playCompleted(page: Page, answers: number): Promise<void> {
 
 /** Play then abort mid-game (a restart-quarantined game). */
 async function playAborted(page: Page): Promise<void> {
-  await page.goto(GAME_URL);
+  await page.goto(ABORT_GAME_URL);
   await waitForGame(page);
+  // A real player necessarily spends time reading the first problem. Give a
+  // newly launched test browser the same brief window to finish the extension's
+  // cold content-script/background handshake; the navigation remains immediate
+  // after the accepted answer, which is the durability boundary under test.
+  await page.waitForTimeout(250);
   await answer(page, 1);
-  // Abort well before 80% of the 2s duration -> the recorder's pagehide path
-  // finishes the game with a short playedMs -> restart quarantine. Dispatching
-  // the event (rather than navigating) keeps the page alive so the async
-  // storage write completes deterministically.
-  await page.evaluate(() => {
-    window.dispatchEvent(new Event('pagehide'));
-  });
+  // Abort well before 80% of the 2s duration. This is a real navigation: the
+  // content context disappears while the background worker owns persistence.
+  await page.goto('https://arithmetic.zetamac.com/left');
   await page.waitForTimeout(250);
 }
 
 test.beforeAll(async () => {
-  // Build the extension fresh so the e2e always runs the current code.
-  execSync('pnpm build', { cwd: extensionRoot, stdio: 'inherit' });
+  // A normal run builds current source. Release CI deliberately skips this and
+  // loads the directory extracted from the immutable ZIP it will publish.
+  if (suppliedExtensionOutput === undefined) {
+    execSync('pnpm build', { cwd: extensionRoot, stdio: 'inherit' });
+  }
 
   const started = await startReplica();
   server = started.server;
@@ -146,14 +188,12 @@ test.beforeAll(async () => {
   // old `--headless`), which loads the extension and starts its worker.
   context = await chromium.launchPersistentContext('', {
     headless: false,
+    ignoreHTTPSErrors: true,
     args: [
       '--headless=new',
       `--disable-extensions-except=${extensionOutput}`,
       `--load-extension=${extensionOutput}`,
       `--host-resolver-rules=MAP arithmetic.zetamac.com 127.0.0.1:${String(started.port)}`,
-      // The real site is HTTPS (a secure context, so `crypto.randomUUID` works);
-      // our http replica is not, so mark its origin secure to match production.
-      '--unsafely-treat-insecure-origin-as-secure=http://arithmetic.zetamac.com',
     ],
   });
 
@@ -170,6 +210,7 @@ test.afterAll(async () => {
       resolve();
     }),
   );
+  await rm(tlsDir, { recursive: true, force: true });
 });
 
 test('records games from the replica and reflects them in the popup', async () => {

@@ -3,12 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { IdentifierMatch } from '@/lib/auth-modes';
 import { sha256Hex } from '@/lib/hash';
-import {
-  EMAIL_DAILY_CAP,
-  MAX_REQUESTS_PER_HOUR,
-  handleVerifyRequest,
-  type VerifyRequestDeps,
-} from './handler';
+import { handleVerifyRequest, type VerifyRequestDeps } from './handler';
 
 const NOW = 1_700_000_000_000;
 
@@ -36,9 +31,13 @@ function deps(over: Partial<VerifyRequestDeps> = {}): VerifyRequestDeps {
     authenticate: vi.fn(async () => Promise.resolve('user-1')),
     listUniversities: vi.fn(async () => Promise.resolve([{ id: 'ox', domains: ['ox.ac.uk'] }])),
     resolveIdentifier: vi.fn(async () => Promise.resolve<IdentifierMatch | null>(null)),
-    countRequestsForEmail: vi.fn(async () => Promise.resolve(0)),
-    countEmailsSince: vi.fn(async () => Promise.resolve(0)),
-    createVerification: vi.fn(async () => Promise.resolve()),
+    reserveVerification: vi.fn(async () =>
+      Promise.resolve({
+        status: 'reserved' as const,
+        verificationId: '11111111-1111-4111-8111-111111111111',
+      }),
+    ),
+    recordDelivery: vi.fn(async () => Promise.resolve()),
     sendCode: vi.fn(async () => Promise.resolve(ok({ id: 'email-1' }))),
     random: () => 424242,
     now: () => NOW,
@@ -69,7 +68,11 @@ describe('POST /api/verify/request', () => {
   it('rate-limits after 3 requests to one address in an hour', async () => {
     const response = await handleVerifyRequest(
       request({ email: 'a@ox.ac.uk' }),
-      deps({ countRequestsForEmail: vi.fn(async () => Promise.resolve(MAX_REQUESTS_PER_HOUR)) }),
+      deps({
+        reserveVerification: vi.fn(async () =>
+          Promise.resolve({ status: 'rate-limited' as const }),
+        ),
+      }),
     );
     expect(response.status).toBe(429);
   });
@@ -77,25 +80,39 @@ describe('POST /api/verify/request', () => {
   it('refuses with 503 capacity when the daily email cap is reached', async () => {
     const response = await handleVerifyRequest(
       request({ email: 'a@ox.ac.uk' }),
-      deps({ countEmailsSince: vi.fn(async () => Promise.resolve(EMAIL_DAILY_CAP)) }),
+      deps({
+        reserveVerification: vi.fn(async () => Promise.resolve({ status: 'capacity' as const })),
+      }),
     );
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ error: { code: 'capacity' } });
   });
 
-  it('returns 502 and stores nothing when the send fails', async () => {
-    const createVerification = vi.fn(async () => Promise.resolve());
+  it('returns 502 after reserving a durable failed-delivery record when the send fails', async () => {
+    const reserveVerification = vi.fn(async () =>
+      Promise.resolve({
+        status: 'reserved' as const,
+        verificationId: '11111111-1111-4111-8111-111111111111',
+      }),
+    );
+    const recordDelivery = vi.fn(async () => Promise.resolve());
     const response = await handleVerifyRequest(
       request({ email: 'a@ox.ac.uk' }),
       deps({
-        createVerification,
+        reserveVerification,
+        recordDelivery,
         sendCode: vi.fn(async () =>
           Promise.resolve(err({ code: 'send-failed' as const, message: 'x' })),
         ),
       }),
     );
     expect(response.status).toBe(502);
-    expect(createVerification).not.toHaveBeenCalled();
+    expect(reserveVerification).toHaveBeenCalledTimes(1);
+    expect(recordDelivery).toHaveBeenCalledWith({
+      verificationId: '11111111-1111-4111-8111-111111111111',
+      sent: false,
+      error: 'x',
+    });
   });
 
   it("returns 409 when the address is another account's primary email", async () => {
@@ -153,21 +170,43 @@ describe('POST /api/verify/request', () => {
     expect(resolveIdentifier).not.toHaveBeenCalled();
   });
 
-  it('sends the code and stores only its hash on success', async () => {
+  it('reserves before sending and persists delivery state on success', async () => {
     const sendCode = vi.fn(async () => Promise.resolve(ok({ id: 'email-1' })));
-    const createVerification = vi.fn(async () => Promise.resolve());
+    const reserveVerification = vi.fn(async () =>
+      Promise.resolve({
+        status: 'reserved' as const,
+        verificationId: '11111111-1111-4111-8111-111111111111',
+      }),
+    );
+    const recordDelivery = vi.fn(async () => Promise.resolve());
     const response = await handleVerifyRequest(
       request({ email: 'Student@OX.AC.UK' }),
-      deps({ sendCode, createVerification }),
+      deps({ sendCode, reserveVerification, recordDelivery }),
     );
     expect(response.status).toBe(200);
     // 424242 → zero-padded already; sent to the lowercased address.
     expect(sendCode).toHaveBeenCalledWith('student@ox.ac.uk', '424242');
-    expect(createVerification).toHaveBeenCalledWith({
+    expect(reserveVerification).toHaveBeenCalledWith({
       userId: 'user-1',
       email: 'student@ox.ac.uk',
       codeHash: sha256Hex('424242'),
       expiresAtMs: NOW + 15 * 60 * 1000,
     });
+    expect(recordDelivery).toHaveBeenCalledWith({
+      verificationId: '11111111-1111-4111-8111-111111111111',
+      sent: true,
+    });
+  });
+
+  it('does not report a delivered email as failed when the delivery audit write fails', async () => {
+    const sendCode = vi.fn(async () => Promise.resolve(ok({ id: 'email-1' })));
+    const response = await handleVerifyRequest(
+      request({ email: 'student@ox.ac.uk' }),
+      deps({
+        sendCode,
+        recordDelivery: vi.fn(async () => Promise.reject(new Error('database down'))),
+      }),
+    );
+    expect(response.status).toBe(200);
   });
 });

@@ -1,4 +1,10 @@
-import type { GameEvent, GameRecord, ZetamacSettings } from '@zetalog/shared';
+import {
+  MAX_GAME_EVENTS,
+  MAX_PROBLEM_TEXT_LENGTH,
+  type GameEvent,
+  type GameRecord,
+  type ZetamacSettings,
+} from '@zetalog/shared';
 
 /** Maximum characters stored per input snapshot — matches `gameEventSchema` (`value.max(12)`). */
 const MAX_INPUT_LENGTH = 12;
@@ -28,6 +34,8 @@ export interface Recorder {
   inputChanged(value: string, at: number): void;
   /** Zetamac auto-advanced: the running score went up. Emits `accepted` for the last input. */
   scoreIncremented(at: number): void;
+  /** Non-destructive partial record used for navigation-safe checkpoints. */
+  snapshot(at: number): GameRecord;
   /** End the game and produce the record. `playedMs` is the elapsed time passed here. */
   finish(at: number): GameRecord;
 }
@@ -44,28 +52,34 @@ export function createRecorder(deps: RecorderDeps): Recorder {
   let lastInputValue = '';
   let claimedScore = 0;
 
+  const snapshot = (at: number): GameRecord => ({
+    id: deps.id,
+    startedAtMs: deps.startedAtMs,
+    playedMs: at,
+    settings: deps.settings,
+    events: [...events],
+    claimedScore,
+  });
+
   return {
     problemShown(text, at) {
-      events.push({ kind: 'problem', at, text });
+      if (events.length >= MAX_GAME_EVENTS) return;
+      events.push({ kind: 'problem', at, text: text.slice(0, MAX_PROBLEM_TEXT_LENGTH) });
     },
     inputChanged(value, at) {
+      if (events.length >= MAX_GAME_EVENTS) return;
       const capped = value.length > MAX_INPUT_LENGTH ? value.slice(0, MAX_INPUT_LENGTH) : value;
       lastInputValue = capped;
       events.push({ kind: 'input', at, value: capped });
     },
     scoreIncremented(at) {
+      if (events.length >= MAX_GAME_EVENTS) return;
       claimedScore += 1;
       events.push({ kind: 'accepted', at, answer: toAnswer(lastInputValue) });
     },
+    snapshot,
     finish(at) {
-      return {
-        id: deps.id,
-        startedAtMs: deps.startedAtMs,
-        playedMs: at,
-        settings: deps.settings,
-        events: [...events],
-        claimedScore,
-      };
+      return snapshot(at);
     },
   };
 }

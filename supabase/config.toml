@@ -92,8 +92,6 @@ port = 54323
 # External URL of the API server that frontend connects to.
 api_url = "http://127.0.0.1"
 
-
-
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
 [inbucket]
@@ -144,8 +142,7 @@ enabled = false
 max_buckets = 10
 max_indexes = 5
 
-# Vector Buckets is available to Supabase Pro plan.
-
+# Vector Buckets are available on hosted plans.
 
 [auth]
 enabled = true
@@ -174,9 +171,9 @@ enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-# W8: mirrors the app's password policy (lib/password.ts) and the hosted
-# dashboard setting — keep all three in step.
-minimum_password_length = 8
+# Mirrors the app's password policy (lib/password.ts) and the hosted dashboard
+# setting. Keep all three in step.
+minimum_password_length = 10
 # Passwords that do not meet the following requirements will be rejected as weak. Supported values
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
 password_requirements = ""
@@ -193,8 +190,8 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-# W8: raised for the full-stack e2e — sign-up/recovery runs send real (Mailpit)
-# emails and 2/hour starves repeated local runs. Local stack only.
+# Raised for full-stack tests: sign-up and recovery send real messages to
+# Mailpit, and the production-like default starves repeated local runs.
 email_sent = 30
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
@@ -222,8 +219,8 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-# W8: enabled to mirror production — sign-up requires the emailed code
-# (verifyOtp type 'signup') before a session exists.
+# Mirrors production: sign-up requires the emailed code (`verifyOtp` with type
+# `signup`) before a session exists.
 enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
@@ -249,9 +246,9 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
-# W8: local GoTrue renders the SAME branded, code-only templates the owner
-# pastes into the hosted dashboard. Files are generated from
-# apps/web/lib/email/template.ts and byte-sync-tested — edit there, not here.
+# Local GoTrue renders the same branded, code-only templates used by the hosted
+# project. Files are generated from apps/web/lib/email/template.ts and
+# byte-sync-tested; edit the source module rather than these paths.
 [auth.email.template.magic_link]
 subject = "Your ZetaLog sign-in code: {{ .Token }}"
 content_path = "./supabase/templates/magic_link.html"

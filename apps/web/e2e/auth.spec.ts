@@ -1,4 +1,5 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process';
+import { request as httpRequest } from 'node:http';
 import path from 'node:path';
 
 import { expect, test, type Page } from '@playwright/test';
@@ -61,6 +62,35 @@ async function poll(url: string, timeoutMs: number): Promise<void> {
     if (Date.now() > deadline) throw new Error(`timed out waiting for ${url}`);
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
+}
+
+/** Node fetch does not reliably forward a caller-supplied Host header. */
+async function requestAsApex(pathname: string): Promise<{
+  readonly statusCode: number | undefined;
+  readonly location: string | undefined;
+}> {
+  return await new Promise((resolve, reject) => {
+    const request = httpRequest(
+      {
+        hostname: '127.0.0.1',
+        port: WEB_PORT,
+        path: pathname,
+        headers: { host: 'zetalog.co.uk', 'x-forwarded-proto': 'https' },
+      },
+      (response) => {
+        response.resume();
+        response.once('end', () => {
+          const location = response.headers.location;
+          resolve({
+            statusCode: response.statusCode,
+            location,
+          });
+        });
+      },
+    );
+    request.once('error', reject);
+    request.end();
+  });
 }
 
 /**
@@ -146,16 +176,22 @@ test.describe('auth flows', () => {
     }
   });
 
+  test('redirects the apex host to the canonical HTTPS host without losing the URL', async () => {
+    const response = await requestAsApex('/how-it-works?source=apex-test');
+    expect(response.statusCode).toBe(308);
+    expect(response.location).toBe('https://www.zetalog.co.uk/how-it-works?source=apex-test');
+  });
+
   test('sign-up asks for a code once; sign-in is email + password only', async ({ browser }) => {
     const suffix = Math.random().toString(36).slice(2, 8);
-    const email = `w8_signup_${suffix}@example.com`;
+    const email = `e2e_signup_${suffix}@example.com`;
     const password = `Marble9 kettle ${suffix}`;
 
     // Sign-up through the real form: email → password + confirm → code.
     const context = await browser.newContext();
     const page = await context.newPage();
     await continueWithEmail(page, email);
-    await expect(page.getByText('New account for')).toBeVisible();
+    await expect(page.getByText('Create your account')).toBeVisible();
     await page.getByLabel('Password', { exact: true }).fill(password);
     await page.getByLabel('Confirm password').fill(password);
     await page.getByRole('button', { name: 'Create account' }).click();
@@ -166,9 +202,10 @@ test.describe('auth flows', () => {
     await page.getByLabel('Sign-up code').fill(code);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
-    // Session established → display-name onboarding on /me (no bounce).
+    // Session established → /me renders and points new users to account setup.
     await page.waitForURL(`${WEB_URL}/me`);
-    await expect(page.getByLabel('Display name')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'My progress' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Account settings', exact: true })).toBeVisible();
     await context.close();
 
     // A FRESH browser signs in with email + password — no code anywhere.
@@ -184,7 +221,7 @@ test.describe('auth flows', () => {
     const response = await freshPage.goto(`${WEB_URL}/me`, { waitUntil: 'domcontentloaded' });
     expect(response?.status()).toBe(200);
     await expect(freshPage).toHaveURL(`${WEB_URL}/me`);
-    await expect(freshPage.getByLabel('Display name')).toBeVisible();
+    await expect(freshPage.getByRole('heading', { name: 'My progress' })).toBeVisible();
     await fresh.close();
   });
 
@@ -192,11 +229,11 @@ test.describe('auth flows', () => {
     browser,
   }) => {
     const suffix = Math.random().toString(36).slice(2, 8);
-    const email = `w8_alias_${suffix}@example.com`;
-    const alias = `w8_alias_${suffix}@dur.ac.uk`;
+    const email = `e2e_alias_${suffix}@example.com`;
+    const alias = `e2e_alias_${suffix}@dur.ac.uk`;
     // The bystander's PRIMARY email is on a uni domain — the address user A
     // must not be able to claim as a badge/alias.
-    const foreignPrimary = `w8_other_${suffix}@dur.ac.uk`;
+    const foreignPrimary = `e2e_other_${suffix}@dur.ac.uk`;
     const password = `Kettle drums ${suffix}`;
     const user = await createConfirmedUser(sb, email, password);
     await createConfirmedUser(sb, foreignPrimary, password);
@@ -253,7 +290,7 @@ test.describe('auth flows', () => {
 
   test('wrong-password and unknown-identifier are byte-identical', async () => {
     const suffix = Math.random().toString(36).slice(2, 8);
-    const email = `w8_parity_${suffix}@example.com`;
+    const email = `e2e_parity_${suffix}@example.com`;
     await createConfirmedUser(sb, email, `Parity pass ${suffix}`);
 
     const attempt = async (identifier: string): Promise<{ status: number; body: string }> => {
@@ -266,7 +303,7 @@ test.describe('auth flows', () => {
     };
 
     const wrongPassword = await attempt(email);
-    const unknownIdentifier = await attempt(`w8_ghost_${suffix}@example.com`);
+    const unknownIdentifier = await attempt(`e2e_ghost_${suffix}@example.com`);
     expect(wrongPassword.status).toBe(401);
     expect(unknownIdentifier.status).toBe(401);
     expect(wrongPassword.body).toBe(unknownIdentifier.body);

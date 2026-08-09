@@ -2,7 +2,7 @@ import { err, ok, type GameRecord, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
 import { type FetchLike } from './auth.js';
-import { WEB_APP_URL } from './config.js';
+import { WEB_APP_URL } from './endpoints.js';
 
 /** The subset of `GET /api/profile` the extension reads (extra fields ignored). */
 export const profileViewSchema = z.object({ leaderboardOptOut: z.boolean() });
@@ -39,6 +39,11 @@ export const remoteGameSchema = z.object({
   status: submitOutcomeSchema,
 });
 export type RemoteGame = z.infer<typeof remoteGameSchema>;
+export const gameChallengeSchema = z.object({
+  challengeId: z.uuid(),
+  nonce: z.string().min(16).max(128),
+});
+export type GameChallenge = z.infer<typeof gameChallengeSchema>;
 
 const listGamesResponseSchema = z.object({ games: z.array(remoteGameSchema) });
 
@@ -74,6 +79,13 @@ export interface ApiDeps {
 export interface ApiClient {
   submitGame(record: GameRecord): Promise<Result<SubmitSuccess, ApiError>>;
   revokeGame(clientGameId: string): Promise<Result<null, ApiError>>;
+  restoreGame(clientGameId: string): Promise<Result<SubmitSuccess, ApiError>>;
+  /** Transparent online binding; capture proceeds normally if this fails. */
+  startChallenge(): Promise<Result<GameChallenge, ApiError>>;
+  /** Revoke the active installation credential during an online unlink. */
+  revokeSession(): Promise<Result<null, ApiError>>;
+  /** Revoke a retained credential after local Unlink has already completed. */
+  revokeCredential(token: string): Promise<Result<null, ApiError>>;
   /** The caller's own leaderboard-privacy state (defaults to visible if no row yet). */
   getProfile(): Promise<Result<ProfileView, ApiError>>;
   /** Set the leaderboard opt-out (true keeps the account off the public boards). */
@@ -137,6 +149,20 @@ export function createApiClient(deps: ApiDeps): ApiClient {
     return second;
   }
 
+  /**
+   * Revoke a supplied opaque installation credential without consulting the
+   * active auth controller. This is what makes post-unlink retries possible.
+   */
+  async function revokeCredential(token: string): Promise<Result<null, ApiError>> {
+    const response = await send('DELETE', '/api/extension/session', token, undefined);
+    if (!response.ok) return response;
+    const { status } = response.value;
+    // The credential is no longer usable after either auth outcome. Treat both
+    // as terminal so offline-unlink retry storage cannot retain a dead secret.
+    if (status === 200 || status === 401 || status === 404) return ok(null);
+    return err({ kind: 'server', status });
+  }
+
   return {
     async submitGame(record) {
       const response = await authed('POST', '/api/games', record);
@@ -174,6 +200,39 @@ export function createApiClient(deps: ApiDeps): ApiClient {
         default:
           return err({ kind: 'server', status });
       }
+    },
+
+    async restoreGame(clientGameId) {
+      const response = await authed(
+        'PATCH',
+        `/api/games/${encodeURIComponent(clientGameId)}`,
+        undefined,
+      );
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      if (status === 200) {
+        const body = submitSuccessSchema.safeParse(parsed);
+        return body.success ? ok(body.data) : err({ kind: 'network' });
+      }
+      if (status === 404) return err({ kind: 'not-found' });
+      return err({ kind: 'server', status });
+    },
+
+    async startChallenge() {
+      const response = await authed('POST', '/api/games/challenge', undefined);
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      if (status !== 201) return err({ kind: 'server', status });
+      const body = gameChallengeSchema.safeParse(parsed);
+      return body.success ? ok(body.data) : err({ kind: 'network' });
+    },
+
+    revokeCredential,
+
+    async revokeSession() {
+      const token = await deps.auth.accessToken();
+      if (token === null) return err({ kind: 'auth' });
+      return revokeCredential(token);
     },
 
     async getProfile() {

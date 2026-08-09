@@ -2,6 +2,7 @@ import { userIdFromCookies } from '@/lib/auth';
 import { getProfile } from '@/lib/db/queries';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { z } from 'zod';
 
 import { handleAdminAction } from './handler';
 
@@ -23,15 +24,15 @@ export async function POST(
       const profile = await getProfile(service, userId);
       return profile?.is_admin ?? false;
     },
-    setGameStatus: async (gameId, status) => {
-      const { data, error } = await service
-        .from('games')
-        .update({ status })
-        .eq('id', gameId)
-        .eq('status', 'quarantined')
-        .select('id');
-      if (error !== null) throw new Error(`setGameStatus: ${error.message}`);
-      return data.length > 0;
+    setGameStatus: async (gameId, adminId, status, reason) => {
+      const { data, error } = await service.rpc('resolve_quarantined_game', {
+        p_game_id: gameId,
+        p_admin_id: adminId,
+        p_status: status,
+        p_reason: reason,
+      });
+      if (error !== null) throw new Error(`resolve_quarantined_game: ${error.message}`);
+      return z.boolean().parse(data);
     },
   });
 }
