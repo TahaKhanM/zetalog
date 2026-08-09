@@ -1,5 +1,7 @@
 import { createIdentifierResolver } from '@/lib/auth-identifier';
+import { apiError, clientIpFrom } from '@/lib/http';
 import { createRateLimiter } from '@/lib/rate-limit';
+import { consumeSharedRateLimit } from '@/lib/shared-rate-limit';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
@@ -25,9 +27,19 @@ export const dynamic = 'force-dynamic';
 const limiter = createRateLimiter({ limit: LOGIN_LIMIT_PER_MINUTE, windowMs: 60_000 });
 
 export async function POST(request: Request): Promise<Response> {
+  const service = createServiceClient();
+  const allowed = await consumeSharedRateLimit(service, {
+    bucket: 'auth-login-ip',
+    key: clientIpFrom(request),
+    nowMs: Date.now(),
+    windowMs: 60_000,
+    limit: LOGIN_LIMIT_PER_MINUTE,
+  });
+  if (!allowed)
+    return apiError(429, 'rate-limited', 'Too many attempts. Please wait and try again.');
   const supabase = await createClient();
   return handleAuthLogin(request, {
-    resolveIdentifier: createIdentifierResolver(createServiceClient()),
+    resolveIdentifier: createIdentifierResolver(service),
     signInWithPassword: async (email, password) => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       // Only the status crosses back: grant failures all collapse to one

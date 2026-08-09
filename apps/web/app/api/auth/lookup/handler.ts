@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { classifyLookup, type IdentifierMatch } from '@/lib/auth-modes';
-import { apiError, apiJson, clientIpFrom } from '@/lib/http';
+import { apiError, apiJson, clientIpFrom, readJsonBody } from '@/lib/http';
 import type { RateLimiter } from '@/lib/rate-limit';
 
 /**
@@ -34,13 +34,14 @@ export interface AuthLookupDeps {
 }
 
 export async function handleAuthLookup(request: Request, deps: AuthLookupDeps): Promise<Response> {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Request body is too large.');
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.');
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(400, 'bad-request', 'Enter a valid email address.');
   }

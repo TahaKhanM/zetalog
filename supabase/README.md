@@ -17,13 +17,29 @@ every change here as security-critical.
 
 Migrations, in order:
 
-1. `…_create_schema.sql` — `citext`, the `game_status` enum, the five tables
-   (`universities`, `profiles`, `games`, `uni_verifications`, `email_events`),
-   their constraints and indexes.
-2. `…_enable_rls.sql` — RLS enabled on every table; broad default grants revoked
-   from `anon`/`authenticated`, then minimal grants + policies restored.
-3. `…_create_views_and_triggers.sql` — the `handle_new_user` badge trigger and
-   the public `leaderboard_entries` view.
+1. `20260720235624_create_schema.sql` — base tables, constraints, indexes, the
+   `game_status` enum, and `citext`.
+2. `20260720235629_enable_rls.sql` — default-deny RLS and minimal grants.
+3. `20260720235630_create_views_and_triggers.sql` — the new-user badge trigger
+   and public `leaderboard_entries` view.
+4. `20260721000000_harden_function_grants.sql` — locks down existing function
+   execution grants.
+5. `20260721120000_alias_login_integrity.sql` — verified-alias uniqueness and
+   identifier lookup.
+6. `20260721210000_display_name_handle_rule.sql`,
+   `20260721223000_profile_avatars.sql`,
+   `20260721231500_display_name_handle_backfill.sql`, and
+   `20260722001000_remove_profile_avatars.sql` — profile constraints and their
+   deterministic backfill/removal sequence.
+7. `20260724100000_profile_independent.sql` and
+   `20260724120000_profile_leaderboard_opt_out.sql` — leaderboard preferences.
+8. `20260806000000_harden_sensitive_workflows.sql` — atomic sensitive workflows,
+   deletion erasure, anonymous 30-day security events, and rate limits.
+9. `20260806090000_extension_sessions_and_game_challenges.sql` — independent
+   extension credentials, PKCE-bound authorization codes, optional game-start
+   evidence, and operational-data retention.
+10. `20260806091000_schedule_data_retention.sql` — hourly scheduled retention;
+    requires `pg_cron` to be available in the hosted project before it runs.
 
 ## Local development
 
@@ -56,37 +72,48 @@ noisy diff means the source dataset changed. Review the diff before committing.
 
 1. **Create** a project in the Supabase dashboard; note its project ref.
 2. **Link** the local repo: `supabase link --project-ref <ref>`.
-3. **Push** the schema: `supabase db push` (applies `migrations/` to the remote
-   database).
-4. **Seed** the reference data — run `seed.sql` once against the remote database
+3. **Enable Cron first**: in the Supabase dashboard, enable the production
+   project's Cron integration so `pg_cron` is available. The final August
+   migration schedules `zetalog-operational-data-retention`; do not apply it
+   until this prerequisite is met.
+4. **Push** the schema: `supabase db push` (applies `migrations/` to the remote
+   database). Confirm the `zetalog-operational-data-retention` job exists and
+   can run `public.purge_expired_operational_data()`.
+5. **Seed** the reference data — run `seed.sql` once against the remote database
    (Dashboard → SQL Editor, or `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`).
    It is idempotent (`on conflict (slug) do nothing`), so re-running is safe.
-5. **Auth providers** (Dashboard → Authentication → Providers): enable **Email**
+6. **Auth providers** (Dashboard → Authentication → Providers): enable **Email**
    (passwords, confirm-email ON, minimum length 10), **Google**, and **GitHub**
-   OAuth — the full W8 checklist, including the GitHub OAuth app and the email
+   OAuth. The full setup checklist, including the GitHub OAuth app and the email
    template pastes, is `docs/ops/github-oauth-setup.md`. Set the
    display-name-on-first-sign-in flow in the app, not here.
-6. **Custom SMTP — required** (Dashboard → Authentication → SMTP settings):
+7. **Custom SMTP — required** (Dashboard → Authentication → SMTP settings):
    configure **Resend** as the custom SMTP sender. **Never** use Supabase's
    built-in email sender: it is rate-limited to a handful of messages per hour
    and will silently fail under real sign-up load (spec §7, product invariant 6).
    Use the Resend SMTP host/credentials and set the From address to `EMAIL_FROM`.
-7. **URLs** (Dashboard → Authentication → URL Configuration): set the **Site URL**
-   to the deployed web origin and add the extension linking page plus preview
-   deployments to **Redirect URLs**.
+8. **URLs** (Dashboard → Authentication → URL Configuration): set the **Site URL**
+   to the deployed web origin and add the website `/auth/callback` plus preview
+   deployments to **Redirect URLs**. Do not add the Chrome Identity callback here.
+9. **Chrome Identity callback**: after the Chrome Web Store assigns the production
+   extension ID, set the web deployment's `EXTENSION_OAUTH_REDIRECT_URIS` to the
+   exact `https://<extension-id>.chromiumapp.org/zetalog-link` value. This is a
+   server-side allowlist, not a Supabase Auth Redirect URL. Deploy the database
+   migrations and web/API with that value before publishing the extension.
 
 ## Environment variables
 
 Names are documented in the repo-root `.env.example`; never commit real values.
 
-| Variable                        | Used by                      | Notes                                              |
-| ------------------------------- | ---------------------------- | -------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | web + extension (client)     | Client-safe; RLS enforces access.                  |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | web + extension (client)     | Client-safe; RLS enforces access.                  |
-| `SUPABASE_SERVICE_ROLE_KEY`     | web API routes (server only) | Bypasses RLS. Never ship to any client bundle.     |
-| `SUPABASE_DB_URL`               | migrations / seeding         | Postgres connection string (Dashboard → Database). |
-| `RESEND_API_KEY`                | Supabase Auth SMTP / email   | Resend API key for the custom SMTP sender.         |
-| `EMAIL_FROM`                    | auth + verification emails   | From address, e.g. `ZetaLog <verify@example.com>`. |
+| Variable                        | Used by                      | Notes                                                                             |
+| ------------------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | web + extension (client)     | Client-safe; RLS enforces access.                                                 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | web + extension (client)     | Client-safe; RLS enforces access.                                                 |
+| `SUPABASE_SERVICE_ROLE_KEY`     | web API routes (server only) | Bypasses RLS. Never ship to any client bundle.                                    |
+| `EXTENSION_OAUTH_REDIRECT_URIS` | web API routes (server only) | Exact Chrome Identity callbacks after CWS assigns the extension ID; no wildcards. |
+| `SUPABASE_DB_URL`               | migrations / seeding         | Postgres connection string (Dashboard → Database).                                |
+| `RESEND_API_KEY`                | Supabase Auth SMTP / email   | Resend API key for the custom SMTP sender.                                        |
+| `EMAIL_FROM`                    | auth + verification emails   | From address, e.g. `ZetaLog <verify@example.com>`.                                |
 
 ## Security model (why it is shaped this way)
 

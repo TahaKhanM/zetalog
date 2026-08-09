@@ -5,14 +5,23 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           node-version: 24
           cache: pnpm
@@ -21,27 +30,127 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm test:release-tooling
+      - run: pnpm release:check-public
+      - run: pnpm audit --prod
       - run: pnpm build
 
-  e2e:
-    # Required extension e2e only: the built extension against the offline
-    # Zetamac replica. Never the live site, never Docker — safe and deterministic.
+  extension-e2e:
+    # Real Chromium against the offline Zetamac replica: deterministic and
+    # incapable of writing to the live website.
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
-      # `test:e2e` builds the extension itself, then runs the replica e2e.
-      - run: pnpm --filter @zetalog/extension test:e2e
+      - run: >-
+          pnpm --filter @zetalog/extension exec playwright test
+          e2e/extension.spec.ts e2e/link.spec.ts --repeat-each=3
+
+  fullstack:
+    # Fresh local Supabase applies every migration, runs pgTAP, and then serves
+    # the real web/API routes used by the browser and extension suites. Setting
+    # ZL_FULLSTACK=1 makes a skipped full-stack test a CI failure condition.
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ZL_FULLSTACK: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: supabase/setup-cli@ea165f8d65b6e75b540449e92b4886f43607fa02 # v2
+        with:
+          version: 2.98.2
+          github-token: ${{ github.token }}
+      - run: pnpm install --frozen-lockfile
+      - name: Cache Playwright browsers
+        uses: actions/cache@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Start fresh Supabase and apply migrations
+        run: supabase start
+      - name: Lint database schema
+        run: supabase db lint --local --level error
+      - name: Run pgTAP database tests
+        run: supabase test db
+      - name: Run full-stack website authentication and dashboard tests
+        run: pnpm --filter @zetalog/web test:e2e
+      - name: Run full-stack extension API and browser tests
+        run: pnpm --filter @zetalog/extension test:e2e
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup
+
+  release-artifact:
+    # Build once, inspect once, load that exact ZIP in Chromium, then retain the
+    # same bytes and checksum. Store submission must download this artifact;
+    # nobody may rebuild it manually after approval.
+    needs: [verify, extension-e2e, fullstack]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Cache Playwright browsers
+        uses: actions/cache@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build immutable version 1.0.0 ZIP
+        run: pnpm --filter @zetalog/extension zip
+      - name: Inspect release ZIP
+        run: node scripts/inspect-extension-zip.mjs apps/extension/.output/zetalogextension-1.0.0-chrome.zip
+      - name: Extract exact release ZIP
+        run: |
+          mkdir -p "$RUNNER_TEMP/zetalog-release"
+          unzip -q apps/extension/.output/zetalogextension-1.0.0-chrome.zip -d "$RUNNER_TEMP/zetalog-release"
+      - name: Verify website download has the same extension payload
+        run: |
+          mkdir -p "$RUNNER_TEMP/zetalog-public"
+          unzip -q apps/web/public/zetalog-chrome-1.0.0-secure.zip -d "$RUNNER_TEMP/zetalog-public"
+          diff -qr "$RUNNER_TEMP/zetalog-release" "$RUNNER_TEMP/zetalog-public"
+      - name: Browser-test exact release ZIP
+        env:
+          ZL_EXTENSION_OUTPUT: ${{ runner.temp }}/zetalog-release
+        run: >-
+          pnpm --filter @zetalog/extension exec playwright test
+          e2e/extension.spec.ts --repeat-each=3
+      - name: Record release checksum
+        run: |
+          cd apps/extension/.output
+          sha256sum zetalogextension-1.0.0-chrome.zip > zetalogextension-1.0.0-chrome.zip.sha256
+      - name: Retain exact tested release artifact
+        uses: actions/upload-artifact@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          name: zetalog-extension-1.0.0-${{ github.sha }}
+          path: |
+            apps/extension/.output/zetalogextension-1.0.0-chrome.zip
+            apps/extension/.output/zetalogextension-1.0.0-chrome.zip.sha256
+          if-no-files-found: error
+          retention-days: 30

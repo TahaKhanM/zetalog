@@ -11,7 +11,7 @@ const SECRET = 'a-test-password-value';
 function request(body: unknown, ip = '203.0.113.7'): Request {
   return new Request('http://localhost/api/auth/login', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+    headers: { 'content-type': 'application/json', 'x-vercel-forwarded-for': ip },
     body: JSON.stringify(body),
   });
 }

@@ -1,15 +1,46 @@
+import { ZETAMAC_DEFAULT_SETTINGS } from '@zetalog/shared';
 import { describe, expect, it } from 'vitest';
 
-import { bgRequestSchema } from './messages.js';
+import {
+  bgRequestSchema,
+  capturePortRequestSchema,
+  capturePortResponseSchema,
+  captureRequestSchema,
+} from './messages.js';
+
+const record = {
+  id: '11111111-1111-4111-8111-111111111111',
+  startedAtMs: 1,
+  playedMs: 2,
+  settings: ZETAMAC_DEFAULT_SETTINGS,
+  events: [],
+  claimedScore: 0,
+};
+
+describe('captureRequestSchema', () => {
+  it('accepts only validated capture records', () => {
+    expect(captureRequestSchema.safeParse({ type: 'zl-checkpoint-game', record }).success).toBe(
+      true,
+    );
+    expect(captureRequestSchema.safeParse({ type: 'zl-save-game', record: {} }).success).toBe(
+      false,
+    );
+    expect(captureRequestSchema.safeParse({ type: 'zl-drain' }).success).toBe(false);
+  });
+
+  it('keeps the port handshake separate from record messages', () => {
+    expect(capturePortRequestSchema.safeParse({ type: 'zl-capture-mounted' }).success).toBe(true);
+    expect(capturePortRequestSchema.safeParse({ type: 'zl-checkpoint-game', record }).success).toBe(
+      true,
+    );
+    expect(capturePortResponseSchema.safeParse({ type: 'zl-capture-ready' }).success).toBe(true);
+    expect(capturePortResponseSchema.safeParse({ type: 'zl-capture-mounted' }).success).toBe(false);
+  });
+});
 
 describe('bgRequestSchema', () => {
-  it('accepts a link request with both tokens', () => {
-    const parsed = bgRequestSchema.safeParse({
-      type: 'zl-link',
-      accessToken: 'a',
-      refreshToken: 'r',
-    });
-    expect(parsed.success).toBe(true);
+  it('accepts an explicit link-begin request', () => {
+    expect(bgRequestSchema.safeParse({ type: 'zl-begin-link' }).success).toBe(true);
   });
 
   it('accepts drain and unlink requests', () => {
@@ -27,8 +58,10 @@ describe('bgRequestSchema', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-backfill' }).success).toBe(true);
   });
 
-  it('rejects a link request missing tokens', () => {
-    expect(bgRequestSchema.safeParse({ type: 'zl-link' }).success).toBe(false);
+  it('rejects the obsolete link-claim protocol', () => {
+    expect(
+      bgRequestSchema.safeParse({ type: 'zl-claim-link', requestId: 'zlr_request' }).success,
+    ).toBe(false);
   });
 
   it('rejects an unknown message type', () => {

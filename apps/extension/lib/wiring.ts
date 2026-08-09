@@ -16,7 +16,9 @@ export interface CaptureClock {
 
 /** Where finished games and capture failures are routed (the storage repository). */
 export interface CaptureHooks {
-  /** A completed (or mid-game-exited) game — the store applies quarantine + status. */
+  /** A partial record persisted during play so navigation cannot erase it. */
+  readonly onCheckpoint?: (record: GameRecord) => void;
+  /** A completed game — the store applies quarantine + status. */
   readonly onGameComplete: (record: GameRecord) => void;
   /** A capture failure — surfaces the "recorder needs an update" banner. */
   readonly onCaptureFailed: (record: GameRecord) => void;
@@ -49,7 +51,9 @@ function readScore(text: string): number | null {
  * required elements up front; any failure routes a placeholder record to
  * `onCaptureFailed` and captures nothing further (never a silent loss, never a
  * throw across the boundary). On success it observes the DOM and drives the
- * pure recorder, saving on game-over (`disabled`) or mid-game `pagehide`.
+ * pure recorder, saving on game-over (`disabled`) or a genuine mid-game exit.
+ * Exits remain restart-quarantined by the existing judge; BFCache transitions
+ * keep the live capture attached.
  */
 export function startCapture(env: CaptureEnv): CaptureHandle {
   const { document: doc, window: win, clock, hooks } = env;
@@ -98,6 +102,7 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
   if (lastProblem.length > 0) recorder.problemShown(lastProblem, at());
 
   let finished = false;
+  let hasActivityCheckpoint = false;
 
   // CAPTURE-phase listener on the document, NOT a plain listener on the input.
   // Zetamac's own `input` handler (registered on the element at page init, so
@@ -112,6 +117,13 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
   const onInput = (event: Event): void => {
     if (event.target !== answerEl) return;
     recorder.inputChanged(answerEl.value, at());
+    // The first input proves that play has begun. Dispatch its checkpoint from
+    // this input event so immediate navigation cannot outrun both the
+    // MutationObserver and the pagehide message.
+    if (!hasActivityCheckpoint) {
+      hasActivityCheckpoint = true;
+      hooks.onCheckpoint?.(recorder.snapshot(at()));
+    }
   };
 
   // Ordering audit (same hazard class as the input snapshot above): Zetamac
@@ -144,6 +156,7 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
       recorder.problemShown(nextProblem, at());
       lastProblem = nextProblem;
     }
+    if (accepted) hooks.onCheckpoint?.(recorder.snapshot(at()));
     if (answerEl.disabled) finish();
   });
 
@@ -160,7 +173,11 @@ export function startCapture(env: CaptureEnv): CaptureHandle {
     hooks.onGameComplete(recorder.finish(at()));
   }
 
-  function onPageHide(): void {
+  function onPageHide(event: PageTransitionEvent): void {
+    // BFCache keeps the document and observer alive; they resume together on
+    // pageshow. A real navigation preserves the partial record through the
+    // background worker, where the existing restart check quarantines it.
+    if (event.persisted || finished) return;
     finish();
   }
 

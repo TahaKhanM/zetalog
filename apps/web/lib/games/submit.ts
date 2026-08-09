@@ -53,6 +53,7 @@ export interface GameToInsert {
   readonly status: ValidationOutcome;
   readonly telemetry: readonly GameEvent[];
   readonly validation: Verdict;
+  readonly challengeId?: string | undefined;
 }
 
 /**
@@ -71,15 +72,28 @@ export interface PersistedGame {
 
 /** The narrow database surface the submit pipeline needs. */
 export interface SubmitPort {
+  /** Existing idempotency key lookup must happen before rate limiting. */
+  findExistingGame?: (userId: string, clientGameId: string) => Promise<PersistedGame | null>;
   /** Games this user has had received at or after `sinceMs` (rate limiting). */
   countGamesReceivedSince(userId: string, sinceMs: number): Promise<number>;
   /** This user's accepted scores at `duration` — the history for the PB-jump rule. */
   getAcceptedScores(userId: string, duration: RankableDuration): Promise<number[]>;
+  /** Validate optional online start evidence; null preserves the offline fallback. */
+  resolveChallenge?: (
+    userId: string,
+    evidence: NonNullable<GameRecord['evidence']>,
+    startedAtMs: number,
+  ) => Promise<string | null>;
   /**
    * Insert the game idempotently (`on conflict (user_id, client_game_id) do
    * nothing`). On a conflict, resolves to the existing row's outcome.
    */
-  insertGame(game: GameToInsert): Promise<PersistedGame>;
+  /** Null means the atomic database-side rate check rejected this new id. */
+  insertGame(
+    game: GameToInsert,
+    rateSinceMs?: number,
+    rateLimit?: number,
+  ): Promise<PersistedGame | null>;
 }
 
 /** A typed JSON error body, matching the API-wide `{ error: { code, message } }` shape. */
@@ -118,8 +132,11 @@ export async function submitGame(
     };
   }
 
+  const existing = await port.findExistingGame?.(userId, record.id);
+  if (existing !== undefined && existing !== null) return { status: 201, body: existing };
+
   const recent = await port.countGamesReceivedSince(userId, nowMs - RATE_WINDOW_MS);
-  if (recent > RATE_LIMIT_MAX) {
+  if (recent >= RATE_LIMIT_MAX) {
     return {
       status: 429,
       body: {
@@ -133,19 +150,40 @@ export async function submitGame(
 
   const acceptedScores = await port.getAcceptedScores(userId, duration);
   const verdict = judge(record, { acceptedScores });
+  const challengeId =
+    record.evidence !== undefined && port.resolveChallenge !== undefined
+      ? await port.resolveChallenge(userId, record.evidence, record.startedAtMs)
+      : null;
 
-  const persisted = await port.insertGame({
-    userId,
-    clientGameId: record.id,
-    playedAt: playedAtIso(record.startedAtMs, nowMs),
-    settingsFingerprint: fingerprint(record.settings),
-    rankableDuration: duration,
-    claimedScore: record.claimedScore,
-    serverScore: verdict.serverScore,
-    status: verdict.outcome,
-    telemetry: record.events,
-    validation: verdict,
-  });
+  const persisted = await port.insertGame(
+    {
+      userId,
+      clientGameId: record.id,
+      playedAt: playedAtIso(record.startedAtMs, nowMs),
+      settingsFingerprint: fingerprint(record.settings),
+      rankableDuration: duration,
+      claimedScore: record.claimedScore,
+      serverScore: verdict.serverScore,
+      status: verdict.outcome,
+      telemetry: record.events,
+      validation: verdict,
+      ...(challengeId === null ? {} : { challengeId }),
+    },
+    nowMs - RATE_WINDOW_MS,
+    RATE_LIMIT_MAX,
+  );
+
+  if (persisted === null) {
+    return {
+      status: 429,
+      body: {
+        error: {
+          code: 'rate-limited',
+          message: 'Too many games submitted in the past hour. Please try again later.',
+        },
+      },
+    };
+  }
 
   return { status: 201, body: persisted };
 }

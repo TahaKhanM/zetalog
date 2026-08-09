@@ -22,7 +22,10 @@ export interface TrendPoint {
 /** How the popup should render a config's history, by kept-game count. */
 export type GraphMode = 'list' | 'sparkline' | 'chart';
 
-const isKept = (game: StoredGame): boolean => game.status === 'kept';
+const isKept = (game: StoredGame): boolean =>
+  game.status === 'kept' &&
+  game.sync?.outcome !== 'rejected' &&
+  game.sync?.outcome !== 'user_removed';
 
 /** Best kept score for each rankable duration. */
 export function personalBests(games: readonly StoredGame[]): PersonalBests {

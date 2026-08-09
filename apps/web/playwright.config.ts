@@ -3,10 +3,9 @@ import { defineConfig } from '@playwright/test';
 /**
  * Playwright config for the web app's full-stack e2e.
  *
- * The single spec is OPT-IN (skipped unless `ZL_FULLSTACK=1`), because it needs
- * a local Supabase stack (`supabase start`) and boots `next dev` itself — the
- * same posture as the extension's optional full-stack smoke, so the default
- * test run and CI stay Docker-free.
+ * The suite is opt-in locally (skipped unless `ZL_FULLSTACK=1`) because it needs
+ * a local Supabase stack and boots Next.js itself. CI sets the flag and runs it
+ * against a fresh database after applying every migration.
  */
 export default defineConfig({
   testDir: './e2e',

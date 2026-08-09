@@ -104,11 +104,35 @@ describe('submitGame — gating', () => {
     expect(insertSpy).not.toHaveBeenCalled();
   });
 
-  it('allows a submission exactly at the cap and counts the hour window', async () => {
+  it('rejects the next submission exactly at the cap and counts the hour window', async () => {
     const { port, countSpy } = makePort({ recentCount: RATE_LIMIT_MAX });
     const result = await submitGame(record(), USER_ID, NOW_MS, port);
-    expect(result.status).toBe(201);
+    expect(result.status).toBe(429);
     expect(countSpy).toHaveBeenCalledWith(USER_ID, NOW_MS - RATE_WINDOW_MS);
+  });
+
+  it('returns an existing idempotent result before consuming the hourly budget', async () => {
+    const { port, countSpy, scoresSpy, insertSpy } = makePort({ recentCount: RATE_LIMIT_MAX });
+    port.findExistingGame = vi.fn(async () =>
+      Promise.resolve({ id: 'existing', outcome: 'accepted' as const, serverScore: 3 }),
+    );
+    const result = await submitGame(record(), USER_ID, NOW_MS, port);
+
+    expect(result).toEqual({
+      status: 201,
+      body: { id: 'existing', outcome: 'accepted', serverScore: 3 },
+    });
+    expect(countSpy).not.toHaveBeenCalled();
+    expect(scoresSpy).not.toHaveBeenCalled();
+    expect(insertSpy).not.toHaveBeenCalled();
+  });
+
+  it('maps the database-side atomic rate decision to 429', async () => {
+    const { port } = makePort();
+    port.insertGame = vi.fn(async () => Promise.resolve(null));
+    const result = await submitGame(record(), USER_ID, NOW_MS, port);
+    expect(result.status).toBe(429);
+    expect(result.body).toMatchObject({ error: { code: 'rate-limited' } });
   });
 });
 
@@ -226,5 +250,43 @@ describe('submitGame — judging and persistence', () => {
     const { port, scoresSpy } = makePort({ acceptedScores: [10, 20] });
     await submitGame(record(), USER_ID, NOW_MS, port);
     expect(scoresSpy).toHaveBeenCalledWith(USER_ID, 120);
+  });
+
+  it('attaches valid optional start evidence without requiring it for offline games', async () => {
+    const online = makePort();
+    const resolveChallenge = vi.fn(async () =>
+      Promise.resolve('44444444-4444-4444-8444-444444444444'),
+    );
+    online.port.resolveChallenge = resolveChallenge;
+    const evidence = {
+      challengeId: '55555555-5555-4555-8555-555555555555',
+      nonce: 'zlc_nonce-123456789',
+    };
+    await submitGame(record({ evidence }), USER_ID, NOW_MS, online.port);
+    expect(resolveChallenge).toHaveBeenCalledWith(USER_ID, evidence, 0);
+    expect(online.inserted[0]?.challengeId).toBe('44444444-4444-4444-8444-444444444444');
+
+    const offline = makePort();
+    offline.port.resolveChallenge = vi.fn();
+    await submitGame(record({ evidence: undefined }), USER_ID, NOW_MS, offline.port);
+    expect(offline.port.resolveChallenge).not.toHaveBeenCalled();
+    expect(offline.inserted[0]?.challengeId).toBeUndefined();
+  });
+
+  it('ignores invalid optional evidence instead of rejecting a legitimate score', async () => {
+    const { port, inserted } = makePort();
+    port.resolveChallenge = vi.fn(async () => Promise.resolve(null));
+    await submitGame(
+      record({
+        evidence: {
+          challengeId: '55555555-5555-4555-8555-555555555555',
+          nonce: 'zlc_nonce-123456789',
+        },
+      }),
+      USER_ID,
+      NOW_MS,
+      port,
+    );
+    expect(inserted[0]?.challengeId).toBeUndefined();
   });
 });

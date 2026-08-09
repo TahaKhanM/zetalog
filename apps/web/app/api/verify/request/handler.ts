@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { adjudicateAliasClaim, type IdentifierMatch } from '@/lib/auth-modes';
 import type { SendResult } from '@/lib/email/types';
-import { apiError, apiJson } from '@/lib/http';
+import { apiError, apiJson, readJsonBody } from '@/lib/http';
 import { findUniversityForEmail } from '@/lib/uni';
 import { expiresAtMs, generateCode, hashCode, type RandomInt } from '@/lib/verification';
 
@@ -17,8 +17,6 @@ import { expiresAtMs, generateCode, hashCode, type RandomInt } from '@/lib/verif
 export const MAX_REQUESTS_PER_HOUR = 3;
 /** Global daily email cap guard: at or above this in 24h, refuse. */
 export const EMAIL_DAILY_CAP = 90;
-const HOUR_MS = 60 * 60 * 1000;
-const DAY_MS = 24 * HOUR_MS;
 
 const bodySchema = z.object({ email: z.email() });
 
@@ -28,13 +26,20 @@ export interface VerifyRequestDeps {
   listUniversities: () => Promise<{ id: string; domains: string[] }[]>;
   /** Resolve who (if anyone) already owns this address as email or alias. */
   resolveIdentifier: (email: string) => Promise<IdentifierMatch | null>;
-  countRequestsForEmail: (email: string, sinceMs: number) => Promise<number>;
-  countEmailsSince: (sinceMs: number) => Promise<number>;
-  createVerification: (input: {
+  /** Atomically reserve the per-address/global quotas and persist the pending OTP. */
+  reserveVerification: (input: {
     userId: string;
     email: string;
     codeHash: string;
     expiresAtMs: number;
+  }) => Promise<
+    { status: 'reserved'; verificationId: string } | { status: 'rate-limited' | 'capacity' }
+  >;
+  /** Best-effort durable delivery state for the outbox row. */
+  recordDelivery: (input: {
+    verificationId: string;
+    sent: boolean;
+    error?: string;
   }) => Promise<void>;
   sendCode: (email: string, code: string) => Promise<SendResult>;
   random: RandomInt;
@@ -50,13 +55,14 @@ export async function handleVerifyRequest(
     return apiError(401, 'unauthorized', 'Sign in before verifying a university email.');
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Request body is too large.');
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.');
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(400, 'bad-request', 'Enter a valid email address.');
   }
@@ -86,7 +92,14 @@ export async function handleVerifyRequest(
     );
   }
 
-  if ((await deps.countRequestsForEmail(email, nowMs - HOUR_MS)) >= MAX_REQUESTS_PER_HOUR) {
+  const code = generateCode(deps.random);
+  const reservation = await deps.reserveVerification({
+    userId,
+    email,
+    codeHash: hashCode(code),
+    expiresAtMs: expiresAtMs(nowMs),
+  });
+  if (reservation.status !== 'reserved' && reservation.status === 'rate-limited') {
     return apiError(
       429,
       'rate-limited',
@@ -94,22 +107,25 @@ export async function handleVerifyRequest(
     );
   }
 
-  if ((await deps.countEmailsSince(nowMs - DAY_MS)) >= EMAIL_DAILY_CAP) {
+  if (reservation.status !== 'reserved') {
     return apiError(503, 'capacity', 'Verification is busy right now. Please try again tomorrow.');
   }
 
-  const code = generateCode(deps.random);
   const sent = await deps.sendCode(email, code);
+  // Delivery audit must not turn an already delivered code into a false error;
+  // an unsent/pending outbox row is safer than claiming the code was unusable.
+  try {
+    await deps.recordDelivery({
+      verificationId: reservation.verificationId,
+      sent: sent.ok,
+      ...(sent.ok ? {} : { error: sent.error.message }),
+    });
+  } catch {
+    // The reservation remains durable and can be reconciled operationally.
+  }
   if (!sent.ok) {
     return apiError(502, 'email-failed', 'Could not send the code. Please try again shortly.');
   }
-
-  await deps.createVerification({
-    userId,
-    email,
-    codeHash: hashCode(code),
-    expiresAtMs: expiresAtMs(nowMs),
-  });
 
   return apiJson(200, { ok: true });
 }

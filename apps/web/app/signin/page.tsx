@@ -5,16 +5,13 @@ import { SignInForm } from '@/app/_components/SignInForm';
 import { userIdFromCookies } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 
+import { safeNext } from './safe-next';
+
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
 type SearchParams = Record<string, string | string[] | undefined>;
-
-function safeNext(value: string | string[] | undefined): string {
-  const raw = Array.isArray(value) ? value[0] : value;
-  return raw !== undefined && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/me';
-}
 
 /**
  * `/signin` — email-first auth: password sign-in (uni aliases welcome),

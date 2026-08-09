@@ -11,6 +11,7 @@ import { createServiceClient } from '@/lib/supabase/service';
 import { UniBadge } from '../_components/UniBadge';
 import { DisplayNameForm } from '../me/_components/DisplayNameForm';
 import { ChangePasswordForm } from './_components/ChangePasswordForm';
+import { DeleteAccountButton } from './_components/DeleteAccountButton';
 import { IndependentToggle } from './_components/IndependentToggle';
 import { LeaderboardPrivacyToggle } from './_components/LeaderboardPrivacyToggle';
 import { RemoveAliasButton } from './_components/RemoveAliasButton';
@@ -202,6 +203,17 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
             Sign out
           </button>
         </form>
+      </section>
+
+      <section className="me__section" aria-label="Delete account">
+        <h2 className="me__h2">Delete account</h2>
+        <div className="card card--pad">
+          <p className="meta" style={{ marginTop: 0 }}>
+            Remove your account and uploaded game data. This cannot be undone; local extension data
+            stays on this device until you remove it or uninstall the extension.
+          </p>
+          <DeleteAccountButton />
+        </div>
       </section>
     </div>
   );

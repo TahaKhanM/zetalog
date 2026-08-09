@@ -1,20 +1,29 @@
 import { z } from 'zod';
 
-import { apiError, apiJson } from '@/lib/http';
+import { apiError, apiJson, readJsonBody } from '@/lib/http';
 
 /**
  * The testable core of `POST /api/admin/games/[id]`: an admin resolves
  * a quarantined game — approve → accepted (ranks), reject → rejected (audit).
  */
 
-const bodySchema = z.object({ action: z.enum(['approve', 'reject']) });
+const bodySchema = z.object({
+  action: z.enum(['approve', 'reject']),
+  reason: z.string().trim().min(3).max(500),
+});
+const gameIdSchema = z.uuid();
 
 /** Injected dependencies for the core handler. */
 export interface AdminActionDeps {
   authenticate: () => Promise<string | null>;
   isAdmin: (userId: string) => Promise<boolean>;
   /** Update a quarantined game's status; resolves true iff a row changed. */
-  setGameStatus: (gameId: string, status: 'accepted' | 'rejected') => Promise<boolean>;
+  setGameStatus: (
+    gameId: string,
+    adminId: string,
+    status: 'accepted' | 'rejected',
+    reason: string,
+  ) => Promise<boolean>;
 }
 
 export async function handleAdminAction(
@@ -29,20 +38,24 @@ export async function handleAdminAction(
   if (!(await deps.isAdmin(userId))) {
     return apiError(403, 'forbidden', 'Admins only.');
   }
+  if (!gameIdSchema.safeParse(gameId).success) {
+    return apiError(400, 'bad-request', 'Game id must be a UUID.');
+  }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Request body is too large.');
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.');
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(400, 'bad-request', 'action must be "approve" or "reject".');
   }
 
   const status = parsed.data.action === 'approve' ? 'accepted' : 'rejected';
-  const changed = await deps.setGameStatus(gameId, status);
+  const changed = await deps.setGameStatus(gameId, userId, status, parsed.data.reason);
   if (!changed) {
     return apiError(404, 'not-found', 'No quarantined game with that id.');
   }

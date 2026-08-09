@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { chromeWebStoreUrl } from '@/lib/chrome-store';
+
 export const metadata: Metadata = {
   title: 'How it works',
-  description: 'Download the ZetaLog extension and load it into Chrome in about a minute.',
+  description: 'Install the ZetaLog extension in Chrome in about a minute.',
 };
 
 /** Static product page. There is no data to revalidate here. */
@@ -11,8 +13,16 @@ export const dynamic = 'force-static';
 
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
 const MS_QUARANTINE_URL = 'https://security.microsoft.com/quarantine';
-const EXTENSION_ZIP = '/zetalog-chrome-1.0.0.zip';
+// Cache-busted from the pre-hardening archive that used the same manifest
+// version. CI inspects this tracked download and compares its extracted payload
+// with the Store candidate.
+const EXTENSION_ZIP = '/zetalog-chrome-1.0.0-secure.zip';
 const EXTENSION_VERSION = '1.0.0';
+
+// The production deployment switches to the auto-updating Store install by
+// setting this after Google assigns the permanent item ID. Until then the
+// cache-busted, CI-inspected ZIP remains available for existing beta testing.
+const EXTENSION_STORE_URL = chromeWebStoreUrl(process.env.NEXT_PUBLIC_CHROME_WEB_STORE_URL);
 
 function DownloadIcon(): React.JSX.Element {
   return (
@@ -74,129 +84,192 @@ export default function HowItWorksPage(): React.JSX.Element {
           ranks your best against players around the world.
         </p>
         <p className="hiw-hero__actions">
-          <a href={EXTENSION_ZIP} download className="btn btn--primary hiw-download__btn">
-            <DownloadIcon /> Download for Chrome
+          <a
+            href={EXTENSION_STORE_URL ?? EXTENSION_ZIP}
+            download={EXTENSION_STORE_URL === null ? true : undefined}
+            target={EXTENSION_STORE_URL === null ? undefined : '_blank'}
+            rel={EXTENSION_STORE_URL === null ? undefined : 'noreferrer noopener'}
+            className="btn btn--primary hiw-download__btn"
+          >
+            <DownloadIcon />{' '}
+            {EXTENSION_STORE_URL === null ? 'Download for Chrome' : 'Add to Chrome'}
           </a>
           <a href="#install" className="btn btn--ghost">
-            How to load it
+            How to install it
           </a>
         </p>
         <p className="hiw-hero__note meta">
-          <span className="num">v{EXTENSION_VERSION} · 680 KB</span> · Chrome, Edge and Brave
+          <span className="num">v{EXTENSION_VERSION}</span> · Chrome, Edge and Brave
         </p>
       </section>
 
       <section className="hiw-install" id="install" aria-label="Install">
-        <h2 className="display hiw-install__title">Load it into Chrome</h2>
-        <p className="meta hiw-install__intro">
-          It is not on the Chrome Web Store yet, so download the file above and load it by hand.
-          Five steps, about a minute.
-        </p>
+        <h2 className="display hiw-install__title">
+          {EXTENSION_STORE_URL === null
+            ? 'Load it into Chrome'
+            : 'Add it from the Chrome Web Store'}
+        </h2>
+        {EXTENSION_STORE_URL === null ? (
+          <>
+            <p className="meta hiw-install__intro">
+              It is not on the Chrome Web Store yet, so download the file above and load it by hand.
+              Five steps, about a minute.
+            </p>
 
-        <ol className="walk" aria-label="How to load the extension">
-          <li className="walk-step">
-            <div className="walk-step__copy">
-              <span className="walk-step__n num">1</span>
-              <h3 className="walk-step__title">Unzip the download</h3>
-              <p className="meta">
-                Double-click the file. You get a folder called zetalog-chrome. Keep it somewhere you
-                will not delete by accident.
-              </p>
-            </div>
-            <div className="walk-art walk-art--unzip" aria-hidden="true">
-              <span className="mock-zip num">ZIP</span>
-              <span className="mock-into">→</span>
-              <span className="mock-folder">
-                <FolderGlyph />
-                <span className="num">zetalog-chrome</span>
-              </span>
-            </div>
-          </li>
-
-          <li className="walk-step">
-            <div className="walk-step__copy">
-              <span className="walk-step__n num">2</span>
-              <h3 className="walk-step__title">Open the extensions page</h3>
-              <p className="meta">
-                In Chrome, type <span className="num">chrome://extensions</span> into the address
-                bar and press Enter.
-              </p>
-            </div>
-            <div className="walk-art" aria-hidden="true">
-              <div className="chrome-frame">
-                <div className="chrome-frame__bar">
-                  <span className="chrome-frame__dots">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className="chrome-frame__omni num">chrome://extensions</span>
+            <ol className="walk" aria-label="How to load the extension">
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">1</span>
+                  <h3 className="walk-step__title">Unzip the download</h3>
+                  <p className="meta">
+                    Double-click the file. You get a folder called zetalog-chrome. Keep it somewhere
+                    you will not delete by accident.
+                  </p>
                 </div>
-              </div>
-            </div>
-          </li>
-
-          <li className="walk-step">
-            <div className="walk-step__copy">
-              <span className="walk-step__n num">3</span>
-              <h3 className="walk-step__title">Turn on Developer mode</h3>
-              <p className="meta">
-                Flip the Developer mode switch in the top-right corner of the page. Three buttons
-                appear.
-              </p>
-            </div>
-            <div className="walk-art" aria-hidden="true">
-              <div className="chrome-frame">
-                <div className="chrome-frame__head">
-                  <span className="chrome-frame__title display">Extensions</span>
-                  <span className="mock-dev">
-                    <span className="meta">Developer mode</span>
-                    <span className="mock-switch mock-switch--on">
-                      <span className="mock-switch__thumb" />
-                    </span>
+                <div className="walk-art walk-art--unzip" aria-hidden="true">
+                  <span className="mock-zip num">ZIP</span>
+                  <span className="mock-into">→</span>
+                  <span className="mock-folder">
+                    <FolderGlyph />
+                    <span className="num">zetalog-chrome</span>
                   </span>
                 </div>
-              </div>
-            </div>
-          </li>
+              </li>
 
-          <li className="walk-step">
-            <div className="walk-step__copy">
-              <span className="walk-step__n num">4</span>
-              <h3 className="walk-step__title">Load unpacked</h3>
-              <p className="meta">
-                Click Load unpacked, then choose the zetalog-chrome folder you unzipped in step one.
-              </p>
-            </div>
-            <div className="walk-art" aria-hidden="true">
-              <div className="chrome-frame">
-                <div className="chrome-frame__actions">
-                  <span className="mock-btn mock-btn--on">Load unpacked</span>
-                  <span className="mock-btn">Pack extension</span>
-                  <span className="mock-btn">Update</span>
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">2</span>
+                  <h3 className="walk-step__title">Open the extensions page</h3>
+                  <p className="meta">
+                    In Chrome, type <span className="num">chrome://extensions</span> into the
+                    address bar and press Enter.
+                  </p>
                 </div>
-              </div>
-            </div>
-          </li>
+                <div className="walk-art" aria-hidden="true">
+                  <div className="chrome-frame">
+                    <div className="chrome-frame__bar">
+                      <span className="chrome-frame__dots">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span className="chrome-frame__omni num">chrome://extensions</span>
+                    </div>
+                  </div>
+                </div>
+              </li>
 
-          <li className="walk-step">
-            <div className="walk-step__copy">
-              <span className="walk-step__n num">5</span>
-              <h3 className="walk-step__title">Pin it and play</h3>
-              <p className="meta">
-                Open the puzzle icon and pin ZetaLog to your toolbar. Play a game on{' '}
-                <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
-                  Zetamac
-                </a>{' '}
-                and click the icon to see your score.
-              </p>
-            </div>
-            <div className="walk-art" aria-hidden="true">
-              <div className="chrome-frame">
-                <div className="chrome-frame__toolbar">
-                  <span className="chrome-frame__omni chrome-frame__omni--sm num">
-                    arithmetic.zetamac.com
-                  </span>
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">3</span>
+                  <h3 className="walk-step__title">Turn on Developer mode</h3>
+                  <p className="meta">
+                    Flip the Developer mode switch in the top-right corner of the page. Three
+                    buttons appear.
+                  </p>
+                </div>
+                <div className="walk-art" aria-hidden="true">
+                  <div className="chrome-frame">
+                    <div className="chrome-frame__head">
+                      <span className="chrome-frame__title display">Extensions</span>
+                      <span className="mock-dev">
+                        <span className="meta">Developer mode</span>
+                        <span className="mock-switch mock-switch--on">
+                          <span className="mock-switch__thumb" />
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">4</span>
+                  <h3 className="walk-step__title">Load unpacked</h3>
+                  <p className="meta">
+                    Click Load unpacked, then choose the zetalog-chrome folder you unzipped in step
+                    one.
+                  </p>
+                </div>
+                <div className="walk-art" aria-hidden="true">
+                  <div className="chrome-frame">
+                    <div className="chrome-frame__actions">
+                      <span className="mock-btn mock-btn--on">Load unpacked</span>
+                      <span className="mock-btn">Pack extension</span>
+                      <span className="mock-btn">Update</span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">5</span>
+                  <h3 className="walk-step__title">Pin it and play</h3>
+                  <p className="meta">
+                    Open the puzzle icon and pin ZetaLog to your toolbar. Play a game on{' '}
+                    <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+                      Zetamac
+                    </a>{' '}
+                    and click the icon to see your score.
+                  </p>
+                </div>
+                <div className="walk-art" aria-hidden="true">
+                  <div className="chrome-frame">
+                    <div className="chrome-frame__toolbar">
+                      <span className="chrome-frame__omni chrome-frame__omni--sm num">
+                        arithmetic.zetamac.com
+                      </span>
+                      <span className="mock-tool">
+                        <PuzzleGlyph />
+                      </span>
+                      <span className="mock-tool mock-tool--pinned">
+                        <img src="/icon-96.png" alt="" width={18} height={18} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </>
+        ) : (
+          <>
+            <p className="meta hiw-install__intro">
+              Chrome installs updates automatically. You do not need Developer mode or a downloaded
+              folder.
+            </p>
+            <ol className="walk" aria-label="How to install the extension">
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">1</span>
+                  <h3 className="walk-step__title">Open the Store listing</h3>
+                  <p className="meta">Choose Add to Chrome, then confirm the permission prompt.</p>
+                  <p>
+                    <a
+                      href={EXTENSION_STORE_URL}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="btn btn--primary btn--sm"
+                    >
+                      Add to Chrome
+                    </a>
+                  </p>
+                </div>
+              </li>
+              <li className="walk-step">
+                <div className="walk-step__copy">
+                  <span className="walk-step__n num">2</span>
+                  <h3 className="walk-step__title">Pin it and play</h3>
+                  <p className="meta">
+                    Open Chrome's puzzle icon, pin ZetaLog, then play on{' '}
+                    <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+                      Zetamac
+                    </a>
+                    . Your scores appear in the popup automatically.
+                  </p>
+                </div>
+                <div className="walk-art" aria-hidden="true">
                   <span className="mock-tool">
                     <PuzzleGlyph />
                   </span>
@@ -204,10 +277,10 @@ export default function HowItWorksPage(): React.JSX.Element {
                     <img src="/icon-96.png" alt="" width={18} height={18} />
                   </span>
                 </div>
-              </div>
-            </div>
-          </li>
-        </ol>
+              </li>
+            </ol>
+          </>
+        )}
       </section>
 
       <section className="hiw-after" aria-label="After you install">
@@ -217,8 +290,9 @@ export default function HowItWorksPage(): React.JSX.Element {
             <h3 className="hiw-block__title display">Link your account</h3>
             <p className="meta">
               Your games stay on your machine until you connect them. Make a free account, open the
-              popup and press Sync to leaderboard. That links this browser once, and every new game
-              uploads on its own from then on.
+              popup and press Sync to leaderboard. If this browser needs linking, choose Link the
+              ZetaLog extension once to open its secure browser-owned sign-in window. That links
+              this browser once, and every new game uploads on its own from then on.
             </p>
             <p className="hiw-block__cta">
               <Link href="/signin" className="btn btn--ghost btn--sm">

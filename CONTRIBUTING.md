@@ -8,7 +8,8 @@ cutting rigor.
 - **TypeScript strict**, plus `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`.
   No `any`, no non-null assertions, no `@ts-expect-error` without an explanatory comment.
 - **`pnpm verify` green before every commit.** It runs format, lint (zero warnings),
-  typecheck, test and build, which is the same gate CI runs.
+  typecheck, test and build. Protected CI additionally runs the release tooling,
+  dependency audit, fresh Supabase/pgTAP, full-stack E2E and exact-ZIP browser gate.
 - **Test-driven.** Write the failing test first for any behaviour-bearing code.
 - **Pure domain core.** All scoring, validation, fingerprint and quarantine logic lives
   as pure functions in `packages/shared` with no I/O, clocks or randomness inside; inject
@@ -38,8 +39,9 @@ Violating any of these is a bug.
    font families elsewhere. All numerals use a tabular mono face. Fonts are self-hosted; no
    external font requests.
 8. Content scripts run only on `arithmetic.zetamac.com` (recorder) and the ZetaLog `/link`
-   pages (session handoff), never anywhere else. Selectors live in a versioned module; a
-   capture failure surfaces a banner rather than losing data.
+   pages (the one-click Chrome Identity/PKCE entry point), never anywhere else. They never
+   receive website tokens or PKCE material. Selectors live in a versioned module; a capture
+   failure surfaces a banner rather than losing data.
 
 ## Copy rules
 
@@ -55,4 +57,6 @@ Every word a user sees follows these:
 
 - `pnpm install` — bootstrap the workspace.
 - `pnpm verify` — full local CI. Run before every commit.
+- `pnpm test:release-tooling` — test the production env and ZIP inspectors.
+- `pnpm release:check-public` — inspect the extension currently offered by the website.
 - `pnpm --filter @zetalog/shared test` — one package's tests.

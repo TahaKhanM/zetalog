@@ -16,6 +16,8 @@ export interface RateLimiterConfig {
   readonly limit: number;
   /** Window length in milliseconds. */
   readonly windowMs: number;
+  /** Hard cap on attacker-controlled keys retained in this process. */
+  readonly maxKeys?: number;
 }
 
 /** A keyed sliding-window limiter. */
@@ -30,19 +32,37 @@ export interface RateLimiter {
 
 /** Create an independent limiter (one per route concern). */
 export function createRateLimiter(config: RateLimiterConfig): RateLimiter {
-  const hits = new Map<string, number[]>();
+  const maxKeys = config.maxKeys ?? 10_000;
+  if (!Number.isSafeInteger(maxKeys) || maxKeys < 1)
+    throw new Error('RateLimiterConfig.maxKeys must be a positive integer.');
+  const hits = new Map<string, { at: number[]; touchedAt: number }>();
+
+  function evictOldest(): void {
+    if (hits.size < maxKeys) return;
+    let oldestKey: string | undefined;
+    let oldestAt = Number.POSITIVE_INFINITY;
+    for (const [key, value] of hits) {
+      if (value.touchedAt < oldestAt) {
+        oldestKey = key;
+        oldestAt = value.touchedAt;
+      }
+    }
+    if (oldestKey !== undefined) hits.delete(oldestKey);
+  }
 
   return {
     check(key, nowMs) {
       const cutoff = nowMs - config.windowMs;
-      const kept = (hits.get(key) ?? []).filter((at) => at > cutoff);
+      const existing = hits.get(key);
+      if (existing === undefined) evictOldest();
+      const kept = (existing?.at ?? []).filter((at) => at > cutoff);
       if (kept.length >= config.limit) {
         // Still store the pruned list so stale entries do not accumulate.
-        hits.set(key, kept);
+        hits.set(key, { at: kept, touchedAt: nowMs });
         return false;
       }
       kept.push(nowMs);
-      hits.set(key, kept);
+      hits.set(key, { at: kept, touchedAt: nowMs });
       return true;
     },
   };

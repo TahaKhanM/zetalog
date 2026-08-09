@@ -53,4 +53,12 @@ describe('createRateLimiter', () => {
     expect(limiter.check('k', 2_001)).toBe(true);
     expect(limiter.check('k', 2_002)).toBe(false);
   });
+
+  it('bounds retained attacker-controlled keys by evicting the least recently used key', () => {
+    const limiter = createRateLimiter({ limit: 1, windowMs: 60_000, maxKeys: 2 });
+    limiter.check('a', 1);
+    limiter.check('b', 2);
+    limiter.check('c', 3); // evicts a
+    expect(limiter.check('a', 4)).toBe(true);
+  });
 });

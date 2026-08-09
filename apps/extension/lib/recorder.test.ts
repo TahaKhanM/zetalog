@@ -1,4 +1,6 @@
 import {
+  MAX_GAME_EVENTS,
+  MAX_PROBLEM_TEXT_LENGTH,
   ZETAMAC_DEFAULT_SETTINGS,
   gameRecordSchema,
   recomputeScore,
@@ -138,5 +140,36 @@ describe('createRecorder — over-long input', () => {
     const record = recorder.finish(1000);
 
     expect(accepted(record.events)[0]?.answer).toBe(999_999_999_999);
+  });
+});
+
+describe('createRecorder — telemetry bounds', () => {
+  it('truncates problem text to the shared schema limit', () => {
+    const recorder = createRecorder(deps);
+    recorder.problemShown('x'.repeat(MAX_PROBLEM_TEXT_LENGTH + 50), 0);
+    const record = recorder.finish(1);
+
+    expect(record.events[0]).toEqual({
+      kind: 'problem',
+      at: 0,
+      text: 'x'.repeat(MAX_PROBLEM_TEXT_LENGTH),
+    });
+    expect(gameRecordSchema.safeParse(record).success).toBe(true);
+  });
+
+  it('stops accepting every event kind at the hard event limit', () => {
+    const recorder = createRecorder(deps);
+    for (let index = 0; index < MAX_GAME_EVENTS; index += 1) {
+      recorder.inputChanged('', index);
+    }
+
+    recorder.problemShown('1 + 1', MAX_GAME_EVENTS);
+    recorder.inputChanged('2', MAX_GAME_EVENTS);
+    recorder.scoreIncremented(MAX_GAME_EVENTS);
+    const record = recorder.finish(MAX_GAME_EVENTS);
+
+    expect(record.events).toHaveLength(MAX_GAME_EVENTS);
+    expect(record.claimedScore).toBe(0);
+    expect(gameRecordSchema.safeParse(record).success).toBe(true);
   });
 });

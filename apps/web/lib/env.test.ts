@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clientEnv } from './env';
-import { serverEnv } from './env.server';
+import { extensionOAuthRedirectUris, serverEnv } from './env.server';
 
 const KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -10,6 +10,9 @@ const KEYS = [
   'RESEND_API_KEY',
   'EMAIL_FROM',
 ] as const;
+
+const EXTENSION_REDIRECT_URI =
+  'https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/zetalog-link';
 
 /**
  * The mere fact this test module imported `env` at the top without throwing is
@@ -62,6 +65,16 @@ describe('env (lazy parsing)', () => {
       RESEND_API_KEY: 're_123',
       EMAIL_FROM: 'ZetaLog <verify@zetalog.dev>',
     });
+  });
+
+  it('rejects redirect allowlists that are not exact Chrome Identity callbacks', () => {
+    vi.stubEnv('EXTENSION_OAUTH_REDIRECT_URIS', 'https://attacker.example/zetalog-link');
+    expect(() => extensionOAuthRedirectUris()).toThrow(/chromiumapp\.org\/zetalog-link/);
+  });
+
+  it('reads the extension allowlist without requiring unrelated server configuration', () => {
+    vi.stubEnv('EXTENSION_OAUTH_REDIRECT_URIS', EXTENSION_REDIRECT_URI);
+    expect(extensionOAuthRedirectUris()).toEqual([EXTENSION_REDIRECT_URI]);
   });
 
   it('reflects env changes between calls (no import-time snapshot)', () => {

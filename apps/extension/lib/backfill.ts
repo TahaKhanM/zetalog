@@ -12,7 +12,10 @@ import { type StoredGame } from './store.js';
  * trend and sync status all appear. The `sync` state is the terminal
  * already-synced value so the queue never re-submits a backfilled game.
  */
-export function remoteGameToStored(remote: RemoteGame): StoredGame {
+export function remoteGameToStored(
+  remote: RemoteGame,
+  ownerUserId: string | null = null,
+): StoredGame {
   const settings = settingsFromFingerprint(remote.settingsFingerprint);
   const parsed = Date.parse(remote.playedAt);
   const at = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
@@ -27,6 +30,7 @@ export function remoteGameToStored(remote: RemoteGame): StoredGame {
   };
   const base = {
     record,
+    ownerUserId,
     // The server's recomputed score is the authoritative one that ranks.
     verifiedScore: remote.serverScore,
     fingerprint: remote.settingsFingerprint,
@@ -42,8 +46,13 @@ export function remoteGameToStored(remote: RemoteGame): StoredGame {
       sync: { state: 'revoked', outcome: 'user_removed', serverScore: remote.serverScore },
     };
   }
-  // accepted / quarantined / rejected all stay `kept` locally (matching the
-  // live submit flow, which never demotes status); the verdict shows via sync.
+  if (remote.status === 'quarantined' || remote.status === 'rejected') {
+    return {
+      ...base,
+      status: 'quarantined',
+      sync: { state: 'uploaded', outcome: remote.status, serverScore: remote.serverScore },
+    };
+  }
   return {
     ...base,
     status: 'kept',

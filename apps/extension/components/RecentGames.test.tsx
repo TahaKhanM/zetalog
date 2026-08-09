@@ -153,8 +153,8 @@ describe('syncTag', () => {
       tone: 'fail',
     });
     expect(syncTag(game({ sync: { state: 'uploaded', outcome: 'user_removed' } }))).toEqual({
-      label: 'Synced',
-      tone: 'ok',
+      label: 'Removed',
+      tone: 'muted',
     });
     expect(syncTag(game({ sync: { state: 'uploaded' } }))).toEqual({ label: 'Synced', tone: 'ok' });
   });

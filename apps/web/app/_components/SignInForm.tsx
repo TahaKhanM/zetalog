@@ -6,6 +6,7 @@ import { lookupResponseSchema } from '@/lib/auth-modes';
 import { MIN_PASSWORD_LENGTH, checkPassword, passwordStrength } from '@/lib/password';
 import { isCompleteCode, normaliseCode, signInErrorMessage } from '@/lib/signin';
 import { createClient } from '@/lib/supabase/browser';
+import { safeNext } from '@/app/signin/safe-next';
 
 /**
  * Email-first auth: one form serves sign-in, sign-up, recovery, and the
@@ -92,6 +93,9 @@ function StrengthMeter({ password }: { password: string }): React.JSX.Element | 
 }
 
 export function SignInForm({ next }: { next: string }): React.JSX.Element {
+  // Defence in depth: this component may be reused by a future page which has
+  // not already parsed its query string through the server-page validator.
+  const safeDestination = safeNext(next);
   const [step, setStep] = useState<Step>({ name: 'email' });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -175,7 +179,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
       }
       // Full navigation (not a client transition) so Server Components render
       // with the fresh auth cookies the route just set.
-      window.location.assign(next);
+      window.location.assign(safeDestination);
     } catch {
       setBusy(false);
       setError('Network error. Please try again.');
@@ -229,15 +233,18 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
       setError(signInErrorMessage('verify', verifyError));
       return;
     }
-    window.location.assign(next);
+    window.location.assign(safeDestination);
   }
 
   async function startRecovery(address: string, intent: RecoveryIntent): Promise<boolean> {
     setError(null);
-    const supabase = createClient();
-    const { error: sendError } = await supabase.auth.resetPasswordForEmail(address);
-    if (sendError !== null) {
-      setError(signInErrorMessage('recovery-send', sendError));
+    const response = await fetch('/api/auth/recovery/request', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ identifier: address }),
+    }).catch(() => null);
+    if (!response?.ok) {
+      setError(signInErrorMessage('recovery-send', { message: 'Error sending recovery email' }));
       return false;
     }
     setCode('');
@@ -249,15 +256,14 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
     if (step.name !== 'recovery-code') return;
     setBusy(true);
     setError(null);
-    const supabase = createClient();
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      email: step.email,
-      token: code,
-      type: 'recovery',
-    });
+    const response = await fetch('/api/auth/recovery/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ identifier: step.email, code }),
+    }).catch(() => null);
     setBusy(false);
-    if (verifyError !== null) {
-      setError(signInErrorMessage('verify', verifyError));
+    if (!response?.ok) {
+      setError(signInErrorMessage('verify', { message: 'Token has expired or is invalid' }));
       return;
     }
     setPassword('');
@@ -278,7 +284,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
       setError(signInErrorMessage('update-password', updateError));
       return;
     }
-    window.location.assign(next);
+    window.location.assign(safeDestination);
   }
 
   async function continueWithProvider(provider: 'google' | 'github'): Promise<void> {
@@ -287,7 +293,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeDestination)}`,
       },
     });
     if (oauthError !== null) {

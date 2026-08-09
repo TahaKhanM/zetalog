@@ -12,7 +12,15 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "test:release-tooling": "node --test scripts/*.test.mjs",
+    "release:check-env": "node scripts/check-release-env.mjs",
+    "release:check-public": "node scripts/inspect-extension-zip.mjs apps/web/public/zetalog-chrome-1.0.0-secure.zip",
     "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "pnpm": {
+    "overrides": {
+      "nanoid@<3.3.17": "3.3.18"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

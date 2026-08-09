@@ -26,7 +26,7 @@ export const BACKOFF_FACTOR = 5;
 export const BACKOFF_CAP_MS = 2 * 60 * 60 * 1000;
 
 /** Whether a queued entry uploads a game or revokes a previously-uploaded one. */
-export type SyncKind = 'submit' | 'revoke';
+export type SyncKind = 'submit' | 'revoke' | 'restore';
 
 /** One pending sync operation. `attempts` is the number of failures so far. */
 export interface SyncEntry {
@@ -38,7 +38,7 @@ export interface SyncEntry {
 
 const syncEntrySchema = z.object({
   clientGameId: z.string(),
-  kind: z.enum(['submit', 'revoke']),
+  kind: z.enum(['submit', 'revoke', 'restore']),
   attempts: z.number().int().nonnegative(),
   nextAttemptAtMs: z.number(),
 });
@@ -55,19 +55,25 @@ export function backoffDelayMs(attempts: number): number {
 /**
  * The sync operation a game currently warrants, or null if none.
  *
- * Submit: a kept rankable game that is neither uploaded nor permanently failed —
- * including one whose earlier upload was `revoked` and has since been restored
- * (it must go back through server validation). Revoke: an `uploaded` game the
- * user removed. `revoked` itself is TERMINAL for a removed game: the completed
- * server-side removal must never re-derive another revoke on later drains.
+ * Submit: a kept rankable game that is neither uploaded nor permanently failed.
+ * Restore: a previously revoked server row the user restored locally. Revoke:
+ * an `uploaded` game the user removed. `revoked` itself is TERMINAL for a
+ * removed game: the completed server-side removal must never re-derive another
+ * revoke on later drains.
  */
-function desiredKind(game: StoredGame): SyncKind | null {
+function desiredKind(game: StoredGame, userId?: string): SyncKind | null {
+  if (userId !== undefined && game.ownerUserId !== userId) return null;
   const state = game.sync?.state;
+  // A server restore needs no raw telemetry, so it still works after an old
+  // uploaded/revoked stream has been retired locally.
+  if (game.status === 'kept' && state === 'revoked') return 'restore';
+  if (game.telemetryPruned === true) return null;
   if (
     game.status === 'kept' &&
     game.rankableDuration !== null &&
     state !== 'uploaded' &&
-    state !== 'failed'
+    state !== 'failed' &&
+    state !== 'revoked'
   ) {
     return 'submit';
   }
@@ -95,13 +101,14 @@ export function reconcileJobs(
   games: readonly StoredGame[],
   queue: readonly SyncEntry[],
   nowMs: number,
+  userId?: string,
 ): ReconcileJob[] {
   const existing = new Map<string, SyncEntry>();
   for (const entry of queue) existing.set(`${entry.kind}:${entry.clientGameId}`, entry);
 
   const jobs: ReconcileJob[] = [];
   for (const game of games) {
-    const kind = desiredKind(game);
+    const kind = desiredKind(game, userId);
     if (kind === null) continue;
     const id = game.record.id;
     const prior = existing.get(`${kind}:${id}`);
@@ -118,8 +125,9 @@ export function reconcileQueue(
   games: readonly StoredGame[],
   queue: readonly SyncEntry[],
   nowMs: number,
+  userId?: string,
 ): SyncEntry[] {
-  return reconcileJobs(games, queue, nowMs).map((job) => job.entry);
+  return reconcileJobs(games, queue, nowMs, userId).map((job) => job.entry);
 }
 
 /** Persisted queue storage over a `browser.storage.local`-shaped area. */
@@ -170,6 +178,7 @@ export interface SyncDeps {
   readonly now: () => number;
   /** Whether an account is currently linked; the drain no-ops when signed out. */
   readonly isLinked: () => Promise<boolean>;
+  readonly userId?: () => Promise<string | null>;
 }
 
 /** What to do with an entry after attempting it. */
@@ -199,14 +208,20 @@ export async function drainSync(deps: SyncDeps): Promise<DrainSummary> {
   const listed = await deps.store.listGames();
   if (!listed.ok) return EMPTY;
 
+  const userId = deps.userId === undefined ? undefined : await deps.userId();
+  if (deps.userId !== undefined && userId === null) return { ...EMPTY, authFailed: true };
+
   const now = deps.now();
-  const jobs = reconcileJobs(listed.value, await deps.queue.read(), now);
+  const jobs = reconcileJobs(listed.value, await deps.queue.read(), now, userId ?? undefined);
 
   // Show a "pending" chip the moment a game is queued for its first upload —
   // or for a re-upload after its previous submission was revoked and the game
   // restored (the stale "Revoked" chip flips to "Syncing…").
   for (const { entry, game } of jobs) {
-    if (entry.kind === 'submit' && (game.sync === undefined || game.sync.state === 'revoked')) {
+    if (
+      (entry.kind === 'submit' || entry.kind === 'restore') &&
+      (game.sync === undefined || game.sync.state === 'revoked')
+    ) {
       await deps.store.markSync(entry.clientGameId, { state: 'pending' });
     }
   }
@@ -240,6 +255,25 @@ export async function drainSync(deps: SyncDeps): Promise<DrainSummary> {
       } else if (result.error.kind === 'auth') {
         action = 'auth-stop';
       } else if (result.error.kind === 'not-rankable' || result.error.kind === 'bad-request') {
+        await deps.store.markSync(entry.clientGameId, { state: 'failed' });
+        failed += 1;
+        action = 'done';
+      } else {
+        action = 'retry';
+      }
+    } else if (entry.kind === 'restore') {
+      const result = await deps.api.restoreGame(entry.clientGameId);
+      if (result.ok) {
+        await deps.store.markSync(entry.clientGameId, {
+          state: 'uploaded',
+          outcome: result.value.outcome,
+          serverScore: result.value.serverScore,
+        });
+        uploaded += 1;
+        action = 'done';
+      } else if (result.error.kind === 'auth') {
+        action = 'auth-stop';
+      } else if (result.error.kind === 'not-found') {
         await deps.store.markSync(entry.clientGameId, { state: 'failed' });
         failed += 1;
         action = 'done';

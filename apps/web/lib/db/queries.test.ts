@@ -5,6 +5,7 @@ import type { Db } from '../supabase/database';
 import {
   getLeaderboard,
   getOwnGames,
+  getOwnGamesPage,
   getProfile,
   getQuarantineQueue,
   getUniversityBySlug,
@@ -29,6 +30,8 @@ interface Builder extends PromiseLike<Response> {
   eq(...args: unknown[]): Builder;
   not(...args: unknown[]): Builder;
   order(...args: unknown[]): Builder;
+  limit(...args: unknown[]): Builder;
+  range(...args: unknown[]): Builder;
   maybeSingle(): PromiseLike<Response>;
 }
 
@@ -49,6 +52,14 @@ function makeBuilder(response: Response, calls: Call[]): Builder {
     },
     order(...args) {
       calls.push({ method: 'order', args });
+      return builder;
+    },
+    limit(...args) {
+      calls.push({ method: 'limit', args });
+      return builder;
+    },
+    range(...args) {
+      calls.push({ method: 'range', args });
       return builder;
     },
     maybeSingle() {
@@ -94,6 +105,7 @@ describe('getLeaderboard', () => {
     expect(result[0]?.best_score).toBe(90);
     expect(calls).toContainEqual({ method: 'eq', args: ['duration', 120] });
     expect(calls).toContainEqual({ method: 'order', args: ['best_score', { ascending: false }] });
+    expect(calls).toContainEqual({ method: 'limit', args: [500] });
     // No university filter applied for the global board.
     expect(calls.some((c) => c.method === 'eq' && c.args[0] === 'university_slug')).toBe(false);
   });
@@ -180,6 +192,17 @@ describe('getOwnGames', () => {
       args: ['user_id', '11111111-1111-4111-8111-111111111111'],
     });
     expect(calls).toContainEqual({ method: 'order', args: ['received_at', { ascending: false }] });
+    expect(calls).toContainEqual({ method: 'limit', args: [1000] });
+  });
+
+  it('provides a bounded history-page query', async () => {
+    const { client, calls } = makeClient({ games: { data: [], error: null } });
+    const page = await getOwnGamesPage(client, '11111111-1111-4111-8111-111111111111', {
+      offset: 20,
+      limit: 25,
+    });
+    expect(page).toEqual({ items: [], nextOffset: null });
+    expect(calls).toContainEqual({ method: 'range', args: [20, 45] });
   });
 });
 
@@ -220,5 +243,6 @@ describe('getQuarantineQueue', () => {
     expect(queue[0]).not.toHaveProperty('profile');
     expect(calls).toContainEqual({ method: 'eq', args: ['status', 'quarantined'] });
     expect(calls).toContainEqual({ method: 'order', args: ['received_at', { ascending: true }] });
+    expect(calls).toContainEqual({ method: 'limit', args: [100] });
   });
 });

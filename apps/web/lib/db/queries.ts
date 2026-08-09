@@ -58,6 +58,10 @@ export interface LeaderboardQuery {
   readonly universitySlug?: string;
 }
 
+export const PUBLIC_BOARD_LIMIT = 500;
+export const OWN_HISTORY_LIMIT = 1000;
+export const ADMIN_QUEUE_LIMIT = 100;
+
 /**
  * Best score per user at one duration, highest first (display name breaks
  * ties for a stable order). Scoped to one university when `universitySlug` is
@@ -70,7 +74,10 @@ export function getLeaderboard(client: Db, query: LeaderboardQuery): Promise<Lea
     builder = builder.eq('university_slug', query.universitySlug);
   }
   return fetchList(
-    builder.order('best_score', { ascending: false }).order('display_name', { ascending: true }),
+    builder
+      .order('best_score', { ascending: false })
+      .order('display_name', { ascending: true })
+      .limit(PUBLIC_BOARD_LIMIT),
     leaderboardEntrySchema,
     'getLeaderboard',
   );
@@ -145,10 +152,58 @@ export function getOwnGames(client: Db, userId: string): Promise<GameRow[]> {
       .from('games')
       .select('*')
       .eq('user_id', userId)
-      .order('received_at', { ascending: false }),
+      .order('received_at', { ascending: false })
+      .limit(OWN_HISTORY_LIMIT),
     gameRowSchema,
     'getOwnGames',
   );
+}
+
+/** A bounded offset page. Offset pagination is intentionally a foundation API:
+ * callers can migrate to a cursor later without exposing unbounded history.
+ */
+export interface PageRequest {
+  readonly offset?: number;
+  readonly limit?: number;
+}
+
+export interface Page<T> {
+  readonly items: readonly T[];
+  readonly nextOffset: number | null;
+}
+
+const DEFAULT_PAGE_SIZE = 50;
+const MAX_PAGE_SIZE = 100;
+
+function pageBounds(request: PageRequest = {}): { offset: number; limit: number } {
+  const offset = request.offset ?? 0;
+  const limit = request.limit ?? DEFAULT_PAGE_SIZE;
+  if (!Number.isSafeInteger(offset) || offset < 0)
+    throw new Error('page offset must be a non-negative integer');
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > MAX_PAGE_SIZE)
+    throw new Error(`page limit must be between 1 and ${String(MAX_PAGE_SIZE)}`);
+  return { offset, limit };
+}
+
+/** Bounded, deterministic foundation for a user's game-history API. */
+export async function getOwnGamesPage(
+  client: Db,
+  userId: string,
+  request: PageRequest = {},
+): Promise<Page<GameRow>> {
+  const { offset, limit } = pageBounds(request);
+  const rows = await fetchList(
+    client
+      .from('games')
+      .select('*')
+      .eq('user_id', userId)
+      .order('received_at', { ascending: false })
+      .range(offset, offset + limit),
+    gameRowSchema,
+    'getOwnGamesPage',
+  );
+  const items = rows.slice(0, limit);
+  return { items, nextOffset: rows.length > limit ? offset + limit : null };
 }
 
 /** A game as the extension backfills it (camelCase, no telemetry/validation). */
@@ -232,13 +287,36 @@ export async function getQuarantineQueue(service: Db): Promise<AdminGameRow[]> {
       .from('games')
       .select('*, profile:profiles(display_name)')
       .eq('status', 'quarantined')
-      .order('received_at', { ascending: true }),
+      .order('received_at', { ascending: true })
+      .limit(ADMIN_QUEUE_LIMIT),
     quarantineJoinSchema,
     'getQuarantineQueue',
   );
   return rows.map(({ profile, ...game }): AdminGameRow => {
     return adminGameRowSchema.parse({ ...game, display_name: profile?.display_name ?? null });
   });
+}
+
+/** Bounded, oldest-first foundation for an admin review queue API. */
+export async function getQuarantineQueuePage(
+  service: Db,
+  request: PageRequest = {},
+): Promise<Page<AdminGameRow>> {
+  const { offset, limit } = pageBounds(request);
+  const rows = await fetchList(
+    service
+      .from('games')
+      .select('*, profile:profiles(display_name)')
+      .eq('status', 'quarantined')
+      .order('received_at', { ascending: true })
+      .range(offset, offset + limit),
+    quarantineJoinSchema,
+    'getQuarantineQueuePage',
+  );
+  const items = rows.slice(0, limit).map(({ profile, ...game }): AdminGameRow => {
+    return adminGameRowSchema.parse({ ...game, display_name: profile?.display_name ?? null });
+  });
+  return { items, nextOffset: rows.length > limit ? offset + limit : null };
 }
 
 const boardStatsRowSchema = z.object({

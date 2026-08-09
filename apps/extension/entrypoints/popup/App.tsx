@@ -9,7 +9,6 @@ import { Hero } from '../../components/Hero.js';
 import { RecentGames } from '../../components/RecentGames.js';
 import { TrendControls, type ConfigOption } from '../../components/TrendControls.js';
 import { createAuthController } from '../../lib/auth.js';
-import { WEB_APP_URL } from '../../lib/config.js';
 import { type BgRequest, type BgResponse } from '../../lib/messages.js';
 import {
   fingerprintLabel,
@@ -25,8 +24,8 @@ import {
 import { createStore, type Prefs, type StoredGame } from '../../lib/store.js';
 
 const store = createStore(browser.storage.local);
-// Read-only here (link state + Unlink); the background owns token refresh, so a
-// noop fetch is enough — the popup never refreshes tokens itself.
+// The popup uses only the controller's local read methods. The background owns
+// every network request, token migration, refresh, and link operation.
 const auth = createAuthController(browser.storage.local, {
   fetch: (url, init) => fetch(url, init),
 });
@@ -75,18 +74,24 @@ export function App(): JSX.Element {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [linked, setLinked] = useState(false);
+  const [needsRelink, setNeedsRelink] = useState(false);
+  const [storageFailure, setStorageFailure] = useState(false);
   // The leaderboard opt-out for the linked account: null until read from the server.
   const [optedOut, setOptedOut] = useState<boolean | null>(null);
 
   const reload = useCallback(async (): Promise<void> => {
-    const [gamesResult, prefsResult, isLinked] = await Promise.all([
+    const [gamesResult, prefsResult, isLinked, relinkRequired, badgeText] = await Promise.all([
       store.listGames(),
       store.getPrefs(),
       auth.isLinked(),
+      auth.needsRelink(),
+      browser.action.getBadgeText({}).catch(() => ''),
     ]);
     if (gamesResult.ok) setGames(gamesResult.value);
     if (prefsResult.ok) setPrefs(prefsResult.value);
     setLinked(isLinked);
+    setNeedsRelink(relinkRequired);
+    setStorageFailure(badgeText === '!');
   }, []);
 
   useEffect(() => {
@@ -149,17 +154,19 @@ export function App(): JSX.Element {
 
   function persistPrefs(next: Prefs): void {
     setPrefs(next);
-    void store.setPrefs(next);
+    void store.setPrefs(next).then((result) => {
+      if (!result.ok) setStorageFailure(true);
+    });
   }
 
   function restore(id: string): void {
-    void store.restore(id).then(reload);
+    void tellBackground({ type: 'zl-restore-game', id }).then(reload);
   }
   function remove(id: string): void {
-    void store.remove(id).then(reload);
+    void tellBackground({ type: 'zl-remove-game', id }).then(reload);
   }
   function sync(): void {
-    void browser.tabs.create({ url: `${WEB_APP_URL}/link` });
+    void tellBackground({ type: 'zl-begin-link' });
   }
   function unlink(): void {
     void tellBackground({ type: 'zl-unlink' }).then(reload);
@@ -227,8 +234,21 @@ export function App(): JSX.Element {
 
       {hasCaptureFailure ? <CaptureFailedBanner /> : null}
 
+      {storageFailure ? (
+        <div className="zl-banner" role="alert">
+          <span className="zl-banner__dot" />
+          <div>
+            <strong>A score may not have been saved.</strong>
+            <p>
+              Browser storage rejected an update. Free some extension storage, then play normally.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       <Footer
         linked={linked}
+        needsRelink={needsRelink}
         optedOut={optedOut}
         onSync={sync}
         onUnlink={unlink}

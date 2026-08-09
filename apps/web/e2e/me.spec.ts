@@ -180,7 +180,7 @@ test.describe('signed-in /me', () => {
     const suffix = Math.random().toString(36).slice(2, 8);
     const email = `me_e2e_${suffix}@example.com`;
     const password = 'test-password-123';
-    const displayName = `Me ${suffix}`;
+    const displayName = `Me_${suffix}`;
 
     // Confirmed user (handle_new_user creates the profile) + a display name.
     const created = await fetch(`${sb.API_URL}/auth/v1/admin/users`, {

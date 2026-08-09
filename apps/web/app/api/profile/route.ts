@@ -1,5 +1,6 @@
-import { userIdFromBearer, userIdFromCookies } from '@/lib/auth';
+import { userIdFromCookies } from '@/lib/auth';
 import { getProfile } from '@/lib/db/queries';
+import { userIdFromApiBearer } from '@/lib/extension-auth';
 import { readBearerToken } from '@/lib/http';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
@@ -21,7 +22,7 @@ async function authenticate(
   service: ReturnType<typeof createServiceClient>,
 ): Promise<string | null> {
   const token = readBearerToken(request);
-  if (token !== null) return userIdFromBearer(service, token);
+  if (token !== null) return userIdFromApiBearer(service, token);
   return userIdFromCookies(await createClient());
 }
 
@@ -56,25 +57,19 @@ export async function POST(request: Request): Promise<Response> {
   const service = createServiceClient();
   return handleProfilePost(request, {
     authenticate: () => authenticate(request, service),
-    setDisplayName: async (userId, displayName) => {
-      const { error } = await service
-        .from('profiles')
-        .update({ display_name: displayName })
-        .eq('id', userId);
+    updateProfile: async (userId, changes) => {
+      const { error } = await service.rpc('update_profile_settings', {
+        p_user_id: userId,
+        p_set_display_name: changes.displayName !== undefined,
+        p_display_name: changes.displayName ?? null,
+        p_set_independent: changes.independent !== undefined,
+        p_independent: changes.independent ?? false,
+        p_set_leaderboard_opt_out: changes.leaderboardOptOut !== undefined,
+        p_leaderboard_opt_out: changes.leaderboardOptOut ?? false,
+      });
       if (error === null) return 'ok';
       if (error.code === UNIQUE_VIOLATION) return 'taken';
-      throw new Error(`setDisplayName: ${error.message}`);
-    },
-    setIndependent: async (userId, independent) => {
-      const { error } = await service.from('profiles').update({ independent }).eq('id', userId);
-      if (error !== null) throw new Error(`setIndependent: ${error.message}`);
-    },
-    setLeaderboardOptOut: async (userId, optOut) => {
-      const { error } = await service
-        .from('profiles')
-        .update({ leaderboard_opt_out: optOut })
-        .eq('id', userId);
-      if (error !== null) throw new Error(`setLeaderboardOptOut: ${error.message}`);
+      throw new Error(`update_profile_settings: ${error.message}`);
     },
   });
 }

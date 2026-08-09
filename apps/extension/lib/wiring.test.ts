@@ -21,16 +21,20 @@ function makeClock(): { clock: CaptureClock; set: (ms: number) => void } {
 
 function makeHooks(): {
   hooks: CaptureHooks;
+  checkpoints: GameRecord[];
   completed: GameRecord[];
   failed: GameRecord[];
 } {
+  const checkpoints: GameRecord[] = [];
   const completed: GameRecord[] = [];
   const failed: GameRecord[] = [];
   return {
     hooks: {
+      onCheckpoint: (record) => checkpoints.push(record),
       onGameComplete: (record) => completed.push(record),
       onCaptureFailed: (record) => failed.push(record),
     },
+    checkpoints,
     completed,
     failed,
   };
@@ -201,7 +205,7 @@ describe('startCapture — page handler clears the input on accept (real Zetamac
     const { hooks, completed } = makeHooks();
 
     // Zetamac's own handler (test/fixtures/zetamac-app.js): registered on the
-    // input at page INIT — i.e. before the content script's document_idle
+    // input at page INIT — i.e. before the content script's capture listener
     // listener — it accepts inside the same bubble-phase `input` dispatch and
     // clears the field synchronously via problemGeng() → answer.val(''), which
     // fires no further input event. Any later-registered same-target listener
@@ -324,7 +328,7 @@ describe('startCapture — mid-game exit', () => {
     problemEl().textContent = '34 + 66';
   });
 
-  it('saves the partial game on pagehide before completion', async () => {
+  it('preserves a partial game on real navigation for restart quarantine', async () => {
     const { clock, set } = makeClock();
     const { hooks, completed } = makeHooks();
     startCapture({ document, window, clock, hooks });
@@ -341,6 +345,40 @@ describe('startCapture — mid-game exit', () => {
     expect(completed).toHaveLength(1);
     expect(completed[0]?.claimedScore).toBe(1);
     expect(completed[0]?.playedMs).toBe(1200);
+  });
+
+  it('checkpoints the first input before an immediate navigation can cancel capture', () => {
+    const { clock, set } = makeClock();
+    const { hooks, checkpoints } = makeHooks();
+    startCapture({ document, window, clock, hooks });
+
+    set(700);
+    typeAnswer('100');
+
+    expect(checkpoints).toHaveLength(1);
+    expect(checkpoints[0]?.events.map((event) => event.kind)).toEqual(['problem', 'input']);
+    expect(checkpoints[0]?.playedMs).toBe(700);
+  });
+
+  it('keeps capture alive across a BFCache pagehide', async () => {
+    const { clock, set } = makeClock();
+    const { hooks, completed } = makeHooks();
+    startCapture({ document, window, clock, hooks });
+
+    const pagehide = new Event('pagehide') as PageTransitionEvent;
+    Object.defineProperty(pagehide, 'persisted', { value: true });
+    window.dispatchEvent(pagehide);
+
+    set(700);
+    typeAnswer('100');
+    advance('20 + 5', 1);
+    await flush();
+    set(2000);
+    answerEl().disabled = true;
+    await flush();
+
+    expect(completed).toHaveLength(1);
+    expect(completed[0]?.claimedScore).toBe(1);
   });
 });
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  AUTH_STATE_KEY,
   SESSION_KEY,
   createAuthController,
   decodeUserId,
@@ -8,8 +9,10 @@ import {
   sessionFromTokens,
   sessionSchema,
   type FetchLike,
+  type IdentityApi,
   type Session,
 } from './auth.js';
+import { SUPABASE_URL } from './config.js';
 
 /** Build a JWT-shaped token whose payload is the given claims (unsigned; ok for decode tests). */
 function jwt(claims: Record<string, unknown>): string {
@@ -76,6 +79,46 @@ const tokenBody = {
   user: { id: 'user-1' },
 };
 
+type FetchStep = { status: number; body?: unknown; malformed?: boolean } | Error;
+
+/** A multi-request fetch stub for legacy migration/refresh sequences. */
+function fetchSequence(steps: readonly FetchStep[]): FetchLike & {
+  calls: string[];
+  inits: RequestInit[];
+} {
+  const queue = [...steps];
+  const calls: string[] = [];
+  const inits: RequestInit[] = [];
+  const fetchFn: FetchLike = (url, init) => {
+    calls.push(url);
+    inits.push(init);
+    const next = queue.shift();
+    if (next === undefined) return Promise.reject(new Error('no response queued'));
+    if (next instanceof Error) return Promise.reject(next);
+    return Promise.resolve({
+      ok: next.status >= 200 && next.status < 300,
+      status: next.status,
+      json: () =>
+        next.malformed ? Promise.reject(new Error('not json')) : Promise.resolve(next.body ?? {}),
+    });
+  };
+  return Object.assign(fetchFn, { calls, inits });
+}
+
+function fakeIdentity(
+  complete: (authorizeUrl: string) => string | undefined | Promise<string | undefined>,
+): IdentityApi & { authorizeUrls: string[] } {
+  const authorizeUrls: string[] = [];
+  return {
+    authorizeUrls,
+    getRedirectURL: (path = '') => `https://extension-id.chromiumapp.org/${path}`,
+    launchWebAuthFlow: ({ url }) => {
+      authorizeUrls.push(url);
+      return Promise.resolve(complete(url));
+    },
+  };
+}
+
 describe('sessionSchema', () => {
   it('rejects a session missing a token', () => {
     expect(
@@ -114,6 +157,19 @@ describe('requestRefresh', () => {
       ok: true,
       value: { accessToken: 'access-NEW', refreshToken: 'refresh-NEW', userId: 'user-1' },
     });
+  });
+
+  it('uses the bundled config when no override is supplied', async () => {
+    let seenUrl = '';
+    const result = await requestRefresh(
+      'r',
+      fetchOnce((url) => {
+        seenUrl = url;
+        return { status: 200, body: tokenBody };
+      }),
+    );
+    expect(result.ok).toBe(true);
+    expect(seenUrl).toBe(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`);
   });
 
   it('never includes the token in the error detail on a network failure', async () => {
@@ -237,7 +293,170 @@ describe('createAuthController', () => {
     });
     await controller.save(SESSION);
     expect(area.data.get(SESSION_KEY)).toEqual(SESSION);
+    expect(await controller.needsRelink()).toBe(false);
     expect(await controller.accessToken()).toBe('access-abc');
+  });
+
+  it('reads an independent extension credential without refreshing or migrating it', async () => {
+    const extensionSession = { kind: 'extension' as const, token: 'zlx_token', userId: 'user-7' };
+    const fetchFn = fetchSequence([]);
+    const controller = createAuthController(fakeArea({ [SESSION_KEY]: extensionSession }), {
+      fetch: fetchFn,
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBe('zlx_token');
+    expect(await controller.storedUserId()).toBe('user-7');
+    expect(await controller.userId()).toBe('user-7');
+    expect(fetchFn.calls).toHaveLength(0);
+  });
+
+  it('reads a legacy owner id without waiting for migration on the capture path', async () => {
+    const fetchFn = fetchSequence([new Error('capture must not make a request')]);
+    const controller = createAuthController(fakeArea({ [SESSION_KEY]: SESSION }), {
+      fetch: fetchFn,
+      config: CONFIG,
+    });
+
+    expect(await controller.storedUserId()).toBe('user-1');
+    expect(fetchFn.calls).toHaveLength(0);
+  });
+
+  it('silently migrates a valid legacy session to an independent credential', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const fetchFn = fetchSequence([
+      { status: 200, body: { token: 'zlx_migrated', userId: 'user-1' } },
+    ]);
+    const controller = createAuthController(area, {
+      fetch: fetchFn,
+      config: CONFIG,
+      apiBaseUrl: 'https://app.test',
+    });
+
+    expect(await controller.accessToken()).toBe('zlx_migrated');
+    expect(area.data.get(SESSION_KEY)).toEqual({
+      kind: 'extension',
+      token: 'zlx_migrated',
+      userId: 'user-1',
+    });
+    expect(await controller.needsRelink()).toBe(false);
+    expect(fetchFn.calls).toEqual(['https://app.test/api/extension/migrate']);
+  });
+
+  it.each([
+    ['network failure', new Error('offline')],
+    ['server failure', { status: 503, body: {} }],
+    ['malformed JSON', { status: 200, malformed: true }],
+    ['unexpected body', { status: 200, body: { token: '' } }],
+  ] as const)(
+    'keeps normal uploads working through a temporary migration %s',
+    async (_name, step) => {
+      const area = fakeArea({ [SESSION_KEY]: SESSION });
+      const controller = createAuthController(area, {
+        fetch: fetchSequence([step]),
+        config: CONFIG,
+      });
+
+      expect(await controller.accessToken()).toBe('access-abc');
+      expect(area.data.get(SESSION_KEY)).toEqual(SESSION);
+    },
+  );
+
+  it('keeps a legacy session usable when a migration endpoint rejects it non-terminally', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([{ status: 403, body: {} }]),
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBe('access-abc');
+    expect(area.data.get(SESSION_KEY)).toEqual(SESSION);
+  });
+
+  it('refreshes once then migrates when the legacy access token has expired', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const fetchFn = fetchSequence([
+      { status: 401, body: {} },
+      { status: 200, body: tokenBody },
+      { status: 200, body: { token: 'zlx_after-refresh', userId: 'user-1' } },
+    ]);
+    const controller = createAuthController(area, {
+      fetch: fetchFn,
+      config: CONFIG,
+      apiBaseUrl: 'https://app.test',
+    });
+
+    expect(await controller.accessToken()).toBe('zlx_after-refresh');
+    expect(area.data.get(SESSION_KEY)).toEqual({
+      kind: 'extension',
+      token: 'zlx_after-refresh',
+      userId: 'user-1',
+    });
+  });
+
+  it('falls back to the refreshed JWT when retry migration is temporarily unavailable', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([
+        { status: 401, body: {} },
+        { status: 200, body: tokenBody },
+        { status: 503, body: {} },
+      ]),
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBe('access-NEW');
+    expect(area.data.get(SESSION_KEY)).toEqual({
+      accessToken: 'access-NEW',
+      refreshToken: 'refresh-NEW',
+      userId: 'user-1',
+    });
+  });
+
+  it('requests the one-time relink when both the access and refreshed JWT are invalid', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([
+        { status: 401, body: {} },
+        { status: 200, body: tokenBody },
+        { status: 401, body: {} },
+      ]),
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBeNull();
+    expect(area.data.has(SESSION_KEY)).toBe(false);
+    expect(await controller.needsRelink()).toBe(true);
+  });
+
+  it('keeps a legacy session during a non-terminal refresh outage', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([
+        { status: 401, body: {} },
+        { status: 503, body: {} },
+      ]),
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBeNull();
+    expect(area.data.get(SESSION_KEY)).toEqual(SESSION);
+    expect(await controller.needsRelink()).toBe(false);
+  });
+
+  it('requests relink when the legacy refresh token is terminally invalid', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([
+        { status: 401, body: {} },
+        { status: 400, body: {} },
+      ]),
+      config: CONFIG,
+    });
+
+    expect(await controller.accessToken()).toBeNull();
+    expect(area.data.has(SESSION_KEY)).toBe(false);
+    expect(await controller.needsRelink()).toBe(true);
   });
 
   it('accessToken is null when signed out or corrupt', async () => {
@@ -266,29 +485,118 @@ describe('createAuthController', () => {
     expect(await linkedIn.isLinked()).toBe(true);
   });
 
-  it('link builds a session from tokens and persists it', async () => {
-    const seg = (o: unknown): string => Buffer.from(JSON.stringify(o)).toString('base64url');
-    const access = `${seg({ alg: 'HS256' })}.${seg({ sub: 'user-7' })}.sig`;
-    const area = fakeArea();
+  it('clears a corrupt session and exposes the agreed one-time relink state', async () => {
+    const area = fakeArea({ [SESSION_KEY]: { bad: true } });
     const controller = createAuthController(area, {
-      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      fetch: fetchSequence([]),
       config: CONFIG,
     });
-    expect(await controller.link(access, 'refresh-7')).toBe(true);
+
+    expect(await controller.isLinked()).toBe(false);
+    expect(area.data.has(SESSION_KEY)).toBe(false);
+    expect(await controller.needsRelink()).toBe(true);
+  });
+
+  it('uses an explicit Chrome identity PKCE redirect and stores only the returned credential', async () => {
+    const area = fakeArea();
+    const identity = fakeIdentity((authorizeUrl) => {
+      const url = new URL(authorizeUrl);
+      expect(url.pathname).toBe('/api/extension/link/authorize');
+      expect(url.searchParams.get('redirect_uri')).toBe(
+        'https://extension-id.chromiumapp.org/zetalog-link',
+      );
+      expect(url.searchParams.get('code_challenge')).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      expect(url.searchParams.get('code_challenge_method')).toBe('S256');
+      const state = url.searchParams.get('state');
+      expect(state).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      return `https://extension-id.chromiumapp.org/zetalog-link?code=one-time-code&state=${state ?? ''}`;
+    });
+    const fetchFn = fetchSequence([
+      { status: 200, body: { credential: 'zlx_opaque', userId: 'user-7' } },
+    ]);
+    const controller = createAuthController(area, {
+      fetch: fetchFn,
+      config: CONFIG,
+      apiBaseUrl: 'https://app.test',
+      identity,
+    });
+
+    expect(await controller.beginLink()).toBe(true);
+    expect(identity.authorizeUrls).toHaveLength(1);
+    expect(fetchFn.calls).toEqual(['https://app.test/api/extension/link/token']);
+    const exchangeBody: unknown = JSON.parse(fetchFn.inits[0]?.body as string);
+    expect(exchangeBody).toMatchObject({
+      code: 'one-time-code',
+      redirectUri: 'https://extension-id.chromiumapp.org/zetalog-link',
+    });
+    const codeVerifier =
+      typeof exchangeBody === 'object' && exchangeBody !== null && 'codeVerifier' in exchangeBody
+        ? exchangeBody.codeVerifier
+        : undefined;
+    expect(codeVerifier).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(area.data.get(SESSION_KEY)).toEqual({
-      accessToken: access,
-      refreshToken: 'refresh-7',
+      kind: 'extension',
+      token: 'zlx_opaque',
       userId: 'user-7',
     });
   });
 
-  it('link refuses a malformed access token and stores nothing', async () => {
+  it('rejects a mismatched identity callback before a code exchange', async () => {
+    const fetchFn = fetchSequence([]);
+    const controller = createAuthController(fakeArea(), {
+      fetch: fetchFn,
+      config: CONFIG,
+      identity: fakeIdentity(
+        () => 'https://extension-id.chromiumapp.org/not-our-redirect?code=x&state=y',
+      ),
+    });
+
+    expect(await controller.beginLink()).toBe(false);
+    expect(fetchFn.calls).toEqual([]);
+  });
+
+  it('fails closed when Chrome cancels the interactive identity window', async () => {
+    const fetchFn = fetchSequence([]);
+    const identity: IdentityApi = {
+      getRedirectURL: () => 'https://extension-id.chromiumapp.org/zetalog-link',
+      launchWebAuthFlow: () => Promise.reject(new Error('user cancelled')),
+    };
+    const controller = createAuthController(fakeArea(), {
+      fetch: fetchFn,
+      config: CONFIG,
+      identity,
+    });
+
+    expect(await controller.beginLink()).toBe(false);
+    expect(fetchFn.calls).toEqual([]);
+  });
+
+  it('fails closed when link initiation lacks the service-worker identity API', async () => {
+    const fetchFn = fetchSequence([]);
+    const controller = createAuthController(fakeArea(), { fetch: fetchFn, config: CONFIG });
+
+    expect(await controller.beginLink()).toBe(false);
+    expect(fetchFn.calls).toEqual([]);
+  });
+
+  it.each([
+    ['network failure', new Error('offline')],
+    ['non-success response', { status: 429, body: {} }],
+    ['malformed JSON', { status: 200, malformed: true }],
+    ['unexpected response', { status: 200, body: { credential: 'missing-user' } }],
+  ] as const)('keeps no credential when the token exchange has %s', async (_name, step) => {
+    const identity = fakeIdentity((authorizeUrl) => {
+      const state = new URL(authorizeUrl).searchParams.get('state');
+      return `https://extension-id.chromiumapp.org/zetalog-link?code=one-time-code&state=${state ?? ''}`;
+    });
     const area = fakeArea();
     const controller = createAuthController(area, {
-      fetch: fetchOnce(() => ({ status: 200, body: {} })),
+      fetch: fetchSequence([step]),
       config: CONFIG,
+      identity,
     });
-    expect(await controller.link('bad', 'r')).toBe(false);
+
+    expect(await controller.beginLink()).toBe(false);
     expect(area.data.has(SESSION_KEY)).toBe(false);
   });
 
@@ -333,6 +641,20 @@ describe('createAuthController', () => {
     expect(await controller.refresh()).toBeNull();
   });
 
+  it('refresh invalidates an opaque credential so the popup asks for one relink', async () => {
+    const area = fakeArea({
+      [SESSION_KEY]: { kind: 'extension', token: 'zlx_invalid', userId: 'user-1' },
+    });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+
+    expect(await controller.refresh()).toBeNull();
+    expect(area.data.has(SESSION_KEY)).toBe(false);
+    expect(await controller.needsRelink()).toBe(true);
+  });
+
   it('refresh is single-flight: concurrent callers share one token exchange', async () => {
     let fetches = 0;
     const counting: FetchLike = () => {
@@ -360,6 +682,91 @@ describe('createAuthController', () => {
       config: CONFIG,
     });
     expect(await controller.refresh()).toBeNull();
+    expect(area.data.has(SESSION_KEY)).toBe(false);
+    expect(await controller.needsRelink()).toBe(true);
+  });
+
+  it('refresh keeps the legacy session and does not request relink on a temporary failure', async () => {
+    const area = fakeArea({ [SESSION_KEY]: SESSION });
+    const controller = createAuthController(area, {
+      fetch: fetchSequence([new Error('offline')]),
+      config: CONFIG,
+    });
+    expect(await controller.refresh()).toBeNull();
     expect(area.data.get(SESSION_KEY)).toEqual(SESSION);
+    expect(await controller.needsRelink()).toBe(false);
+  });
+
+  it('userId returns null when no readable or migratable session exists', async () => {
+    const controller = createAuthController(fakeArea(), {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+    expect(await controller.userId()).toBeNull();
+  });
+
+  it('userId fails closed if storage disappears between token and owner reads', async () => {
+    const extensionSession = { kind: 'extension' as const, token: 'zlx_token', userId: 'user-7' };
+    let reads = 0;
+    const area = fakeArea({ [SESSION_KEY]: extensionSession });
+    const controller = createAuthController(
+      {
+        ...area,
+        get: (key) => {
+          reads += 1;
+          return Promise.resolve(reads === 1 ? { [key]: extensionSession } : {});
+        },
+      },
+      { fetch: fetchSequence([]), config: CONFIG },
+    );
+    expect(await controller.userId()).toBeNull();
+  });
+
+  it('needsRelink defaults to false for a missing or corrupt auth-state record', async () => {
+    const missing = createAuthController(fakeArea(), { fetch: fetchSequence([]), config: CONFIG });
+    const corrupt = createAuthController(fakeArea({ [AUTH_STATE_KEY]: { needsRelink: 'yes' } }), {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+    expect(await missing.needsRelink()).toBe(false);
+    expect(await corrupt.needsRelink()).toBe(false);
+  });
+
+  it('reads an opaque credential without migration or network traffic', async () => {
+    const area = fakeArea({
+      [SESSION_KEY]: { kind: 'extension', token: 'zlx_stored', userId: 'user-1' },
+    });
+    const fetchFn = fetchSequence([]);
+    const controller = createAuthController(area, { fetch: fetchFn, config: CONFIG });
+
+    expect(await controller.extensionCredential()).toBe('zlx_stored');
+    expect(fetchFn.calls).toEqual([]);
+  });
+
+  it('never exposes a legacy, missing, or corrupt session as an opaque credential', async () => {
+    const legacy = createAuthController(fakeArea({ [SESSION_KEY]: SESSION }), {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+    const missing = createAuthController(fakeArea(), { fetch: fetchSequence([]), config: CONFIG });
+    const corrupt = createAuthController(fakeArea({ [SESSION_KEY]: { token: 9 } }), {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+
+    expect(await legacy.extensionCredential()).toBeNull();
+    expect(await missing.extensionCredential()).toBeNull();
+    expect(await corrupt.extensionCredential()).toBeNull();
+  });
+
+  it('returns no stored owner for a missing or corrupt session without attempting migration', async () => {
+    const missing = createAuthController(fakeArea(), { fetch: fetchSequence([]), config: CONFIG });
+    const corrupt = createAuthController(fakeArea({ [SESSION_KEY]: { userId: 9 } }), {
+      fetch: fetchSequence([]),
+      config: CONFIG,
+    });
+
+    expect(await missing.storedUserId()).toBeNull();
+    expect(await corrupt.storedUserId()).toBeNull();
   });
 });

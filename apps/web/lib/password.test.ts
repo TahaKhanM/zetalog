@@ -3,19 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { COMMON_PASSWORDS, MIN_PASSWORD_LENGTH, checkPassword, passwordStrength } from './password';
 
 describe('checkPassword', () => {
-  it('rejects passwords shorter than the 8-character minimum', () => {
+  it('rejects passwords shorter than the 10-character minimum', () => {
     expect(checkPassword('short')).toEqual({ ok: false, reason: 'too-short' });
-    expect(checkPassword('1234567')).toEqual({ ok: false, reason: 'too-short' });
+    expect(checkPassword('123456789')).toEqual({ ok: false, reason: 'too-short' });
   });
 
   it('accepts a password of exactly the minimum length', () => {
-    expect(MIN_PASSWORD_LENGTH).toBe(8);
-    expect(checkPassword('kV3&mzq!')).toEqual({ ok: true });
+    expect(MIN_PASSWORD_LENGTH).toBe(10);
+    expect(checkPassword('kV3&mzq!24')).toEqual({ ok: true });
   });
 
   it('rejects entries from the embedded common-password list', () => {
-    expect(checkPassword('password')).toEqual({ ok: false, reason: 'common' });
-    expect(checkPassword('12345678')).toEqual({ ok: false, reason: 'common' });
     expect(checkPassword('qwertyuiop')).toEqual({ ok: false, reason: 'common' });
     expect(checkPassword('password123')).toEqual({ ok: false, reason: 'common' });
   });
@@ -26,8 +24,8 @@ describe('checkPassword', () => {
   });
 
   it('checks length before the common list (short common entries stay too-short)', () => {
-    // '1234567' is famously common but under 8 chars — length is the first gate.
-    expect(checkPassword('1234567')).toEqual({ ok: false, reason: 'too-short' });
+    // '123456789' is famously common but under 10 chars — length is the first gate.
+    expect(checkPassword('123456789')).toEqual({ ok: false, reason: 'too-short' });
   });
 
   it('accepts long uncommon passphrases', () => {

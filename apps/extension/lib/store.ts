@@ -25,8 +25,8 @@ export type RemovableStatus = 'kept' | 'quarantined' | 'capture_failed';
 /**
  * Where a game stands relative to the leaderboard sync. `revoked` is the
  * TERMINAL state after a completed server-side removal — it stops the queue
- * from re-deriving the revoke, and a later restore of the game re-derives a
- * fresh submit from it.
+ * from re-deriving the revoke, and a later local restore derives a matching
+ * server-side restore operation.
  */
 export type SyncState = 'pending' | 'uploaded' | 'failed' | 'revoked';
 
@@ -45,12 +45,16 @@ export interface GameSync {
 /** A stored game: the raw record plus derived, denormalised fields the popup reads directly. */
 export interface StoredGame {
   readonly record: GameRecord;
+  /** Account this row may sync to; absent/null is assigned on the next link. */
+  readonly ownerUserId?: string | null | undefined;
+  /** Raw events were retired after a terminal/server-resolved state; score metadata remains. */
+  readonly telemetryPruned?: boolean | undefined;
   /**
    * The recomputed, verified score — shared `recomputeScore(record.events).score`,
    * the same server-side truth that ranks (product invariant 1). This, NOT
    * `record.claimedScore`, is what every popup surface (hero/PB/trend/new-PB)
-   * shows: the scraped `claimedScore` can miss end-of-game points (the score-span
-   * race, w1-report), so it is kept only for the server's claimed-vs-recomputed
+   * shows: the scraped `claimedScore` can miss points during the final DOM
+   * update, so it is kept only for the server's claimed-vs-recomputed
    * cross-check at submit time. Backfilled from `record.events` for legacy rows
    * written before this field existed.
    */
@@ -87,7 +91,7 @@ const DEFAULT_PREFS: Prefs = { selectedFingerprint: null, range: 'all' };
 
 /** Corruption is surfaced, never swallowed — the caller decides how to react. */
 export interface StoreError {
-  readonly reason: 'corrupt-games' | 'corrupt-prefs';
+  readonly reason: 'corrupt-games' | 'corrupt-prefs' | 'write-failed';
   readonly detail: string;
 }
 
@@ -107,6 +111,8 @@ const gameSyncSchema = z.object({
 
 const storedGameSchema = z.object({
   record: gameRecordSchema,
+  ownerUserId: z.string().min(1).nullable().optional(),
+  telemetryPruned: z.boolean().optional(),
   // Optional on the wire: rows written before verifiedScore existed lack it and
   // are backfilled on read (see readGames) by recomputing from record.events.
   verifiedScore: z.number().int().nonnegative().optional(),
@@ -126,9 +132,10 @@ const prefsSchema = z.object({
 
 /**
  * Reclaim storage by clearing the event streams of the oldest *non-rankable*
- * games first, once the store exceeds `limit` rows. Rankable games keep their
- * events (they still need server backfill); scores and status are never
- * touched, and no row is ever deleted.
+ * games and server-resolved games first, once the store exceeds `limit` rows.
+ * Unsynced rankable games — including rows a temporarily incompatible server
+ * rejected as `failed` — always keep their evidence so a later extension/server
+ * fix can recover them; scores/status are never touched and no row is deleted.
  */
 export function pruneStoredGames(games: readonly StoredGame[], limit = PRUNE_LIMIT): StoredGame[] {
   if (games.length <= limit) return [...games];
@@ -138,31 +145,50 @@ export function pruneStoredGames(games: readonly StoredGame[], limit = PRUNE_LIM
   const oldestFirst = [...games].sort((a, b) => a.savedAtMs - b.savedAtMs);
   for (const game of oldestFirst) {
     if (withEvents <= limit) break;
-    if (game.rankableDuration === null && game.record.events.length > 0) {
+    const safeToStrip =
+      game.rankableDuration === null ||
+      game.status === 'capture_failed' ||
+      game.sync?.state === 'uploaded' ||
+      game.sync?.state === 'revoked';
+    if (safeToStrip && game.record.events.length > 0) {
       stripIds.add(game.record.id);
       withEvents -= 1;
     }
   }
 
   return games.map((game) =>
-    stripIds.has(game.record.id) ? { ...game, record: { ...game.record, events: [] } } : game,
+    stripIds.has(game.record.id)
+      ? { ...game, telemetryPruned: true, record: { ...game.record, events: [] } }
+      : game,
   );
 }
 
 /** The storage repository surface the content script and popup consume. */
 export interface Store {
-  saveGame(record: GameRecord): Promise<Result<StoredGame, StoreError>>;
-  saveCaptureFailed(record: GameRecord): Promise<Result<StoredGame, StoreError>>;
+  checkpointGame(
+    record: GameRecord,
+    ownerUserId?: string | null,
+  ): Promise<Result<StoredGame, StoreError>>;
+  saveGame(
+    record: GameRecord,
+    ownerUserId?: string | null,
+  ): Promise<Result<StoredGame, StoreError>>;
+  saveCaptureFailed(
+    record: GameRecord,
+    ownerUserId?: string | null,
+  ): Promise<Result<StoredGame, StoreError>>;
   restore(id: string): Promise<Result<StoredGame | null, StoreError>>;
   remove(id: string): Promise<Result<StoredGame | null, StoreError>>;
   /** Write leaderboard sync state onto a game (`null` if the id is unknown). */
   markSync(id: string, sync: GameSync): Promise<Result<StoredGame | null, StoreError>>;
   /** Drop all sync bookkeeping (Unlink). Leaves scores/status/records untouched. */
   clearAllSync(): Promise<Result<void, StoreError>>;
+  /** Silent legacy migration chosen by the product owner. */
+  assignUnownedGames(userId: string): Promise<Result<void, StoreError>>;
   /**
-   * Merge server-fetched games into local history, keyed by `record.id`. A game
-   * already stored locally wins (it holds the real events and live sync state);
-   * only games not present locally are added. Returns the merged list.
+   * Merge server-fetched games into local history, keyed by `record.id`. Local
+   * telemetry remains authoritative, while server moderation/removal and sync
+   * state are reconciled across installations.
    */
   importBackfill(remote: readonly StoredGame[]): Promise<Result<StoredGame[], StoreError>>;
   listGames(): Promise<Result<StoredGame[], StoreError>>;
@@ -175,6 +201,17 @@ export interface Store {
  * `now` supplies each row's `savedAtMs` (inject a fake in tests).
  */
 export function createStore(area: StorageArea, now: () => number = () => Date.now()): Store {
+  let mutationTail: Promise<void> = Promise.resolve();
+
+  function serial<T>(operation: () => Promise<T>): Promise<T> {
+    const running = mutationTail.then(operation, operation);
+    mutationTail = running.then(
+      () => undefined,
+      () => undefined,
+    );
+    return running;
+  }
+
   async function readGames(): Promise<Result<StoredGame[], StoreError>> {
     const raw = await area.get(GAMES_KEY);
     const value = raw[GAMES_KEY];
@@ -198,66 +235,123 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     return ok(games);
   }
 
-  async function writeGames(games: readonly StoredGame[]): Promise<void> {
-    await area.set({ [GAMES_KEY]: pruneStoredGames(games) });
+  async function writeGames(games: readonly StoredGame[]): Promise<StoreError | null> {
+    try {
+      await area.set({ [GAMES_KEY]: pruneStoredGames(games) });
+      return null;
+    } catch {
+      return { reason: 'write-failed', detail: 'Browser storage rejected the game update.' };
+    }
   }
 
-  async function append(stored: StoredGame): Promise<Result<StoredGame, StoreError>> {
-    const games = await readGames();
-    if (!games.ok) return games;
-    await writeGames([...games.value, stored]);
-    return ok(stored);
+  function append(stored: StoredGame): Promise<Result<StoredGame, StoreError>> {
+    return serial(async () => {
+      const games = await readGames();
+      if (!games.ok) return games;
+      const existing = games.value.find((game) => game.record.id === stored.record.id);
+      if (existing !== undefined) return ok(existing);
+      const writeError = await writeGames([...games.value, stored]);
+      if (writeError !== null) return err(writeError);
+      return ok(stored);
+    });
   }
 
   function keptScoresFor(games: readonly StoredGame[], fp: string): number[] {
     return games
       .filter((game) => game.status === 'kept' && game.fingerprint === fp)
       .sort((a, b) => b.savedAtMs - a.savedAtMs)
-      .map((game) => game.record.claimedScore);
+      .map((game) => game.verifiedScore);
   }
 
-  async function update(
+  function update(
     id: string,
     transform: (game: StoredGame) => StoredGame,
   ): Promise<Result<StoredGame | null, StoreError>> {
-    const games = await readGames();
-    if (!games.ok) return games;
-    const existing = games.value.find((game) => game.record.id === id);
-    if (existing === undefined) return ok(null);
-    const updated = transform(existing);
-    await writeGames(games.value.map((game) => (game === existing ? updated : game)));
-    return ok(updated);
+    return serial(async () => {
+      const games = await readGames();
+      if (!games.ok) return games;
+      const existing = games.value.find((game) => game.record.id === id);
+      if (existing === undefined) return ok(null);
+      const updated = transform(existing);
+      const writeError = await writeGames(
+        games.value.map((game) => (game === existing ? updated : game)),
+      );
+      if (writeError !== null) return err(writeError);
+      return ok(updated);
+    });
   }
 
   return {
-    async saveGame(record) {
-      const games = await readGames();
-      if (!games.ok) return games;
-      const fp = fingerprint(record.settings);
-      const reason = evaluateQuarantine({
-        score: record.claimedScore,
-        playedMs: record.playedMs,
-        durationSeconds: record.settings.durationSeconds,
-        recentKeptScores: keptScoresFor(games.value, fp),
+    checkpointGame(record, ownerUserId = null) {
+      return serial(async () => {
+        const games = await readGames();
+        if (!games.ok) return games;
+        const existing = games.value.find((game) => game.record.id === record.id);
+        if (existing?.sync !== undefined) return ok(existing);
+        const checkpoint: StoredGame = {
+          record,
+          ownerUserId: existing?.ownerUserId ?? ownerUserId,
+          verifiedScore: recomputeScore(record.events).score,
+          fingerprint: fingerprint(record.settings),
+          rankableDuration: rankableDuration(record.settings),
+          status: 'quarantined',
+          quarantineReason: 'restart',
+          savedAtMs: existing?.savedAtMs ?? now(),
+        };
+        const next =
+          existing === undefined
+            ? [...games.value, checkpoint]
+            : games.value.map((game) => (game === existing ? checkpoint : game));
+        const writeError = await writeGames(next);
+        if (writeError !== null) return err(writeError);
+        return ok(checkpoint);
       });
-      const base = {
-        record,
-        verifiedScore: recomputeScore(record.events).score,
-        fingerprint: fp,
-        rankableDuration: rankableDuration(record.settings),
-        savedAtMs: now(),
-      };
-      const stored: StoredGame =
-        reason === null
-          ? { ...base, status: 'kept' }
-          : { ...base, status: 'quarantined', quarantineReason: reason };
-      await writeGames([...games.value, stored]);
-      return ok(stored);
     },
 
-    saveCaptureFailed(record) {
+    saveGame(record, ownerUserId = null) {
+      return serial(async () => {
+        const games = await readGames();
+        if (!games.ok) return games;
+        const existing = games.value.find((game) => game.record.id === record.id);
+        const isCheckpoint =
+          existing?.status === 'quarantined' &&
+          existing.quarantineReason === 'restart' &&
+          existing.sync === undefined;
+        if (existing !== undefined && !isCheckpoint) return ok(existing);
+        const fp = fingerprint(record.settings);
+        const verifiedScore = recomputeScore(record.events).score;
+        const reason = evaluateQuarantine({
+          score: verifiedScore,
+          playedMs: record.playedMs,
+          durationSeconds: record.settings.durationSeconds,
+          recentKeptScores: keptScoresFor(games.value, fp),
+        });
+        const base = {
+          record,
+          ownerUserId,
+          verifiedScore,
+          fingerprint: fp,
+          rankableDuration: rankableDuration(record.settings),
+          savedAtMs: now(),
+        };
+        const stored: StoredGame =
+          reason === null
+            ? { ...base, status: 'kept' }
+            : { ...base, status: 'quarantined', quarantineReason: reason };
+        const next =
+          existing === undefined
+            ? [...games.value, stored]
+            : games.value.map((game) => (game === existing ? stored : game));
+        const writeError = await writeGames(next);
+        if (writeError !== null) return err(writeError);
+        return ok(stored);
+      });
+    },
+
+    saveCaptureFailed(record, ownerUserId = null) {
       return append({
         record,
+        ownerUserId,
         verifiedScore: recomputeScore(record.events).score,
         fingerprint: fingerprint(record.settings),
         rankableDuration: rankableDuration(record.settings),
@@ -280,13 +374,15 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
               : game.status;
         const base = {
           record: game.record,
+          ownerUserId: game.ownerUserId,
+          telemetryPruned: game.telemetryPruned,
           verifiedScore: game.verifiedScore,
           fingerprint: game.fingerprint,
           rankableDuration: game.rankableDuration,
           savedAtMs: game.savedAtMs,
           // Sync bookkeeping survives the round trip: a restored game whose
           // upload was revoked carries `state: 'revoked'`, from which the sync
-          // queue re-derives a fresh submit (and the chip shows Revoked, not
+          // queue derives a server restore (and the chip shows Revoked, not
           // Synced, until it re-uploads).
           sync: game.sync,
         };
@@ -308,22 +404,71 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
       return update(id, (game) => ({ ...game, sync }));
     },
 
-    async clearAllSync() {
-      const games = await readGames();
-      if (!games.ok) return games;
-      await writeGames(games.value.map((game) => ({ ...game, sync: undefined })));
-      return ok(undefined);
+    clearAllSync() {
+      return serial(async () => {
+        const games = await readGames();
+        if (!games.ok) return games;
+        const writeError = await writeGames(
+          games.value.map((game) => ({ ...game, sync: undefined })),
+        );
+        if (writeError !== null) return err(writeError);
+        return ok(undefined);
+      });
     },
 
-    async importBackfill(remote) {
-      const games = await readGames();
-      if (!games.ok) return games;
-      const localIds = new Set(games.value.map((game) => game.record.id));
-      const additions = remote.filter((game) => !localIds.has(game.record.id));
-      if (additions.length === 0) return ok(games.value);
-      const merged = [...games.value, ...additions];
-      await writeGames(merged);
-      return ok(merged);
+    assignUnownedGames(userId) {
+      return serial(async () => {
+        const games = await readGames();
+        if (!games.ok) return games;
+        const migrated = games.value.map((game) =>
+          game.ownerUserId === undefined || game.ownerUserId === null
+            ? { ...game, ownerUserId: userId }
+            : game,
+        );
+        const writeError = await writeGames(migrated);
+        if (writeError !== null) return err(writeError);
+        return ok(undefined);
+      });
+    },
+
+    importBackfill(remote) {
+      return serial(async () => {
+        const games = await readGames();
+        if (!games.ok) return games;
+        const remoteById = new Map(remote.map((game) => [game.record.id, game]));
+        const localIds = new Set(games.value.map((game) => game.record.id));
+        const reconciled = games.value.map((local) => {
+          const server = remoteById.get(local.record.id);
+          if (server === undefined) return local;
+          // A local delete which has not reached the server must remain queued;
+          // otherwise the server's current accepted row would undo the click.
+          if (local.status === 'removed' && server.status !== 'removed')
+            return {
+              ...local,
+              ownerUserId: server.ownerUserId ?? local.ownerUserId,
+              verifiedScore: server.verifiedScore,
+              sync: server.sync,
+            };
+          return {
+            ...local,
+            ownerUserId: server.ownerUserId ?? local.ownerUserId,
+            verifiedScore: server.verifiedScore,
+            fingerprint: server.fingerprint,
+            rankableDuration: server.rankableDuration,
+            status: server.status,
+            removedFrom: server.removedFrom,
+            quarantineReason: server.quarantineReason,
+            sync: server.sync,
+          };
+        });
+        const additions = remote.filter((game) => !localIds.has(game.record.id));
+        const merged = [...reconciled, ...additions];
+        if (additions.length === 0 && merged.every((game, index) => game === games.value[index]))
+          return ok(games.value);
+        const writeError = await writeGames(merged);
+        if (writeError !== null) return err(writeError);
+        return ok(merged);
+      });
     },
 
     listGames() {
@@ -340,7 +485,11 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
     },
 
     async setPrefs(prefs) {
-      await area.set({ [PREFS_KEY]: prefs });
+      try {
+        await area.set({ [PREFS_KEY]: prefs });
+      } catch {
+        return err({ reason: 'write-failed', detail: 'Browser storage rejected the preference.' });
+      }
       return ok(prefs);
     },
   };

@@ -16,82 +16,50 @@ export async function POST(request: Request): Promise<Response> {
   const service = createServiceClient();
   return handleVerifyConfirm(request, {
     authenticate: async () => userIdFromCookies(await createClient()),
-    getLatestPending: async (userId) => {
-      const { data, error } = await service
-        .from('uni_verifications')
-        .select('id, email, code_hash, expires_at, attempts')
-        .eq('user_id', userId)
-        .is('verified_at', null)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error !== null) throw new Error(`getLatestPending: ${error.message}`);
-      if (data === null) return null;
-      const row = z
-        .object({
-          id: z.uuid(),
-          email: z.string(),
-          code_hash: z.string(),
-          expires_at: z.string(),
-          attempts: z.number().int().nonnegative(),
-        })
-        .parse(data);
-      return {
-        id: row.id,
-        email: row.email,
-        codeHash: row.code_hash,
-        expiresAtMs: new Date(row.expires_at).getTime(),
-        attempts: row.attempts,
-      };
-    },
-    listUniversities: async () => {
-      const { data, error } = await service.from('universities').select('id, name, slug, domains');
-      if (error !== null) throw new Error(`listUniversities: ${error.message}`);
-      return z
+    confirmVerification: async ({ userId, codeHash, nowIso }) => {
+      const { data, error } = await service.rpc('confirm_uni_verification', {
+        p_user_id: userId,
+        p_code_hash: codeHash,
+        p_now: nowIso,
+      });
+      if (error !== null) throw new Error(`confirm_uni_verification: ${error.message}`);
+      const rows = z
         .array(
           z.object({
-            id: z.string(),
-            name: z.string(),
-            slug: z.string(),
-            domains: z.array(z.string()),
+            status: z.enum([
+              'ok',
+              'incorrect',
+              'expired',
+              'locked',
+              'no-pending',
+              'unknown-university',
+              'alias-conflict',
+            ]),
+            university_name: z.string().nullable(),
+            university_slug: z.string().nullable(),
+            attempts_remaining: z.number().int().nullable(),
           }),
         )
+        .length(1)
         .parse(data);
-    },
-    incrementAttempts: async (verificationId) => {
-      const { data, error } = await service
-        .from('uni_verifications')
-        .select('attempts')
-        .eq('id', verificationId)
-        .single();
-      if (error !== null) throw new Error(`incrementAttempts(read): ${error.message}`);
-      const current = z.object({ attempts: z.number().int() }).parse(data).attempts;
-      const { error: updateError } = await service
-        .from('uni_verifications')
-        .update({ attempts: current + 1 })
-        .eq('id', verificationId);
-      if (updateError !== null) throw new Error(`incrementAttempts: ${updateError.message}`);
-    },
-    applyVerification: async ({ userId, universityId, verificationId, nowIso }) => {
-      // Stamp the verification FIRST: the partial unique index on verified
-      // aliases makes this the statement that can lose a claim race —
-      // losing must not leave a half-applied profile.
-      const verification = await service
-        .from('uni_verifications')
-        .update({ verified_at: nowIso })
-        .eq('id', verificationId);
-      if (verification.error !== null) {
-        if (verification.error.code === '23505') return { ok: false, reason: 'alias-conflict' };
-        throw new Error(`applyVerification(verification): ${verification.error.message}`);
+      const row = rows[0];
+      if (row === undefined) throw new Error('confirm_uni_verification returned no row');
+      if (row.status === 'ok') {
+        return {
+          status: 'ok' as const,
+          university: {
+            name: z.string().parse(row.university_name),
+            slug: z.string().parse(row.university_slug),
+          },
+        };
       }
-      const profile = await service
-        .from('profiles')
-        .update({ university_id: universityId, uni_verified_at: nowIso })
-        .eq('id', userId);
-      if (profile.error !== null) {
-        throw new Error(`applyVerification(profile): ${profile.error.message}`);
+      if (row.status === 'incorrect') {
+        return {
+          status: 'incorrect' as const,
+          attemptsRemaining: z.number().int().nonnegative().parse(row.attempts_remaining),
+        };
       }
-      return { ok: true };
+      return { status: row.status };
     },
     now: () => Date.now(),
   });
