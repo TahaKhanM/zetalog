@@ -19,6 +19,7 @@ describe('leaderboardEntrySchema', () => {
     games_counted: 12,
     university_name: 'University of Oxford',
     university_slug: 'university-of-oxford',
+    leaderboard_badge: null,
   };
 
   it('accepts a verified entry with university columns', () => {
@@ -28,6 +29,18 @@ describe('leaderboardEntrySchema', () => {
   it('accepts an unverified entry with null university columns', () => {
     const row = { ...valid, university_name: null, university_slug: null };
     expect(leaderboardEntrySchema.parse(row)).toEqual(row);
+  });
+
+  it('accepts the service-managed Chrome reviewer badge', () => {
+    expect(
+      leaderboardEntrySchema.parse({ ...valid, leaderboard_badge: 'chrome-reviewer' }),
+    ).toMatchObject({ leaderboard_badge: 'chrome-reviewer' });
+  });
+
+  it('rejects an unsupported service badge', () => {
+    expect(() =>
+      leaderboardEntrySchema.parse({ ...valid, leaderboard_badge: 'self-awarded' }),
+    ).toThrow();
   });
 
   it('rejects a non-rankable duration', () => {
@@ -177,6 +190,7 @@ describe('profileRowSchema', () => {
       created_at: '2026-07-01T00:00:00.000Z',
       independent: false,
       leaderboard_opt_out: false,
+      leaderboard_badge: null,
     };
     expect(profileRowSchema.parse(row)).toEqual(row);
   });
