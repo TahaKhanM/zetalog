@@ -31,6 +31,15 @@ function fakeArea(seed: Record<string, unknown> = {}): StorageArea & {
   };
 }
 
+/** Storage whose writes are rejected, matching quota/private-mode failures. */
+function writeRejectingArea(seed: Record<string, unknown> = {}): StorageArea {
+  const readable = fakeArea(seed);
+  return {
+    get: (key) => readable.get(key),
+    set: () => Promise.reject(new Error('quota exceeded')),
+  };
+}
+
 /** A monotonic clock so each save gets a strictly increasing savedAtMs. */
 function tickingClock(start = 1000): () => number {
   let t = start;
@@ -113,6 +122,65 @@ describe('createStore.saveGame — a normal game', () => {
     expect(games.value).toHaveLength(2);
   });
 
+  it('is idempotent when the same record is saved twice', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const record = gameRecord({ score: 10 });
+    const first = await store.saveGame(record, 'owner-1');
+    const second = await store.saveGame(record, 'owner-2');
+
+    expect(second).toEqual(first);
+    const games = await store.listGames();
+    expect(games.ok && games.value).toHaveLength(1);
+    expect(games.ok && games.value[0]?.ownerUserId).toBe('owner-1');
+  });
+
+  it('surfaces a rejected game write without pretending the save succeeded', async () => {
+    const store = createStore(writeRejectingArea(), tickingClock());
+    expect(await store.saveGame(gameRecord({ score: 10 }))).toEqual({
+      ok: false,
+      error: {
+        reason: 'write-failed',
+        detail: 'Browser storage rejected the game update.',
+      },
+    });
+  });
+
+  it('serializes concurrent saves so neither tab can overwrite the other', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const first = gameRecord({ score: 10 });
+    const second = gameRecord({ score: 20 });
+
+    await Promise.all([store.saveGame(first), store.saveGame(second)]);
+
+    const games = await store.listGames();
+    expect(games.ok && games.value.map((game) => game.record.id).sort()).toEqual(
+      [first.id, second.id].sort(),
+    );
+  });
+
+  it('continues serial mutations after a storage read unexpectedly rejects', async () => {
+    const area = fakeArea();
+    let rejectNextRead = true;
+    const flaky: StorageArea = {
+      get: (key) => {
+        if (rejectNextRead) {
+          rejectNextRead = false;
+          return Promise.reject(new Error('temporary read failure'));
+        }
+        return area.get(key);
+      },
+      set: (items) => area.set(items),
+    };
+    const store = createStore(flaky, tickingClock());
+
+    await expect(store.saveGame(gameRecord({ score: 1 }))).rejects.toThrow(
+      'temporary read failure',
+    );
+    expect((await store.saveGame(gameRecord({ score: 2 }))).ok).toBe(true);
+  });
+
   it('persists the recomputed verifiedScore, not the claimed score', async () => {
     const store = createStore(fakeArea(), tickingClock());
     // Claimed 51 undercounts; the events cleanly verify 52.
@@ -123,6 +191,67 @@ describe('createStore.saveGame — a normal game', () => {
     expect(result.value.verifiedScore).toBe(52);
     // The claimed score is retained for the server's cross-check.
     expect(result.value.record.claimedScore).toBe(51);
+  });
+});
+
+describe('createStore.checkpointGame', () => {
+  it('persists and updates a restart-quarantined partial before navigation', async () => {
+    const area = fakeArea();
+    const store = createStore(area, tickingClock());
+    const id = crypto.randomUUID();
+    const first = { ...gameRecord({ playedMs: 0 }), id };
+    const later = { ...gameRecord({ playedMs: 1000, events: verifiedEvents(1) }), id };
+
+    await store.saveGame(gameRecord({ score: 99 }));
+    const initial = await store.checkpointGame(first, 'owner-1');
+    const updated = await store.checkpointGame(later, null);
+    expect(initial.ok && initial.value.status).toBe('quarantined');
+    expect(updated.ok && updated.value.quarantineReason).toBe('restart');
+    expect(updated.ok && updated.value.ownerUserId).toBe('owner-1');
+    expect(updated.ok && updated.value.verifiedScore).toBe(1);
+    if (!initial.ok || !updated.ok) throw new Error('checkpoint failed');
+    expect(updated.value.savedAtMs).toBe(initial.value.savedAtMs);
+  });
+
+  it('upgrades its checkpoint to the completed game instead of losing the finish', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const id = crypto.randomUUID();
+    await store.saveGame(gameRecord({ score: 99 }));
+    await store.checkpointGame({ ...gameRecord({ playedMs: 1000 }), id });
+    const completed = await store.saveGame({
+      ...gameRecord({ playedMs: 120_000, events: verifiedEvents(2) }),
+      id,
+    });
+
+    expect(completed.ok && completed.value.status).toBe('kept');
+    expect(completed.ok && completed.value.verifiedScore).toBe(2);
+  });
+
+  it('does not overwrite a server-synchronised game with a late checkpoint', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ events: verifiedEvents(1) }));
+    if (!saved.ok) throw new Error('setup failed');
+    await store.markSync(saved.value.record.id, {
+      state: 'uploaded',
+      outcome: 'accepted',
+      serverScore: 1,
+    });
+    const checkpoint = await store.checkpointGame({
+      ...saved.value.record,
+      playedMs: 1000,
+      events: [],
+    });
+    expect(checkpoint.ok && checkpoint.value.sync?.state).toBe('uploaded');
+    expect(checkpoint.ok && checkpoint.value.verifiedScore).toBe(1);
+  });
+
+  it('surfaces corrupt reads and rejected checkpoint writes', async () => {
+    const corrupt = createStore(fakeArea({ [GAMES_KEY]: 'bad' }));
+    expect((await corrupt.checkpointGame(gameRecord())).ok).toBe(false);
+    const rejecting = createStore(writeRejectingArea());
+    const result = await rejecting.checkpointGame(gameRecord());
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
   });
 });
 
@@ -139,8 +268,9 @@ describe('createStore.saveGame — quarantine', () => {
 
   it('quarantines an outlier once enough kept history exists', async () => {
     const store = createStore(fakeArea(), tickingClock());
-    for (let n = 0; n < 5; n++) await store.saveGame(gameRecord({ score: 90 }));
-    const result = await store.saveGame(gameRecord({ score: 20 }));
+    for (let n = 0; n < 5; n++)
+      await store.saveGame(gameRecord({ score: 90, events: verifiedEvents(90) }));
+    const result = await store.saveGame(gameRecord({ score: 20, events: verifiedEvents(20) }));
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -174,6 +304,21 @@ describe('createStore.saveCaptureFailed', () => {
     const store = createStore(fakeArea({ [GAMES_KEY]: 'nope' }), tickingClock());
     const result = await store.saveCaptureFailed(gameRecord({ score: 0 }));
     expect(result.ok).toBe(false);
+  });
+
+  it('returns the existing row for an idempotent repeated capture failure', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const record = gameRecord({ score: 0 });
+    const first = await store.saveCaptureFailed(record, 'owner-1');
+    const second = await store.saveCaptureFailed(record, 'owner-2');
+    expect(second).toEqual(first);
+  });
+
+  it('surfaces a rejected capture-failure write', async () => {
+    const store = createStore(writeRejectingArea(), tickingClock());
+    const result = await store.saveCaptureFailed(gameRecord({ score: 0 }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
   });
 });
 
@@ -246,6 +391,22 @@ describe('createStore.remove and restore', () => {
     const store = createStore(fakeArea({ [GAMES_KEY]: 7 }), tickingClock());
     const removed = await store.remove(crypto.randomUUID());
     expect(removed.ok).toBe(false);
+  });
+
+  it('surfaces a rejected update write', async () => {
+    const record = gameRecord({ score: 42 });
+    const stored = {
+      record,
+      verifiedScore: 0,
+      fingerprint: fingerprint(record.settings),
+      rankableDuration: 120,
+      status: 'kept',
+      savedAtMs: 1,
+    };
+    const store = createStore(writeRejectingArea({ [GAMES_KEY]: [stored] }), tickingClock());
+    const result = await store.remove(record.id);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
   });
 });
 
@@ -402,6 +563,18 @@ describe('createStore prefs', () => {
     expect(prefs.value.range).toBe(25);
     expect(prefs.value.selectedFingerprint).toBe('add:2-100x2-100|sub:on|mul:off|div:on|t:60');
   });
+
+  it('surfaces a rejected preference write', async () => {
+    const store = createStore(writeRejectingArea(), tickingClock());
+    const result = await store.setPrefs({ selectedFingerprint: null, range: 'all' });
+    expect(result).toEqual({
+      ok: false,
+      error: {
+        reason: 'write-failed',
+        detail: 'Browser storage rejected the preference.',
+      },
+    });
+  });
 });
 
 describe('createStore — corrupt data recovery', () => {
@@ -471,6 +644,31 @@ describe('pruneStoredGames', () => {
     ];
     const pruned = pruneStoredGames(games, 2);
     expect(pruned.every((g) => g.record.events.length === 1)).toBe(true);
+  });
+
+  it('never retires an unsynced rankable game, even far above the soft limit', () => {
+    const games = Array.from({ length: 900 }, (_, index) =>
+      withEvents(storedGame({ savedAtMs: index, verifiedScore: index + 10 })),
+    );
+    const pruned = pruneStoredGames(games, 0);
+
+    expect(pruned.every((game) => game.record.events.length === 1)).toBe(true);
+    expect(pruned.every((game) => game.telemetryPruned !== true)).toBe(true);
+  });
+
+  it('keeps a failed rankable game recoverable after a client/server compatibility fix', () => {
+    const failed = withEvents(
+      storedGame({ savedAtMs: 1, rankableDuration: 120, sync: { state: 'failed' } }),
+    );
+    const [pruned] = pruneStoredGames([failed], 0);
+
+    expect(pruned?.record.events).toHaveLength(1);
+    expect(pruned?.telemetryPruned).not.toBe(true);
+  });
+
+  it('keeps telemetry for a removed game that never reached the server', () => {
+    const removed = withEvents(storedGame({ savedAtMs: 1, status: 'removed' }));
+    expect(pruneStoredGames([removed], 0)[0]?.record.events).toHaveLength(1);
   });
 
   it('preserves scores and status while pruning', () => {
@@ -557,6 +755,63 @@ describe('createStore.markSync / clearAllSync', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.reason).toBe('corrupt-games');
   });
+
+  it('clearAllSync surfaces a rejected write', async () => {
+    const record = gameRecord({ score: 10 });
+    const stored = {
+      record,
+      verifiedScore: 0,
+      fingerprint: fingerprint(record.settings),
+      rankableDuration: 120,
+      status: 'kept',
+      savedAtMs: 1,
+      sync: { state: 'pending' },
+    };
+    const store = createStore(writeRejectingArea({ [GAMES_KEY]: [stored] }), tickingClock());
+    const result = await store.clearAllSync();
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
+  });
+});
+
+describe('createStore.assignUnownedGames', () => {
+  function stored(ownerUserId?: string | null): StoredGame {
+    const record = gameRecord({ score: 10 });
+    return {
+      record,
+      ownerUserId,
+      verifiedScore: 0,
+      fingerprint: fingerprint(record.settings),
+      rankableDuration: 120,
+      status: 'kept',
+      savedAtMs: 1,
+    };
+  }
+
+  it('silently attributes only unowned legacy games to the linked account', async () => {
+    const area = fakeArea({ [GAMES_KEY]: [stored(undefined), stored(null), stored('other-user')] });
+    const store = createStore(area, tickingClock());
+    expect((await store.assignUnownedGames('current-user')).ok).toBe(true);
+    const games = await store.listGames();
+    expect(games.ok && games.value.map((game) => game.ownerUserId)).toEqual([
+      'current-user',
+      'current-user',
+      'other-user',
+    ]);
+  });
+
+  it('surfaces corrupt source data and rejected migration writes', async () => {
+    const corrupt = createStore(fakeArea({ [GAMES_KEY]: 'bad' }), tickingClock());
+    expect((await corrupt.assignUnownedGames('user')).ok).toBe(false);
+
+    const rejected = createStore(
+      writeRejectingArea({ [GAMES_KEY]: [stored(undefined)] }),
+      tickingClock(),
+    );
+    const result = await rejected.assignUnownedGames('user');
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
+  });
 });
 
 describe('createStore.restore — sync bookkeeping', () => {
@@ -573,7 +828,7 @@ describe('createStore.restore — sync bookkeeping', () => {
 
     if (!restored.ok || restored.value === null) throw new Error('expected a game');
     expect(restored.value.status).toBe('kept');
-    // The revoked marker survives, so the sync queue re-derives a submit for it.
+    // The revoked marker survives, so the sync queue derives a restore for it.
     expect(restored.value.sync).toEqual({ state: 'revoked' });
   });
 });
@@ -610,7 +865,7 @@ describe('createStore.importBackfill', () => {
     expect(list.ok && list.value).toHaveLength(3);
   });
 
-  it('keeps the local game on an id clash (local wins)', async () => {
+  it('keeps local telemetry but reconciles the server score on an id clash', async () => {
     const store = createStore(fakeArea(), tickingClock());
     const local = await store.saveGame(gameRecord({ score: 30 }));
     const id = local.ok ? local.value.record.id : '';
@@ -618,6 +873,74 @@ describe('createStore.importBackfill', () => {
     const list = await store.listGames();
     expect(list.ok && list.value).toHaveLength(1);
     expect(list.ok && list.value[0]?.record.claimedScore).toBe(30);
+    expect(list.ok && list.value[0]?.verifiedScore).toBe(99);
+  });
+
+  it('reconciles a cross-device moderation decision without deleting local telemetry', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const localRecord = gameRecord({ events: verifiedEvents(2) });
+    await store.saveGame(localRecord, 'owner-local');
+    const server = {
+      ...backfilled(localRecord.id, 2),
+      ownerUserId: 'owner-server',
+      status: 'quarantined' as const,
+      sync: { state: 'uploaded' as const, outcome: 'rejected' as const, serverScore: 2 },
+    };
+    await store.importBackfill([server]);
+    const list = await store.listGames();
+    if (!list.ok) throw new Error('list failed');
+    expect(list.value[0]?.status).toBe('quarantined');
+    expect(list.value[0]?.sync?.outcome).toBe('rejected');
+    expect(list.value[0]?.ownerUserId).toBe('owner-server');
+    expect(list.value[0]?.record.events).toEqual(localRecord.events);
+  });
+
+  it('preserves a local removal while importing the server row so revoke remains queued', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ events: verifiedEvents(1) }), 'owner-local');
+    if (!saved.ok) throw new Error('setup failed');
+    await store.remove(saved.value.record.id);
+    await store.importBackfill([
+      { ...backfilled(saved.value.record.id, 1), ownerUserId: 'owner-server' },
+    ]);
+    await store.importBackfill([backfilled(saved.value.record.id, 1)]);
+    const list = await store.listGames();
+    if (!list.ok) throw new Error('list failed');
+    expect(list.value[0]?.status).toBe('removed');
+    expect(list.value[0]?.sync?.state).toBe('uploaded');
+    expect(list.value[0]?.ownerUserId).toBe('owner-server');
+  });
+
+  it('applies a server-side removal to an existing local game', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ events: verifiedEvents(1) }), 'owner-local');
+    if (!saved.ok) throw new Error('setup failed');
+    await store.importBackfill([
+      {
+        ...backfilled(saved.value.record.id, 1),
+        status: 'removed',
+        sync: { state: 'revoked', outcome: 'user_removed', serverScore: 1 },
+      },
+    ]);
+    const list = await store.listGames();
+    expect(list.ok && list.value[0]?.status).toBe('removed');
+    expect(list.ok && list.value[0]?.sync?.state).toBe('revoked');
+  });
+
+  it('keeps server removal authoritative when the same game is already removed locally', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const saved = await store.saveGame(gameRecord({ events: verifiedEvents(1) }), 'owner-local');
+    if (!saved.ok) throw new Error('setup failed');
+    await store.remove(saved.value.record.id);
+    await store.importBackfill([
+      {
+        ...backfilled(saved.value.record.id, 1),
+        status: 'removed',
+        sync: { state: 'revoked', outcome: 'user_removed', serverScore: 1 },
+      },
+    ]);
+    const list = await store.listGames();
+    expect(list.ok && list.value[0]?.sync?.outcome).toBe('user_removed');
   });
 
   it('is a no-op when there is nothing new to add', async () => {
@@ -630,5 +953,12 @@ describe('createStore.importBackfill', () => {
     const store = createStore(fakeArea({ [GAMES_KEY]: 'nope' }), tickingClock());
     const result = await store.importBackfill([backfilled(crypto.randomUUID(), 10)]);
     expect(result.ok).toBe(false);
+  });
+
+  it('surfaces a rejected merged-history write', async () => {
+    const store = createStore(writeRejectingArea(), tickingClock());
+    const result = await store.importBackfill([backfilled(crypto.randomUUID(), 10)]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.reason).toBe('write-failed');
   });
 });

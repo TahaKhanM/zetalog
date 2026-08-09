@@ -1,56 +1,35 @@
 import { browser, defineContentScript } from '#imports';
 
-import { LINK_ORIGINS } from '../lib/config.js';
-import { LINK_ACK, LINK_READY, isLinkPing, parseLinkMessage } from '../lib/link.js';
 import { type BgRequest, type BgResponse } from '../lib/messages.js';
 
 /**
- * Account-link handoff receiver. The browser runs this
- * script ONLY on our own `/link` origins, so it — and therefore the extension it
- * belongs to — is the guaranteed recipient of the session the page posts. No
- * extension id ever appears in a URL and the token can reach no other recipient.
- *
- * On an explicit user click the page posts `{ type: 'zl-link', session }`; this
- * script validates the origin AND that the message came from the page's own
- * window (`event.source === window`) before reading anything, forwards the
- * tokens to the background, and — only once the background confirms it stored
- * the session — posts `zl-link-ack` back to the validated origin so the page can
- * show "Linked". It adds no new permissions: content-script matches only.
+ * Account-link entry point. A stable button marker and an actual browser click
+ * prevent a page script from opening an interactive identity window. The
+ * background then owns the PKCE verifier, state, Chrome identity redirect, and
+ * opaque credential exchange. No credential, authorization code, or PKCE
+ * material crosses the page/content-script boundary.
  *
  * The localhost match exists for local development ONLY — the wxt.config.ts
  * `build:manifest:generated` hook strips it from every non-development build,
  * so the published extension ships the production origin alone.
  */
 export default defineContentScript({
-  matches: ['https://www.zetalog.co.uk/link*', 'http://localhost:3000/link*'],
+  matches: import.meta.env.DEV
+    ? ['https://www.zetalog.co.uk/link*', 'http://localhost:3000/link*']
+    : ['https://www.zetalog.co.uk/link*'],
   main() {
-    window.addEventListener('message', (event) => {
-      // Presence handshake: answer the page's ping so it can show that the
-      // extension is reachable before the user clicks Link.
-      if (isLinkPing(event, window, LINK_ORIGINS)) {
-        window.postMessage(LINK_READY, event.origin);
-        return;
-      }
-
-      const parsed = parseLinkMessage(event, window, LINK_ORIGINS);
-      if (!parsed.ok) return;
-
-      const request: BgRequest = {
-        type: 'zl-link',
-        accessToken: parsed.value.accessToken,
-        refreshToken: parsed.value.refreshToken,
-      };
-      void browser.runtime.sendMessage(request).then((response) => {
-        if ((response as BgResponse | undefined)?.ok) {
-          window.postMessage(LINK_ACK, event.origin);
-        }
+    const button = document.querySelector<HTMLButtonElement>('[data-zetalog-link-button]');
+    if (button === null) return;
+    button.addEventListener('click', (event: MouseEvent) => {
+      if (!event.isTrusted) return;
+      const request: BgRequest = { type: 'zl-begin-link' };
+      void browser.runtime.sendMessage(request).then((response: unknown) => {
+        const result = response as BgResponse | undefined;
+        window.postMessage(
+          { type: result?.ok === true ? 'zl-link-complete' : 'zl-link-failed' },
+          window.location.origin,
+        );
       });
     });
-
-    // Announce unprompted too — if the page mounted first its ping is already
-    // gone, and if this script loads first the announce covers that ordering.
-    if (LINK_ORIGINS.includes(window.location.origin as (typeof LINK_ORIGINS)[number])) {
-      window.postMessage(LINK_READY, window.location.origin);
-    }
   },
 });

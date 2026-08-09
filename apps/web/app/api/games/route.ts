@@ -1,5 +1,5 @@
-import { userIdFromBearer } from '@/lib/auth';
 import { getRecentGamesForUser } from '@/lib/db/queries';
+import { userIdFromApiBearer } from '@/lib/extension-auth';
 import { createSubmitPort } from '@/lib/games/port';
 import { createServiceClient } from '@/lib/supabase/service';
 
@@ -27,7 +27,7 @@ export function OPTIONS(): Response {
 export function POST(request: Request): Promise<Response> {
   const service = createServiceClient();
   return handleGamesPost(request, {
-    authenticateBearer: (token) => userIdFromBearer(service, token),
+    authenticateBearer: (token) => userIdFromApiBearer(service, token),
     port: createSubmitPort(service),
     now: () => Date.now(),
   });
@@ -36,7 +36,7 @@ export function POST(request: Request): Promise<Response> {
 export function GET(request: Request): Promise<Response> {
   const service = createServiceClient();
   return handleGamesGet(request, {
-    authenticateBearer: (token) => userIdFromBearer(service, token),
+    authenticateBearer: (token) => userIdFromApiBearer(service, token),
     listGames: (userId) => getRecentGamesForUser(service, userId, BACKFILL_LIMIT),
   });
 }

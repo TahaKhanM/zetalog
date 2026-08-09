@@ -1,7 +1,7 @@
 import { gameRecordSchema } from '@zetalog/shared';
 
 import { submitGame, type SubmitPort } from '@/lib/games/submit';
-import { apiError, apiJson, readBearerToken } from '@/lib/http';
+import { apiError, apiJson, readBearerToken, readJsonBody } from '@/lib/http';
 
 /**
  * The testable core of `POST /api/games`. Kept out of `route.ts` because a
@@ -15,6 +15,9 @@ export const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Authorization, Content-Type',
 };
+
+/** Generous enough for legitimate telemetry while bounding JSON parse work. */
+export const MAX_GAME_BODY_BYTES = 2_000_000;
 
 /** Injected dependencies for the core handler. */
 export interface GamesPostDeps {
@@ -56,14 +59,15 @@ export async function handleGamesPost(request: Request, deps: GamesPostDeps): Pr
     return apiError(401, 'unauthorized', 'Invalid or expired token.', CORS_HEADERS);
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request, MAX_GAME_BODY_BYTES);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Game record is too large.', CORS_HEADERS);
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.', CORS_HEADERS);
   }
 
-  const parsed = gameRecordSchema.safeParse(body);
+  const parsed = gameRecordSchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(400, 'bad-request', 'Body is not a valid game record.', CORS_HEADERS);
   }

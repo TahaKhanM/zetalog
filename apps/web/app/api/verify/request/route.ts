@@ -10,7 +10,7 @@ import { createResendSender } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
-import { handleVerifyRequest } from './handler';
+import { EMAIL_DAILY_CAP, MAX_REQUESTS_PER_HOUR, handleVerifyRequest } from './handler';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,32 +47,27 @@ export async function POST(request: Request): Promise<Response> {
       if (error !== null) throw new Error(`listUniversities: ${error.message}`);
       return z.array(z.object({ id: z.string(), domains: z.array(z.string()) })).parse(data);
     },
-    countRequestsForEmail: async (email, sinceMs) => {
-      const { count, error } = await service
-        .from('uni_verifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('email', email)
-        .gte('created_at', new Date(sinceMs).toISOString());
-      if (error !== null) throw new Error(`countRequestsForEmail: ${error.message}`);
-      return count ?? 0;
-    },
-    countEmailsSince: async (sinceMs) => {
-      const { count, error } = await service
-        .from('email_events')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', new Date(sinceMs).toISOString());
-      if (error !== null) throw new Error(`countEmailsSince: ${error.message}`);
-      return count ?? 0;
-    },
-    createVerification: async ({ userId, email, codeHash, expiresAtMs: expires }) => {
-      const { error } = await service.from('uni_verifications').insert({
-        user_id: userId,
-        email,
-        code_hash: codeHash,
-        expires_at: new Date(expires).toISOString(),
-        attempts: 0,
+    reserveVerification: async ({ userId, email, codeHash, expiresAtMs: expires }) => {
+      const { data, error } = await service.rpc('reserve_uni_verification', {
+        p_user_id: userId,
+        p_email: email,
+        p_code_hash: codeHash,
+        p_expires_at: new Date(expires).toISOString(),
+        p_per_email_limit: MAX_REQUESTS_PER_HOUR,
+        p_global_limit: EMAIL_DAILY_CAP,
       });
-      if (error !== null) throw new Error(`createVerification: ${error.message}`);
+      if (error !== null) throw new Error(`reserve_uni_verification: ${error.message}`);
+      const result = z.string().parse(data);
+      if (result === 'rate-limited' || result === 'capacity') return { status: result };
+      return { status: 'reserved', verificationId: z.uuid().parse(result) };
+    },
+    recordDelivery: async ({ verificationId, sent, error: deliveryError }) => {
+      const { error } = await service.rpc('record_verification_email_delivery', {
+        p_verification_id: verificationId,
+        p_sent: sent,
+        p_error: deliveryError ?? null,
+      });
+      if (error !== null) throw new Error(`record_verification_email_delivery: ${error.message}`);
     },
     sendCode: (email, code) => {
       const { subject, html, text } = renderVerificationEmail(code);

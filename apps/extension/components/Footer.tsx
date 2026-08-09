@@ -3,6 +3,8 @@ import type { JSX } from 'react';
 interface FooterProps {
   /** Whether an account is currently linked. */
   readonly linked: boolean;
+  /** A legacy/expired credential failed terminally and needs one user action. */
+  readonly needsRelink?: boolean;
   /**
    * The leaderboard opt-out for the linked account: `true` hidden, `false`
    * visible, `null` while it is still being read.
@@ -24,6 +26,7 @@ interface FooterProps {
  */
 export function Footer({
   linked,
+  needsRelink = false,
   optedOut,
   onSync,
   onUnlink,
@@ -61,9 +64,13 @@ export function Footer({
   return (
     <footer className="zl-footer">
       <button className="zl-sync" type="button" onClick={onSync}>
-        Sync to leaderboard
+        {needsRelink ? 'Relink ZetaLog' : 'Sync to leaderboard'}
       </button>
-      <p className="zl-footer__note">Works without an account</p>
+      <p className="zl-footer__note">
+        {needsRelink
+          ? 'Your session expired. Relink once to resume automatic syncing.'
+          : 'Works without an account'}
+      </p>
     </footer>
   );
 }

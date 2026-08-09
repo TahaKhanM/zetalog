@@ -1,10 +1,17 @@
 export { palette, color, typography, type PaletteColor } from './tokens';
 export {
+  MAX_GAME_DURATION_SECONDS,
+  MAX_GAME_EVENTS,
+  MAX_OPERAND_ABS,
+  MAX_PLAYED_MS,
+  MAX_PROBLEM_TEXT_LENGTH,
   gameEventSchema,
+  gameEvidenceSchema,
   gameRecordSchema,
   operandRangeSchema,
   zetamacSettingsSchema,
   type GameEvent,
+  type GameEvidence,
   type GameRecord,
   type OperandRange,
   type ZetamacSettings,

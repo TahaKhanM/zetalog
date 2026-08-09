@@ -1,9 +1,10 @@
-import { userIdFromBearer, userIdFromCookies } from '@/lib/auth';
+import { userIdFromCookies } from '@/lib/auth';
+import { userIdFromApiBearer } from '@/lib/extension-auth';
 import { readBearerToken } from '@/lib/http';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 
-import { CORS_HEADERS, REVOCABLE_STATUSES, handleGameDelete } from './handler';
+import { CORS_HEADERS, handleGameDelete, handleGameRestore } from './handler';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,19 +30,59 @@ export async function DELETE(
   return handleGameDelete(request, clientGameId, {
     authenticate: async (req) => {
       const token = readBearerToken(req);
-      if (token !== null) return userIdFromBearer(service, token);
+      if (token !== null) return userIdFromApiBearer(service, token);
       return userIdFromCookies(await createClient());
     },
     removeGame: async (userId, gameId) => {
-      const { data, error } = await service
+      const { data, error } = await service.rpc('remove_owned_game', {
+        p_user_id: userId,
+        p_client_game_id: gameId,
+      });
+      if (error !== null) throw new Error(`removeGame: ${error.message}`);
+      return data === true;
+    },
+  });
+}
+
+/** Restore a previously removed owned game to its recorded moderation state. */
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ clientGameId: string }> },
+): Promise<Response> {
+  const { clientGameId } = await context.params;
+  const service = createServiceClient();
+  return handleGameRestore(request, clientGameId, {
+    authenticate: async (req) => {
+      const token = readBearerToken(req);
+      if (token !== null) return userIdFromApiBearer(service, token);
+      return userIdFromCookies(await createClient());
+    },
+    restoreGame: async (userId, gameId) => {
+      const { data, error } = await service.rpc('restore_owned_game', {
+        p_user_id: userId,
+        p_client_game_id: gameId,
+      });
+      if (error !== null) throw new Error(`restoreGame: ${error.message}`);
+      if (data !== true) return null;
+      const restored = await service
         .from('games')
-        .update({ status: 'user_removed' })
+        .select('status, server_score')
         .eq('user_id', userId)
         .eq('client_game_id', gameId)
-        .in('status', [...REVOCABLE_STATUSES])
-        .select('id');
-      if (error !== null) throw new Error(`removeGame: ${error.message}`);
-      return data.length > 0;
+        .single();
+      if (restored.error !== null) throw new Error(`restoreGame(read): ${restored.error.message}`);
+      const row = restored.data;
+      const outcome = row.status;
+      if (
+        outcome !== 'accepted' &&
+        outcome !== 'quarantined' &&
+        outcome !== 'rejected' &&
+        outcome !== 'user_removed'
+      ) {
+        throw new Error('restoreGame(read): invalid status');
+      }
+      if (typeof row.server_score !== 'number') throw new Error('restoreGame(read): invalid score');
+      return { id: gameId, outcome, serverScore: row.server_score };
     },
   });
 }

@@ -12,6 +12,7 @@ export function AdminActions({ gameId }: { gameId: string }): React.JSX.Element 
   const router = useRouter();
   const [busy, setBusy] = useState<'approve' | 'reject' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reason, setReason] = useState('');
 
   async function act(action: 'approve' | 'reject'): Promise<void> {
     setBusy(action);
@@ -20,7 +21,7 @@ export function AdminActions({ gameId }: { gameId: string }): React.JSX.Element 
       const response = await fetch(`/api/admin/games/${gameId}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, reason }),
       });
       if (!response.ok) {
         setError('Action failed. Refresh and try again.');
@@ -36,10 +37,22 @@ export function AdminActions({ gameId }: { gameId: string }): React.JSX.Element 
 
   return (
     <div className="admin-actions">
+      <label className="uni-filter" style={{ flex: '1 1 100%' }}>
+        <span className="uni-filter__label">Review reason</span>
+        <input
+          className="field"
+          value={reason}
+          maxLength={500}
+          placeholder="Evidence considered and reason for this decision"
+          onChange={(event) => {
+            setReason(event.target.value);
+          }}
+        />
+      </label>
       <button
         type="button"
         className="btn btn--primary btn--sm"
-        disabled={busy !== null}
+        disabled={busy !== null || reason.trim().length < 3}
         onClick={() => void act('approve')}
       >
         {busy === 'approve' ? 'Approving…' : 'Approve'}
@@ -47,7 +60,7 @@ export function AdminActions({ gameId }: { gameId: string }): React.JSX.Element 
       <button
         type="button"
         className="btn btn--danger"
-        disabled={busy !== null}
+        disabled={busy !== null || reason.trim().length < 3}
         onClick={() => void act('reject')}
       >
         {busy === 'reject' ? 'Rejecting…' : 'Reject'}

@@ -1,4 +1,5 @@
 import { execSync, spawn, type ChildProcess } from 'node:child_process';
+import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,19 +9,19 @@ import { expect, test } from '@playwright/test';
 import { createApiClient } from '../lib/api.js';
 
 /**
- * OPTIONAL full-stack smoke. Proves the extension's real
+ * Full-stack smoke. Proves the extension's real
  * API client submits a recorded game through the live `POST /api/games` route to
  * a local Supabase, is judged `accepted`, and surfaces on the leaderboard.
  *
- * Skipped unless `ZL_FULLSTACK=1` AND a local Supabase stack is running
- * (`supabase start`), so the default e2e run — and CI — stays replica-only, with
- * no Docker dependency. When enabled it reads the local Supabase keys, boots
- * `next dev`, and drives the whole chain.
+ * Skipped locally unless `ZL_FULLSTACK=1` and a local Supabase stack is running.
+ * The full-stack CI job sets the flag after starting a fresh database. When
+ * enabled it reads the local keys, boots Next.js, and drives the whole chain.
  */
 
 const FULLSTACK = process.env.ZL_FULLSTACK === '1';
 const WEB_PORT = 3100;
 const WEB_URL = `http://localhost:${String(WEB_PORT)}`;
+const REDIRECT_URI = 'https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/zetalog-link';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(dirname, '..', '..', '..');
@@ -83,6 +84,7 @@ test.describe('full-stack leaderboard smoke', () => {
           NEXT_PUBLIC_SUPABASE_URL: sb.API_URL,
           NEXT_PUBLIC_SUPABASE_ANON_KEY: sb.ANON_KEY,
           SUPABASE_SERVICE_ROLE_KEY: sb.SERVICE_ROLE_KEY,
+          EXTENSION_OAUTH_REDIRECT_URIS: REDIRECT_URI,
           RESEND_API_KEY: 'dummy-key',
           EMAIL_FROM: 'ZetaLog <test@example.com>',
         },
@@ -101,13 +103,15 @@ test.describe('full-stack leaderboard smoke', () => {
     }
   });
 
-  test('submits a recorded game through the API, ranks it, then revokes it', async () => {
+  test('links an independent session and exercises its complete game lifecycle', async ({
+    browser,
+  }) => {
     const api = sb.API_URL;
     const suffix = Math.random().toString(36).slice(2, 8);
     const email = `e2e_${suffix}@example.com`;
     const password = 'test-password-123';
-    // display_name is unique + constrained to ^[A-Za-z0-9_][A-Za-z0-9_ ]{1,18}[A-Za-z0-9_]$.
-    const displayName = `E2E ${suffix}`;
+    // display_name is a unique 3–15 character handle: letters, digits or underscore.
+    const displayName = `E2E_${suffix}`;
 
     // Create an email-confirmed user (the handle_new_user trigger makes a profile).
     const created = await fetch(`${api}/auth/v1/admin/users`, {
@@ -135,25 +139,95 @@ test.describe('full-stack leaderboard smoke', () => {
     });
     expect(named.status).toBe(204);
 
-    // Sign in the way the extension's session was minted.
-    const tokenRes = await fetch(`${api}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: { apikey: sb.ANON_KEY, 'content-type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const token = (await tokenRes.json()) as { access_token: string };
-    expect(token.access_token).toBeTruthy();
+    // Two simultaneous verification-email reservations for one address cannot
+    // both spend the same quota. This exercises the database advisory-lock
+    // boundary, not a JavaScript mock.
+    const reserveAlias = (codeHash: string) =>
+      fetch(`${api}/rest/v1/rpc/reserve_uni_verification`, {
+        method: 'POST',
+        headers: {
+          apikey: sb.SERVICE_ROLE_KEY,
+          authorization: `Bearer ${sb.SERVICE_ROLE_KEY}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          p_user_id: user.id,
+          p_email: `parallel_${suffix}@dur.ac.uk`,
+          p_code_hash: codeHash,
+          p_expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
+          p_per_email_limit: 1,
+          p_global_limit: 100,
+        }),
+      });
+    const reservations = await Promise.all([
+      reserveAlias('parallel-code-one'),
+      reserveAlias('parallel-code-two'),
+    ]);
+    expect(reservations.map((response) => response.status)).toEqual([200, 200]);
+    const reservationResults = await Promise.all(
+      reservations.map(async (response) => (await response.json()) as string),
+    );
+    expect(reservationResults.filter((value) => value === 'rate-limited')).toHaveLength(1);
+    expect(
+      reservationResults.filter((value) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(value),
+      ),
+    ).toHaveLength(1);
+
+    // Sign the website in normally, then run the exact browser-owned PKCE link
+    // protocol. The credential returned below is independent: neither the
+    // website access token nor its rotating refresh token crosses the page.
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(`${WEB_URL}/signin`);
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.getByLabel('Password', { exact: true }).fill(password);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await page.waitForURL(`${WEB_URL}/me`);
+
+    const verifier = randomBytes(32).toString('base64url');
+    const codeChallenge = createHash('sha256').update(verifier).digest('base64url');
+    const state = randomBytes(32).toString('base64url');
+    const authorizeUrl = new URL('/api/extension/link/authorize', WEB_URL);
+    authorizeUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+    authorizeUrl.searchParams.set('code_challenge', codeChallenge);
+    authorizeUrl.searchParams.set('code_challenge_method', 'S256');
+    authorizeUrl.searchParams.set('state', state);
+    const authorized = await context.request.get(authorizeUrl.toString(), { maxRedirects: 0 });
+    expect(authorized.status()).toBe(303);
+    const callback = new URL(authorized.headers().location ?? '');
+    expect(`${callback.origin}${callback.pathname}`).toBe(REDIRECT_URI);
+    expect(callback.searchParams.get('state')).toBe(state);
+    const code = callback.searchParams.get('code');
+    expect(code).toBeTruthy();
+
+    const exchange = async () =>
+      fetch(`${WEB_URL}/api/extension/link/token`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ code, codeVerifier: verifier, redirectUri: REDIRECT_URI }),
+      });
+    const exchanged = await exchange();
+    expect(exchanged.status).toBe(200);
+    const linked = (await exchanged.json()) as { credential: string; userId: string };
+    expect(linked.credential).toMatch(/^zlx_[A-Za-z0-9_-]{43}$/);
+    expect(linked.userId).toBe(user.id);
+    expect((await exchange()).status).toBe(401); // authorization codes are single-use
 
     // Submit through the extension's OWN API client against the live route.
     const client = createApiClient({
       fetch: (url, init) => fetch(url, init),
       auth: {
-        accessToken: () => Promise.resolve(token.access_token),
+        accessToken: () => Promise.resolve(linked.credential),
         refresh: () => Promise.resolve(null),
       },
       baseUrl: WEB_URL,
     });
-    const game = acceptedGame();
+    const evidence = await client.startChallenge();
+    expect(evidence.ok).toBe(true);
+    if (!evidence.ok) return;
+    const game = acceptedGame({ evidence: evidence.value });
     const result = await client.submitGame(game);
 
     expect(result.ok).toBe(true);
@@ -171,17 +245,80 @@ test.describe('full-stack leaderboard smoke', () => {
     };
     expect(await readLeaderboard()).toEqual([{ duration: 60, best_score: 3 }]);
 
+    // The exact same ID submitted concurrently is admitted once and both
+    // callers resolve to the same durable row (atomic idempotency).
+    const concurrent = acceptedGame();
+    const [left, right] = await Promise.all([
+      client.submitGame(concurrent),
+      client.submitGame(concurrent),
+    ]);
+    expect(left.ok && right.ok).toBe(true);
+    if (!left.ok || !right.ok) return;
+    expect(left.value.id).toBe(right.value.id);
+
+    // Replaying consumed evidence cannot attach it to another game. The game
+    // itself still receives today's normal plausibility verdict, which is the
+    // deliberate friction-free offline fallback.
+    const replay = acceptedGame({ evidence: evidence.value });
+    const replayed = await client.submitGame(replay);
+    expect(replayed.ok).toBe(true);
+    const replayRow = await fetch(
+      `${api}/rest/v1/games?user_id=eq.${user.id}&client_game_id=eq.${replay.id}&select=challenge_id`,
+      {
+        headers: {
+          apikey: sb.SERVICE_ROLE_KEY,
+          authorization: `Bearer ${sb.SERVICE_ROLE_KEY}`,
+        },
+      },
+    );
+    expect(await replayRow.json()).toEqual([{ challenge_id: null }]);
+
+    // The byte limit is enforced by the real route even when a client lies by
+    // omitting Content-Length; no unbounded JSON parse reaches the validator.
+    const oversized = await fetch(`${WEB_URL}/api/games`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${linked.credential}`,
+        'content-type': 'application/json',
+      },
+      body: `{"padding":"${'x'.repeat(2_000_000)}"}`,
+    });
+    expect(oversized.status).toBe(413);
+
     // Revoking through the extension's OWN API client (a background DELETE that,
     // in a real browser, is CORS-preflighted) soft-deletes the game, so it drops
     // off the accepted-only leaderboard view.
     const revoked = await client.revokeGame(game.id);
     expect(revoked.ok).toBe(true);
-    expect(await readLeaderboard()).toEqual([]);
+    const restored = await client.restoreGame(game.id);
+    expect(restored.ok).toBe(true);
+
+    // Unlink revokes only this installation credential. The website session
+    // remains signed in so the user can relink once without account damage.
+    expect((await client.revokeSession()).ok).toBe(true);
+    expect(await client.listGames()).toEqual({ ok: false, error: { kind: 'auth' } });
+    await expect(page).toHaveURL(`${WEB_URL}/me`);
+
+    // Account erasure is also driven through the real authenticated API. The
+    // pgTAP suite separately proves every profile/game/alias/credential row is
+    // removed atomically and only an anonymous 30-day event remains.
+    const deleted = await context.request.delete(`${WEB_URL}/api/account`, {
+      data: { confirmation: 'DELETE' },
+    });
+    expect(deleted.status()).toBe(200);
+    const deletedUser = await fetch(`${api}/auth/v1/admin/users/${user.id}`, {
+      headers: {
+        apikey: sb.SERVICE_ROLE_KEY,
+        authorization: `Bearer ${sb.SERVICE_ROLE_KEY}`,
+      },
+    });
+    expect(deletedUser.status).toBe(404);
+    await context.close();
   });
 });
 
 /** A human-paced, three-problem 60s game that judges to `accepted` (score 3). */
-function acceptedGame(): GameRecord {
+function acceptedGame(over: Partial<GameRecord> = {}): GameRecord {
   return {
     id: crypto.randomUUID(),
     startedAtMs: Date.now() - 60_000,
@@ -212,5 +349,6 @@ function acceptedGame(): GameRecord {
       { kind: 'input', at: 5600, value: '33' },
       { kind: 'accepted', at: 6000, answer: 33 },
     ],
+    ...over,
   };
 }

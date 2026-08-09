@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-import { apiError, apiJson } from '@/lib/http';
-import { findUniversityForEmail } from '@/lib/uni';
-import { verifyCode } from '@/lib/verification';
+import { apiError, apiJson, readJsonBody } from '@/lib/http';
+import { hashCode } from '@/lib/verification';
 
 /**
  * The testable core of `POST /api/verify/confirm`: find the latest
@@ -13,34 +12,23 @@ import { verifyCode } from '@/lib/verification';
 const bodySchema = z.object({ code: z.string().regex(/^\d{6}$/) });
 
 /** A pending verification, resolved from the database. */
-export interface PendingVerification {
-  readonly id: string;
-  readonly email: string;
-  readonly codeHash: string;
-  readonly expiresAtMs: number;
-  readonly attempts: number;
-}
-
-/**
- * Outcome of persisting a verification. `alias-conflict` is the lost race on
- * the verified-alias unique index: someone else claimed the address
- * between the request-time ownership check and this confirm.
- */
-export type ApplyVerificationResult =
-  { readonly ok: true } | { readonly ok: false; readonly reason: 'alias-conflict' };
+export type ConfirmVerificationResult =
+  | { readonly status: 'ok'; readonly university: { readonly name: string; readonly slug: string } }
+  | { readonly status: 'incorrect'; readonly attemptsRemaining: number }
+  | {
+      readonly status:
+        'expired' | 'locked' | 'no-pending' | 'unknown-university' | 'alias-conflict';
+    };
 
 /** Injected dependencies for the core handler. */
 export interface VerifyConfirmDeps {
   authenticate: () => Promise<string | null>;
-  getLatestPending: (userId: string) => Promise<PendingVerification | null>;
-  listUniversities: () => Promise<{ id: string; name: string; slug: string; domains: string[] }[]>;
-  incrementAttempts: (verificationId: string) => Promise<void>;
-  applyVerification: (input: {
+  /** Atomic database transition: locks/consumes the OTP and applies the alias + badge. */
+  confirmVerification: (input: {
     userId: string;
-    universityId: string;
-    verificationId: string;
+    codeHash: string;
     nowIso: string;
-  }) => Promise<ApplyVerificationResult>;
+  }) => Promise<ConfirmVerificationResult>;
   now: () => number;
 }
 
@@ -53,38 +41,33 @@ export async function handleVerifyConfirm(
     return apiError(401, 'unauthorized', 'Sign in before confirming a code.');
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
+  const body = await readJsonBody(request);
+  if (!body.ok && body.reason === 'payload-too-large') {
+    return apiError(413, 'payload-too-large', 'Request body is too large.');
+  }
+  if (!body.ok) {
     return apiError(400, 'bad-request', 'Request body must be JSON.');
   }
-  const parsed = bodySchema.safeParse(body);
+  const parsed = bodySchema.safeParse(body.value);
   if (!parsed.success) {
     return apiError(400, 'bad-request', 'Enter the 6-digit code.');
   }
 
-  const pending = await deps.getLatestPending(userId);
-  if (pending === null) {
-    return apiError(404, 'no-pending', 'No pending verification. Request a new code.');
-  }
-
   const nowMs = deps.now();
-  const outcome = verifyCode({
-    submittedCode: parsed.data.code,
-    storedHash: pending.codeHash,
-    expiresAtMs: pending.expiresAtMs,
-    attempts: pending.attempts,
-    nowMs,
+  const outcome = await deps.confirmVerification({
+    userId,
+    codeHash: hashCode(parsed.data.code),
+    nowIso: new Date(nowMs).toISOString(),
   });
 
   switch (outcome.status) {
+    case 'no-pending':
+      return apiError(404, 'no-pending', 'No pending verification. Request a new code.');
     case 'expired':
       return apiError(410, 'expired', 'That code has expired. Request a new one.');
     case 'locked':
       return apiError(429, 'too-many-attempts', 'Too many attempts. Request a new code.');
     case 'incorrect': {
-      await deps.incrementAttempts(pending.id);
       return apiJson(400, {
         error: {
           code: 'incorrect-code',
@@ -94,23 +77,14 @@ export async function handleVerifyConfirm(
       });
     }
     case 'ok': {
-      const university = findUniversityForEmail(pending.email, await deps.listUniversities());
-      if (university === null) {
-        return apiError(409, 'unknown-university', 'That university is no longer available.');
-      }
-      const applied = await deps.applyVerification({
-        userId,
-        universityId: university.id,
-        verificationId: pending.id,
-        nowIso: new Date(nowMs).toISOString(),
-      });
-      if (!applied.ok) {
-        return apiError(409, 'email-taken', 'That email is already attached to another account.');
-      }
       return apiJson(200, {
         ok: true,
-        university: { name: university.name, slug: university.slug },
+        university: outcome.university,
       });
     }
+    case 'unknown-university':
+      return apiError(409, 'unknown-university', 'That university is no longer available.');
+    case 'alias-conflict':
+      return apiError(409, 'email-taken', 'That email is already attached to another account.');
   }
 }
