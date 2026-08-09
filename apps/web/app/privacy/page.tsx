@@ -16,7 +16,7 @@ export default function PrivacyPage(): React.JSX.Element {
   return (
     <article className="prose board-enter">
       <h1 className="display board-title">Privacy policy</h1>
-      <p className="meta">Last updated: 6 August 2026</p>
+      <p className="meta">Last updated: 9 August 2026</p>
 
       <p>
         ZetaLog is a browser extension that records your results on the Zetamac arithmetic game
@@ -34,11 +34,18 @@ export default function PrivacyPage(): React.JSX.Element {
         </li>
         <li>The resulting score and the time you played.</li>
         <li>Your popup preferences: the configuration and trend range you last viewed.</li>
+        <li>
+          If you link the extension, a random ZetaLog account identifier and a revocable extension
+          credential.
+        </li>
       </ul>
       <p>
         ZetaLog does not collect your browsing history, the other sites or tabs you visit, your
-        keystrokes anywhere other than the Zetamac answer box during a game, your location, or any
-        advertising identifiers. It contains no analytics or advertising tracking.
+        keystrokes anywhere other than the Zetamac answer box during a game, your precise or GPS
+        location, or any advertising identifiers. During account linking, the server processes the
+        request IP address for abuse prevention and stores only its hash as a rate-limit key. Raw IP
+        addresses are not stored by ZetaLog, and inactive rate-limit keys are deleted after two
+        days. ZetaLog contains no analytics or advertising tracking.
       </p>
 
       <h2 className="prose__h2">How data is stored</h2>

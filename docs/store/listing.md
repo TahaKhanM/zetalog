@@ -91,12 +91,13 @@ results when an account is linked. Keep it in sync with
 
 ## Data-use disclosure form (dashboard)
 
-- Collects/handles: "Website content" (the Zetamac game state), "User activity"
-  (game results and play times), and "Authentication information" (a revocable
-  extension credential while linked). The credential is stored locally and sent
-  only to ZetaLog's HTTPS API. The extension does not collect health, financial,
-  personal communications, location, advertising identifiers, or general web
-  browsing history.
+- Collects/handles: "Personally identifiable information" (the persistent
+  ZetaLog account identifier), "Authentication information" (a revocable
+  extension credential while linked), "Location" (the request IP is processed
+  during linking and only its hash is retained for rate limiting), "User
+  activity" (game results and play times), and "Website content" (the Zetamac
+  game state). The extension does not collect health, financial, personal
+  communications, advertising identifiers, or general web browsing history.
 - "Is this data transferred off the user's device?": YES. A linked extension
   sends the credential to authenticate ZetaLog API requests and sends game
   results/telemetry for leaderboard and account-history features. No data is

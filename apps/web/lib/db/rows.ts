@@ -1,6 +1,8 @@
 import { gameEventSchema } from '@zetalog/shared';
 import { z } from 'zod';
 
+import { leaderboardBadgeIdSchema } from '../leaderboard-badge';
+
 /**
  * Zod schemas for every Supabase row this app reads. Rows arrive as untyped
  * JSON from PostgREST; parsing them here is the single trusted boundary
@@ -71,6 +73,8 @@ export const leaderboardEntrySchema = z.object({
   /** NULL unless the profile's `uni_verified_at` is set (view hides it otherwise). */
   university_name: z.string().nullable(),
   university_slug: z.string().nullable(),
+  /** Service-managed exceptional badge; ordinary profiles always return NULL. */
+  leaderboard_badge: leaderboardBadgeIdSchema.nullable(),
 });
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
@@ -125,6 +129,8 @@ export const profileRowSchema = z.object({
   independent: z.boolean(),
   /** The user opted out of the public leaderboards; their scores stay private. */
   leaderboard_opt_out: z.boolean(),
+  /** Service-managed and not writable through the profile API. */
+  leaderboard_badge: leaderboardBadgeIdSchema.nullable(),
 });
 export type ProfileRow = z.infer<typeof profileRowSchema>;
 
