@@ -1,6 +1,6 @@
 # ZetaLog — Privacy Policy
 
-_Last updated: 2026-08-06_
+_Last updated: 2026-08-09_
 
 ZetaLog is a browser extension that records your results on the Zetamac
 arithmetic game (arithmetic.zetamac.com) and shows your progress, with an
@@ -15,11 +15,15 @@ ZetaLog records, for each Zetamac game you play:
 - The game's telemetry: the sequence of problems shown, the values you typed into the answer box, and each correct answer, with timestamps relative to the start of the game.
 - The resulting score and the time you played.
 - Your popup preferences (which configuration and trend range you last viewed).
+- If you link the extension, a random ZetaLog account identifier and a revocable extension credential.
 
 ZetaLog does **not** collect your browsing history, the other sites or tabs you
 visit, your keystrokes anywhere other than the Zetamac answer box during a game,
-your IP-based location, or any advertising identifiers. ZetaLog contains no
-analytics or advertising tracking.
+your precise or GPS location, or any advertising identifiers. During account
+linking, the server processes the request IP address for abuse prevention and
+stores only its hash as a rate-limit key. Raw IP addresses are not stored by
+ZetaLog, and inactive rate-limit keys are deleted after two days. ZetaLog
+contains no analytics or advertising tracking.
 
 ## How data is stored
 

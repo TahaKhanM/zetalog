@@ -8,7 +8,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions, pg_catalog;
 
-select plan(12);
+select plan(14);
 
 -- Fixtures: two users (profiles via trigger).
 insert into auth.users (instance_id, id, aud, role, email)
@@ -57,6 +57,16 @@ select throws_ok(
   $$ update public.profiles set display_name = 'abcdefghijklmnop'
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
   '23514', null, 'rejects names longer than 15 chars');
+
+-- leaderboard_badge CHECK: only service-supported identifiers -------------
+select lives_ok(
+  $$ update public.profiles set leaderboard_badge = 'chrome-reviewer'
+      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  'accepts the supported service badge');
+select throws_ok(
+  $$ update public.profiles set leaderboard_badge = 'self-awarded'
+      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  '23514', null, 'rejects unsupported service badges');
 
 -- Idempotent uploads: (user_id, client_game_id) is unique per user ---------
 insert into public.games

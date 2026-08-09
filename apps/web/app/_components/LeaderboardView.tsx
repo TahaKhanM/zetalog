@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import type { BoardStats, UniversityOption } from '@/lib/db/queries';
 import type { LeaderboardEntry } from '@/lib/db/rows';
+import { leaderboardBadgeForEntry } from '@/lib/leaderboard-badge';
 
 import { UniBadge } from './UniBadge';
 import { UniversityFilter } from './UniversityFilter';
@@ -93,7 +94,7 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
                     </th>
                     <th scope="col">Player</th>
                     {props.showBadges ? (
-                      <th className="ltable__badge-h" scope="col" aria-label="University" />
+                      <th className="ltable__badge-h" scope="col" aria-label="Badge" />
                     ) : null}
                     <th className="ltable__games-h" scope="col">
                       Games
@@ -161,7 +162,7 @@ function LeaderboardRow({
       </td>
       {showBadges ? (
         <td className="ltable__badge-c">
-          <Badge entry={entry} />
+          <LeaderboardBadge entry={entry} />
         </td>
       ) : null}
       <td className="num ltable__games meta">{entry.games_counted}</td>
@@ -170,19 +171,29 @@ function LeaderboardRow({
   );
 }
 
-function Badge({ entry }: { entry: LeaderboardEntry }): React.JSX.Element | null {
-  // Badges sit in their own fixed column so every mark shares one vertical
-  // line; each links to its uni board. The viewer's own "＋ add badge"
-  // affordance is added client-side by ViewerRowHighlight, so this render
-  // stays identity-free and cacheable.
-  if (entry.university_slug !== null && entry.university_name !== null) {
+function LeaderboardBadge({ entry }: { entry: LeaderboardEntry }): React.JSX.Element | null {
+  // Service-managed badges take precedence over university marks and do not
+  // link to a university board. Ordinary university marks keep their existing
+  // link. The viewer's own add-badge affordance is mounted client-side.
+  const badge = leaderboardBadgeForEntry(entry);
+  if (badge === null) return null;
+  if (badge.kind === 'service') {
     return (
-      <Link href={`/uni/${entry.university_slug}`} className="player__badge-link">
-        <UniBadge slug={entry.university_slug} name={entry.university_name} />
-      </Link>
+      <img
+        src={badge.logo}
+        alt={`${badge.name} badge`}
+        title={badge.name}
+        className="uni-badge uni-badge--logo leaderboard-badge"
+        width={20}
+        height={20}
+      />
     );
   }
-  return null;
+  return (
+    <Link href={`/uni/${badge.slug}`} className="player__badge-link">
+      <UniBadge slug={badge.slug} name={badge.name} />
+    </Link>
+  );
 }
 
 function EmptyState(): React.JSX.Element {

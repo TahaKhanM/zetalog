@@ -11,7 +11,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions, pg_catalog;
 
-select plan(20);
+select plan(21);
 
 -- Fixtures -----------------------------------------------------------------
 -- Two users (profiles are created by the on_auth_user_created trigger).
@@ -184,6 +184,14 @@ select throws_ok(
      update public.profiles set uni_verified_at = now()
       where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
   '42501', null, 'user cannot update uni_verified_at');
+
+select throws_ok(
+  $$ set local role authenticated;
+     set local request.jwt.claims to
+       '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","role":"authenticated"}';
+     update public.profiles set leaderboard_badge = 'chrome-reviewer'
+      where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' $$,
+  '42501', null, 'user cannot assign a leaderboard badge');
 
 -- authenticated: cannot insert profiles or universities --------------------
 -- Neither table grants INSERT to clients: profiles rows come from the signup

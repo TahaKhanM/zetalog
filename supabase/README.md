@@ -40,6 +40,8 @@ Migrations, in order:
    evidence, and operational-data retention.
 10. `20260806091000_schedule_data_retention.sql` — hourly scheduled retention;
     requires `pg_cron` to be available in the hosted project before it runs.
+11. `20260809164010_add_profile_leaderboard_badges.sql` — a constrained,
+    service-managed badge slot for exceptional leaderboard identities.
 
 ## Local development
 
@@ -122,12 +124,12 @@ Names are documented in the repo-root `.env.example`; never commit real values.
   service-role only. The service-role key never reaches a client.
 - **`profiles` updates are column-scoped.** A user may update only their own
   `display_name` (column-level `GRANT UPDATE (display_name)` + own-row policy);
-  `is_admin`, `university_id`, and `uni_verified_at` are set by the trigger or
-  the service role.
+  `is_admin`, `university_id`, `uni_verified_at`, and `leaderboard_badge` are set
+  by the trigger or the service role.
 - **`leaderboard_entries` is a definer-semantics view by design.** It bypasses
   RLS so `anon` can read the public board, while exposing only a minimal, public
-  projection (display name, duration, best score, counts, verified badge). The
-  Supabase advisor `security_definer_view` (0010) warning is therefore expected
-  and accepted — see the comment in the view migration. Do not convert it to
-  `security_invoker` (that would empty the public board) and do not add columns
-  that leak per-user private data.
+  projection (display name, duration, best score, counts, verified university,
+  and service-managed badge). The Supabase advisor `security_definer_view`
+  (0010) warning is therefore expected and accepted — see the comment in the
+  view migration. Do not convert it to `security_invoker` (that would empty the
+  public board) and do not add columns that leak per-user private data.
