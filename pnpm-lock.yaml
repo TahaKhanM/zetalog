@@ -45,24 +45,24 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared
       react:
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.8
+        version: 19.2.8
       react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
+        specifier: ^19.2.8
+        version: 19.2.8(react@19.2.8)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       '@testing-library/react':
         specifier: ^16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@types/react':
-        specifier: ^19.2.17
-        version: 19.2.17
+        specifier: ^19.2.18
+        version: 19.2.18
       '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.17)
+        specifier: ^19.2.4
+        version: 19.2.4(@types/react@19.2.18)
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
@@ -94,26 +94,26 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@supabase/ssr':
-        specifier: ^0.12.3
-        version: 0.12.3(@supabase/supabase-js@2.110.7)
+        specifier: ^0.12.4
+        version: 0.12.4(@supabase/supabase-js@2.112.2)
       '@supabase/supabase-js':
-        specifier: ^2.110.7
-        version: 2.110.7
+        specifier: ^2.112.2
+        version: 2.112.2
       '@zetalog/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       next:
         specifier: ^16.3.0
-        version: 16.3.0(@playwright/test@1.61.1)(@types/node@26.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.3.0(@playwright/test@1.61.1)(@types/node@26.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.8
+        version: 19.2.8
       react-dom:
-        specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
+        specifier: ^19.2.8
+        version: 19.2.8(react@19.2.8)
       resend:
-        specifier: ^6.17.2
-        version: 6.17.2
+        specifier: ^6.18.1
+        version: 6.18.1
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -125,11 +125,11 @@ importers:
         specifier: ^26.1.1
         version: 26.1.1
       '@types/react':
-        specifier: ^19.2.17
-        version: 19.2.17
+        specifier: ^19.2.18
+        version: 19.2.18
       '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.17)
+        specifier: ^19.2.4
+        version: 19.2.4(@types/react@19.2.18)
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
@@ -887,37 +887,42 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@supabase/auth-js@2.110.7':
-    resolution: {integrity: sha512-M5Bpl4hCv6kHcOO/xM06Dyfg1mYLHljMkp1plhzG9IRZPc3czvyMsSN1XpL5+GKisOKM3lSN59zhpcm6sMVXfA==}
+  '@supabase/auth-js@2.112.2':
+    resolution: {integrity: sha512-l1InCp4j98d09LZ6+RgubgF4eVPGBGXcLEhFusLg1qUCHJ2IEkYu5FohKK+eaFmIOwEk0kqG/j/lycw5e15mcQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/functions-js@2.110.7':
-    resolution: {integrity: sha512-megYmexlYEoR/0qlsr4Snh9wtzAodO7MAri3NMevZrXzNvQRKlvmTcSBoKGLQEPDakgDZMqbMdf9DwoZz6qfoA==}
+  '@supabase/functions-js@2.112.2':
+    resolution: {integrity: sha512-oMuSWN0ERmrG9S6kOM0bwhHmESGVl3kMtkZl2dNCU/r89hMiziX4GfD1omNo9QcBDele4N0GwSZ7hdbpuiA35A==}
     engines: {node: '>=22.0.0'}
 
   '@supabase/phoenix@0.4.5':
     resolution: {integrity: sha512-aAn9H9ovVyeApKy11OWOrrOGq8DV68yWeH4ud2lN9fzn4aO8Zb5GLL9m1pUg9nLqIcT+ZDfAcsZe0E/nqdv2lw==}
 
-  '@supabase/postgrest-js@2.110.7':
-    resolution: {integrity: sha512-ban6YV0djhVaqVYezlOARKLIuOBSvLLhyQVZjA2nxPrtswhxHCl1+gI4giFgI9ATQAaMNbUZb4JXiuL5lEA/5g==}
+  '@supabase/postgrest-js@2.112.2':
+    resolution: {integrity: sha512-ewhhtRny/HFRGhUTTg/PsqIatsl8OhW8Eha/Tz4S+SRAXBnuhKei9ZpsQTgL/3XcH9UEwuPQyQgQ9itq7nRQeg==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/realtime-js@2.110.7':
-    resolution: {integrity: sha512-AMtZjyFA2gsmjuxopPNS/sRznLQHG0Ht5x+ytTPTOh3vAcOTUlVRLx7gW4/CONNnbb3PKOkE+HmM35HOSbmomQ==}
+  '@supabase/realtime-js@2.112.2':
+    resolution: {integrity: sha512-cd9/CEUJ6Go13FxtfiuC5rYELJtuQzVzTXlGG+XjSppjDS+anq+xo++WQe7ZRUNTuHOCeyKRwmx9Hw/OQJ04ig==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/ssr@0.12.3':
-    resolution: {integrity: sha512-qWXJ/dI7CiYDKyTgIPqJ4Qkh8y5edh2LdF/nkN48z47mmEVzAO2OE+YErYeQ/UemVfonn/F4kFz+lhLqoVMdpw==}
+  '@supabase/ssr@0.12.4':
+    resolution: {integrity: sha512-xHzcgI8cC1TpBKSwJcR5Yd8CCwfIq0SBc5yb4yz/YFw5tbCrEQ0QT3a+2jymCxHgQWLfzwN93HZ6eRbcoMkOlA==}
     peerDependencies:
-      '@supabase/supabase-js': ^2.110.5
+      '@supabase/supabase-js': ^2.111.0
 
-  '@supabase/storage-js@2.110.7':
-    resolution: {integrity: sha512-2tcDE8cjEDy1uKxKavBpKQod1JdMV1jDXQag48TCa+kycmJOltc0yVabC0BUlhOwAl6WykXU2aOsH3ELMtZrmQ==}
+  '@supabase/storage-js@2.112.2':
+    resolution: {integrity: sha512-6jyBq/J1iXOHNpbjCZS7gFcDk49iM1MCJUVkDl71gLd/+XnLDzpUBs8icGebtwiHpl4kVszxIRDYAosbF4Rsig==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/supabase-js@2.110.7':
-    resolution: {integrity: sha512-AnfO3A230Shy6RMO7cya3Wl1OcXnABJrzH8vP+fY7/RFjhzcchB7DjKkkTIAntlwekD+GkSFzEvt2tC+D4Fp8w==}
+  '@supabase/supabase-js@2.112.2':
+    resolution: {integrity: sha512-UyI1epU9B4X51HvNpkmlwTdF20fEcz2vyvrcDKVzFN4jZN41f5iQRqsiIQjAY5OVJD6ljqA/1g9JQeOTvFHpkA==}
     engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -1069,13 +1074,13 @@ packages:
   '@types/node@26.1.1':
     resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
 
-  '@types/react-dom@19.2.3':
-    resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
+  '@types/react-dom@19.2.4':
+    resolution: {integrity: sha512-Bsc+QHgp+P/F02XDzNCY9jnZNCUuLki36KT7VKrTXXLdHf+vHMNZnW1rVu5DNW/rCK+fya3DATySbLM4yhtKUw==}
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.17':
-    resolution: {integrity: sha512-MXfmqaVPEVgkBT/aY0aGCkRWWtByiYQXo3xdQ8r5RzuFrPiRn8Gar2tQdXSUQ2GKV3bkXckek89V8wQBY2Q/Aw==}
+  '@types/react@19.2.18':
+    resolution: {integrity: sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==}
 
   '@types/webextension-polyfill@0.12.5':
     resolution: {integrity: sha512-uKSAv6LgcVdINmxXMKBuVIcg/2m5JZugoZO8x20g7j2bXJkPIl/lVGQcDlbV+aXAiTyXT2RA5U5mI4IGCDMQeg==}
@@ -2479,8 +2484,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  postal-mime@2.7.4:
-    resolution: {integrity: sha512-0WdnFQYUrPGGTFu1uOqD2s7omwua8xaeYGdO6rb88oD5yJ/4pPHDA4sdWqfD8wQVfCny563n/HQS7zTFft+f/g==}
+  postal-mime@2.7.5:
+    resolution: {integrity: sha512-GNEXKvWFQnbgO5NlrGzVa0FmWzBZ24PersAWErttSg1Hjpf0ATxTwS5DOMGaOpTG6bUh5cTr7xi0jAD942wCJA==}
 
   postcss@8.5.20:
     resolution: {integrity: sha512-lW616l85ucIQL+FocMmL7pQFPqBmwejrCMg+iPxyImlrANNJG9NHq/RkyCZopDhd8C3LA03PHRJDjkbGu8vvug==}
@@ -2553,16 +2558,16 @@ packages:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
 
-  react-dom@19.2.7:
-    resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
+  react-dom@19.2.8:
+    resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
     peerDependencies:
-      react: ^19.2.7
+      react: ^19.2.8
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
-  react@19.2.7:
-    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+  react@19.2.8:
+    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
     engines: {node: '>=0.10.0'}
 
   readable-stream@2.3.8:
@@ -2592,8 +2597,8 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  resend@6.17.2:
-    resolution: {integrity: sha512-hbaXEORFIFfT2Bh03NsA/akTTTKkD1hiuJ88ke64c5dWVV6DyoLxzFve3OiZqVOQ+JKLJ5uVkPR6hlUslpJFoA==}
+  resend@6.18.1:
+    resolution: {integrity: sha512-XN8XIaDdKF+ziSQ3K23ndUcyhP7U3ze2gky6SPgYkuAOq54mH4Wdhwm7QylEQ3zlz0NzdX7/l1AgmJUZbdPI/Q==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -3662,42 +3667,42 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@supabase/auth-js@2.110.7':
+  '@supabase/auth-js@2.112.2':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/functions-js@2.110.7':
+  '@supabase/functions-js@2.112.2':
     dependencies:
       tslib: 2.8.1
 
   '@supabase/phoenix@0.4.5': {}
 
-  '@supabase/postgrest-js@2.110.7':
+  '@supabase/postgrest-js@2.112.2':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/realtime-js@2.110.7':
+  '@supabase/realtime-js@2.112.2':
     dependencies:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/ssr@0.12.3(@supabase/supabase-js@2.110.7)':
+  '@supabase/ssr@0.12.4(@supabase/supabase-js@2.112.2)':
     dependencies:
-      '@supabase/supabase-js': 2.110.7
+      '@supabase/supabase-js': 2.112.2
       cookie: 1.1.1
 
-  '@supabase/storage-js@2.110.7':
+  '@supabase/storage-js@2.112.2':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
 
-  '@supabase/supabase-js@2.110.7':
+  '@supabase/supabase-js@2.112.2':
     dependencies:
-      '@supabase/auth-js': 2.110.7
-      '@supabase/functions-js': 2.110.7
-      '@supabase/postgrest-js': 2.110.7
-      '@supabase/realtime-js': 2.110.7
-      '@supabase/storage-js': 2.110.7
+      '@supabase/auth-js': 2.112.2
+      '@supabase/functions-js': 2.112.2
+      '@supabase/postgrest-js': 2.112.2
+      '@supabase/realtime-js': 2.112.2
+      '@supabase/storage-js': 2.112.2
 
   '@swc/helpers@0.5.15':
     dependencies:
@@ -3783,15 +3788,15 @@ snapshots:
       picocolors: 1.1.1
       pretty-format: 27.5.1
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
     optionalDependencies:
-      '@types/react': 19.2.17
-      '@types/react-dom': 19.2.3(@types/react@19.2.17)
+      '@types/react': 19.2.18
+      '@types/react-dom': 19.2.4(@types/react@19.2.18)
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
@@ -3827,11 +3832,11 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
-  '@types/react-dom@19.2.3(@types/react@19.2.17)':
+  '@types/react-dom@19.2.4(@types/react@19.2.18)':
     dependencies:
-      '@types/react': 19.2.17
+      '@types/react': 19.2.18
 
-  '@types/react@19.2.17':
+  '@types/react@19.2.18':
     dependencies:
       csstype: 3.2.3
 
@@ -5036,16 +5041,16 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.3.0(@playwright/test@1.61.1)(@types/node@26.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.3.0(@playwright/test@1.61.1)(@types/node@26.1.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@next/env': 16.3.0
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.10.44
       caniuse-lite: 1.0.30001806
       postcss: 8.5.23
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      styled-jsx: 5.1.6(react@19.2.7)
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      styled-jsx: 5.1.6(react@19.2.8)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.3.0
       '@next/swc-darwin-x64': 16.3.0
@@ -5212,7 +5217,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  postal-mime@2.7.4: {}
+  postal-mime@2.7.5: {}
 
   postcss@8.5.20:
     dependencies:
@@ -5289,14 +5294,14 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-dom@19.2.7(react@19.2.7):
+  react-dom@19.2.8(react@19.2.8):
     dependencies:
-      react: 19.2.7
+      react: 19.2.8
       scheduler: 0.27.0
 
   react-is@17.0.2: {}
 
-  react@19.2.7: {}
+  react@19.2.8: {}
 
   readable-stream@2.3.8:
     dependencies:
@@ -5324,9 +5329,9 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  resend@6.17.2:
+  resend@6.18.1:
     dependencies:
-      postal-mime: 2.7.4
+      postal-mime: 2.7.5
       standardwebhooks: 1.0.0
 
   restore-cursor@5.1.0:
@@ -5524,10 +5529,10 @@ snapshots:
 
   stubborn-utils@1.0.2: {}
 
-  styled-jsx@5.1.6(react@19.2.7):
+  styled-jsx@5.1.6(react@19.2.8):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.7
+      react: 19.2.8
 
   supports-color@7.2.0:
     dependencies:
