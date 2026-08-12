@@ -13,7 +13,8 @@ const DURATION_TABS: readonly RankableDuration[] = [120, 60, 30];
 
 interface LeaderboardViewProps {
   readonly title: string;
-  readonly subtitle: string;
+  /** Optional one-liner under the title (the global board runs without one). */
+  readonly subtitle?: string | undefined;
   readonly entries: readonly LeaderboardEntry[];
   readonly duration: RankableDuration;
   readonly uniOptions: readonly UniversityOption[];
@@ -52,7 +53,7 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
               ) : null}
               <h1 className="display board-title">{props.title}</h1>
             </div>
-            <p className="meta">{props.subtitle}</p>
+            {props.subtitle !== undefined ? <p className="meta">{props.subtitle}</p> : null}
           </div>
           <UniversityFilter
             options={props.uniOptions}
