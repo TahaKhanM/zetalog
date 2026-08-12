@@ -21,6 +21,8 @@ interface LeaderboardViewProps {
   /** University badges are shown on the global board, redundant on a uni board. */
   readonly showBadges: boolean;
   readonly stats: BoardStats;
+  /** A university board's own mark, branded large in the masthead. */
+  readonly universityBadge?: { readonly slug: string; readonly name: string } | undefined;
 }
 
 /**
@@ -40,7 +42,16 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
         </p>
         <div className="masthead__row">
           <div>
-            <h1 className="display board-title">{props.title}</h1>
+            <div className="board-title-row">
+              {props.universityBadge !== undefined ? (
+                <UniBadge
+                  slug={props.universityBadge.slug}
+                  name={props.universityBadge.name}
+                  size="masthead"
+                />
+              ) : null}
+              <h1 className="display board-title">{props.title}</h1>
+            </div>
             <p className="meta">{props.subtitle}</p>
           </div>
           <UniversityFilter
@@ -79,6 +90,9 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
                       #
                     </th>
                     <th scope="col">Player</th>
+                    {props.showBadges ? (
+                      <th className="ltable__badge-h" scope="col" aria-label="University" />
+                    ) : null}
                     <th className="ltable__games-h" scope="col">
                       Games
                     </th>
@@ -143,9 +157,13 @@ function LeaderboardRow({
       <td>
         <span className="player">
           <span className="player__name">{entry.display_name}</span>
-          {showBadges ? <Badge entry={entry} /> : null}
         </span>
       </td>
+      {showBadges ? (
+        <td className="ltable__badge-c">
+          <Badge entry={entry} />
+        </td>
+      ) : null}
       <td className="num ltable__games meta">{entry.games_counted}</td>
       <td className="ltable__num ltable__score">{entry.best_score}</td>
     </tr>
@@ -153,9 +171,10 @@ function LeaderboardRow({
 }
 
 function Badge({ entry }: { entry: LeaderboardEntry }): React.JSX.Element | null {
-  // Row order: name · badge · stats; the badge links to the uni board. The
-  // viewer's own "＋ add badge" affordance is added client-side by
-  // ViewerRowHighlight, so this render stays identity-free and cacheable.
+  // Badges sit in their own fixed column so every mark shares one vertical
+  // line; each links to its uni board. The viewer's own "＋ add badge"
+  // affordance is added client-side by ViewerRowHighlight, so this render
+  // stays identity-free and cacheable.
   if (entry.university_slug !== null && entry.university_name !== null) {
     return (
       <Link href={`/uni/${entry.university_slug}`} className="player__badge-link">
