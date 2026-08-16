@@ -24,3 +24,21 @@ export function isLinkAck(data: unknown): boolean {
     typeof data === 'object' && data !== null && (data as { type?: unknown }).type === 'zl-link-ack'
   );
 }
+
+/**
+ * The presence ping the page posts on mount. The content script answers with
+ * `zl-link-ready` (and also announces itself unprompted when it starts), so
+ * whichever side loads first, the page learns the extension is reachable.
+ */
+export function linkPingMessage(): { readonly type: 'zl-link-ping' } {
+  return { type: 'zl-link-ping' };
+}
+
+/** Whether a received payload is the extension's presence signal. */
+export function isLinkReady(data: unknown): boolean {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    (data as { type?: unknown }).type === 'zl-link-ready'
+  );
+}

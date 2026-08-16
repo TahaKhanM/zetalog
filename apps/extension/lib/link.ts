@@ -23,6 +23,29 @@ const linkMessageSchema = z.object({
 /** The message the extension posts back once the background has stored the session. */
 export const LINK_ACK = { type: 'zl-link-ack' } as const;
 
+/**
+ * Presence signal: posted unprompted when the content script starts and again
+ * in answer to a page ping, so `/link` can show whether the extension is
+ * actually reachable BEFORE the user clicks (a freshly reloaded extension has
+ * no content script in tabs opened earlier — the page tells them to refresh).
+ */
+export const LINK_READY = { type: 'zl-link-ready' } as const;
+
+/** Whether an incoming message is the page's presence ping (same guards as the handoff). */
+export function isLinkPing(
+  event: IncomingMessage,
+  expectedSource: unknown,
+  allowedOrigins: readonly string[],
+): boolean {
+  if (!allowedOrigins.includes(event.origin)) return false;
+  if (event.source !== expectedSource) return false;
+  return (
+    typeof event.data === 'object' &&
+    event.data !== null &&
+    (event.data as { type?: unknown }).type === 'zl-link-ping'
+  );
+}
+
 /** Tokens lifted from a validated handoff message. */
 export interface LinkTokens {
   readonly accessToken: string;
