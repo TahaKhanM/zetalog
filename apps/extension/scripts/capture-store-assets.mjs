@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 import { createServer } from 'node:http';
-import { mkdtemp, mkdir, readFile, readdir, rm } from 'node:fs/promises';
+import { copyFile, mkdtemp, mkdir, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -13,6 +13,7 @@ const extensionRoot = path.resolve(dirname, '..');
 const repositoryRoot = path.resolve(extensionRoot, '../..');
 const extensionOutput = path.join(extensionRoot, '.output', 'chrome-mv3');
 const outputDir = path.join(repositoryRoot, 'docs', 'store', 'assets');
+const howItWorksOutputDir = path.join(repositoryRoot, 'apps', 'web', 'public', 'how-it-works');
 const iconPath = path.join(repositoryRoot, 'Assets', 'icons', 'icon-512.png');
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -322,7 +323,10 @@ async function renderPromoTile(browser, outputPath) {
 }
 
 async function main() {
-  await mkdir(outputDir, { recursive: true });
+  await Promise.all([
+    mkdir(outputDir, { recursive: true }),
+    mkdir(howItWorksOutputDir, { recursive: true }),
+  ]);
   const temporaryDir = await mkdtemp(path.join(tmpdir(), 'zetalog-store-assets-'));
   const api = await startApiReplica();
   let context;
@@ -385,6 +389,9 @@ async function main() {
       state: 'visible',
       timeout: 15_000,
     });
+    // Next keeps background requests open, so networkidle is not reliable.
+    // Give images and self-hosted fonts a short, bounded moment to settle.
+    await leaderboard.waitForTimeout(1_200);
     const leaderboardPath = path.join(temporaryDir, 'live-leaderboard.jpg');
     await leaderboard.screenshot({ path: leaderboardPath, type: 'jpeg', quality: 96 });
 
@@ -418,6 +425,17 @@ async function main() {
     );
     const linkedPopupPath = path.join(temporaryDir, 'popup-linked.png');
     await popup.screenshot({ path: linkedPopupPath, type: 'png' });
+
+    // The website walkthrough uses the real, uncropped product screens. Keep
+    // these separate from the composed Chrome Web Store marketing images so
+    // installation guidance never relies on a simulated browser interface.
+    await Promise.all([
+      copyFile(backgroundPath, path.join(howItWorksOutputDir, 'zetamac-game.jpg')),
+      copyFile(topPopupPath, path.join(howItWorksOutputDir, 'extension-overview.png')),
+      copyFile(recentPopupPath, path.join(howItWorksOutputDir, 'extension-history.png')),
+      copyFile(linkedPopupPath, path.join(howItWorksOutputDir, 'extension-sync.png')),
+      copyFile(leaderboardPath, path.join(howItWorksOutputDir, 'leaderboard.jpg')),
+    ]);
 
     await renderComposition({
       browser: context,
