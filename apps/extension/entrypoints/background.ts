@@ -101,13 +101,22 @@ export default defineBackground(() => {
     return result.ok;
   });
 
-  async function beginLink(): Promise<boolean> {
+  async function beginLink(): Promise<BgResponse> {
     const linked = await auth.beginLink();
-    if (linked) {
-      await backfill();
-      await drain();
+    if (!linked.ok) return linked;
+
+    // Storing the independent extension credential is the success boundary.
+    // A transient history/upload failure must not turn a completed link into a
+    // vague failure or tempt the user to create another credential.
+    let syncPending: boolean;
+    try {
+      syncPending = !(await backfill());
+      const summary = await drain();
+      syncPending ||= summary.authFailed || summary.retryScheduled > 0 || summary.remaining > 0;
+    } catch {
+      syncPending = true;
     }
-    return linked;
+    return { ok: true, ...(syncPending ? { syncPending: true } : {}) };
   }
 
   async function persistCapture(request: CaptureRequest): Promise<boolean> {
@@ -170,8 +179,7 @@ export default defineBackground(() => {
       }
       switch (parsed.data.type) {
         case 'zl-begin-link': {
-          const linked = await beginLink();
-          sendResponse({ ok: linked } satisfies BgResponse);
+          sendResponse(await beginLink());
           break;
         }
         case 'zl-start-challenge': {
@@ -213,8 +221,12 @@ export default defineBackground(() => {
           break;
         }
         case 'zl-drain':
-          await drain();
-          sendResponse({ ok: true } satisfies BgResponse);
+          {
+            const summary = await drain();
+            const syncPending =
+              summary.authFailed || summary.retryScheduled > 0 || summary.remaining > 0;
+            sendResponse({ ok: !summary.authFailed, syncPending } satisfies BgResponse);
+          }
           break;
         case 'zl-unlink': {
           // Forget the account immediately. If its opaque credential cannot be
@@ -251,7 +263,9 @@ export default defineBackground(() => {
           break;
         }
       }
-    })();
+    })().catch(() => {
+      sendResponse({ ok: false, error: 'internal' } satisfies BgResponse);
+    });
     return true; // keep the message channel open for the async sendResponse
   });
 

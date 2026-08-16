@@ -16,6 +16,11 @@ interface FooterProps {
   readonly onUnlink: () => void;
   /** Signed-in affordance: hide from (or show on) the public leaderboards. */
   readonly onSetPrivacy: (optOut: boolean) => void;
+  /** Progress/result of the current interactive link attempt. */
+  readonly linkState?: {
+    readonly phase: 'idle' | 'linking' | 'success' | 'error';
+    readonly message?: string;
+  };
 }
 
 /**
@@ -31,6 +36,7 @@ export function Footer({
   onSync,
   onUnlink,
   onSetPrivacy,
+  linkState = { phase: 'idle' },
 }: FooterProps): JSX.Element {
   if (linked) {
     return (
@@ -57,19 +63,41 @@ export function Footer({
             <span>Keep my scores off the leaderboard</span>
           </label>
         ) : null}
+        {linkState.message !== undefined ? (
+          <p
+            className={`zl-footer__note${linkState.phase === 'error' ? ' zl-footer__note--error' : ''}`}
+            role={linkState.phase === 'error' ? 'alert' : undefined}
+          >
+            {linkState.message}
+          </p>
+        ) : null}
       </footer>
     );
   }
 
   return (
     <footer className="zl-footer">
-      <button className="zl-sync" type="button" onClick={onSync}>
-        {needsRelink ? 'Relink ZetaLog' : 'Sync to leaderboard'}
+      <button
+        className="zl-sync"
+        type="button"
+        onClick={onSync}
+        disabled={linkState.phase === 'linking'}
+        aria-busy={linkState.phase === 'linking'}
+      >
+        {linkState.phase === 'linking'
+          ? 'Opening secure sign-in…'
+          : needsRelink
+            ? 'Relink ZetaLog'
+            : 'Sync to leaderboard'}
       </button>
-      <p className="zl-footer__note">
-        {needsRelink
-          ? 'Your session expired. Relink once to resume automatic syncing.'
-          : 'Works without an account'}
+      <p
+        className={`zl-footer__note${linkState.phase === 'error' ? ' zl-footer__note--error' : ''}`}
+        role={linkState.phase === 'error' ? 'alert' : undefined}
+      >
+        {linkState.message ??
+          (needsRelink
+            ? 'Your session expired. Relink once to resume automatic syncing.'
+            : 'Works without an account')}
       </p>
     </footer>
   );

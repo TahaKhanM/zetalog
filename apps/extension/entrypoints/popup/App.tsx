@@ -55,6 +55,32 @@ async function askBackground(request: BgRequest): Promise<BgResponse | null> {
 const DEFAULT_PREFS: Prefs = { selectedFingerprint: null, range: 'all' };
 const RECENT_LIMIT = 10;
 
+interface LinkUiState {
+  readonly phase: 'idle' | 'linking' | 'success' | 'error';
+  readonly message?: string;
+}
+
+function linkErrorMessage(error: BgResponse['error']): string {
+  switch (error) {
+    case 'extension-not-enabled':
+      return 'This Web Store release is not enabled on ZetaLog yet.';
+    case 'network':
+      return 'Could not reach ZetaLog. Check your connection and retry.';
+    case 'cancelled':
+      return 'Secure sign-in was cancelled or could not finish.';
+    case 'identity-unavailable':
+      return 'Chrome could not start secure sign-in. Restart Chrome and retry.';
+    case 'server':
+    case 'exchange-failed':
+      return 'Secure sign-in is temporarily unavailable. Please retry.';
+    case 'invalid-callback':
+      return 'Chrome returned an invalid response. Update the extension and retry.';
+    case 'internal':
+    case undefined:
+      return 'The extension could not finish linking. Your saved scores are safe.';
+  }
+}
+
 /** Distinct configurations present in history, first-seen order, with labels. */
 function configOptions(games: readonly StoredGame[]): ConfigOption[] {
   const seen = new Map<string, ConfigOption>();
@@ -76,6 +102,7 @@ export function App(): JSX.Element {
   const [linked, setLinked] = useState(false);
   const [needsRelink, setNeedsRelink] = useState(false);
   const [storageFailure, setStorageFailure] = useState(false);
+  const [linkState, setLinkState] = useState<LinkUiState>({ phase: 'idle' });
   // The leaderboard opt-out for the linked account: null until read from the server.
   const [optedOut, setOptedOut] = useState<boolean | null>(null);
 
@@ -166,9 +193,23 @@ export function App(): JSX.Element {
     void tellBackground({ type: 'zl-remove-game', id }).then(reload);
   }
   function sync(): void {
-    void tellBackground({ type: 'zl-begin-link' });
+    setLinkState({ phase: 'linking', message: 'Finish sign-in in the Chrome window.' });
+    void askBackground({ type: 'zl-begin-link' }).then(async (reply) => {
+      if (reply?.ok === true) {
+        setLinkState({
+          phase: 'success',
+          message: reply.syncPending
+            ? 'Connected. Saved scores are queued and will retry automatically.'
+            : 'Connected and synced.',
+        });
+        await reload();
+        return;
+      }
+      setLinkState({ phase: 'error', message: linkErrorMessage(reply?.error) });
+    });
   }
   function unlink(): void {
+    setLinkState({ phase: 'idle' });
     void tellBackground({ type: 'zl-unlink' }).then(reload);
   }
 
@@ -253,6 +294,7 @@ export function App(): JSX.Element {
         onSync={sync}
         onUnlink={unlink}
         onSetPrivacy={setPrivacy}
+        linkState={linkState}
       />
     </div>
   );

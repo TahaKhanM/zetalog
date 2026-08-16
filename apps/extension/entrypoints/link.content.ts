@@ -18,18 +18,40 @@ export default defineContentScript({
     ? ['https://www.zetalog.co.uk/link*', 'http://localhost:3000/link*']
     : ['https://www.zetalog.co.uk/link*'],
   main() {
+    const announce = (): void => {
+      window.postMessage({ type: 'zl-extension-ready' }, window.location.origin);
+    };
+    window.addEventListener('message', (event: MessageEvent<unknown>) => {
+      if (event.origin !== window.location.origin || event.source !== window) return;
+      if (
+        typeof event.data === 'object' &&
+        event.data !== null &&
+        (event.data as { type?: unknown }).type === 'zl-extension-ping'
+      ) {
+        announce();
+      }
+    });
+    announce();
+
     const button = document.querySelector<HTMLButtonElement>('[data-zetalog-link-button]');
     if (button === null) return;
     button.addEventListener('click', (event: MouseEvent) => {
       if (!event.isTrusted) return;
       const request: BgRequest = { type: 'zl-begin-link' };
-      void browser.runtime.sendMessage(request).then((response: unknown) => {
-        const result = response as BgResponse | undefined;
-        window.postMessage(
-          { type: result?.ok === true ? 'zl-link-complete' : 'zl-link-failed' },
-          window.location.origin,
-        );
-      });
+      void browser.runtime
+        .sendMessage(request)
+        .then((response: unknown) => {
+          const result = response as BgResponse | undefined;
+          window.postMessage(
+            result?.ok === true
+              ? { type: 'zl-link-complete', syncPending: result.syncPending === true }
+              : { type: 'zl-link-failed', error: result?.error ?? 'internal' },
+            window.location.origin,
+          );
+        })
+        .catch(() => {
+          window.postMessage({ type: 'zl-link-failed', error: 'internal' }, window.location.origin);
+        });
     });
   },
 });

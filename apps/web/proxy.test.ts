@@ -19,7 +19,6 @@ describe('proxy config.matcher', () => {
       '/me/:path*',
       '/account/:path*',
       '/admin/:path*',
-      '/link/:path*',
       '/verify/:path*',
       '/signin/:path*',
       '/auth/:path*',

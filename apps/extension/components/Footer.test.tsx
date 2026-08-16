@@ -66,4 +66,49 @@ describe('Footer', () => {
     );
     expect(screen.getByText('Linked, scores private')).toBeTruthy();
   });
+
+  it('disables the sync button while secure sign-in is opening', () => {
+    render(
+      <Footer
+        linked={false}
+        optedOut={null}
+        onSync={vi.fn()}
+        onUnlink={vi.fn()}
+        onSetPrivacy={vi.fn()}
+        linkState={{ phase: 'linking', message: 'Finish sign-in in Chrome.' }}
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: 'Opening secure sign-in…' }).hasAttribute('disabled'),
+    ).toBe(true);
+    expect(screen.getByText('Finish sign-in in Chrome.')).toBeTruthy();
+  });
+
+  it('shows an actionable failed-link message as an alert', () => {
+    render(
+      <Footer
+        linked={false}
+        optedOut={null}
+        onSync={vi.fn()}
+        onUnlink={vi.fn()}
+        onSetPrivacy={vi.fn()}
+        linkState={{ phase: 'error', message: 'Update the extension and retry.' }}
+      />,
+    );
+    expect(screen.getByRole('alert').textContent).toContain('Update the extension');
+  });
+
+  it('keeps a successful initial-sync notice visible after linking', () => {
+    render(
+      <Footer
+        linked
+        optedOut={false}
+        onSync={vi.fn()}
+        onUnlink={vi.fn()}
+        onSetPrivacy={vi.fn()}
+        linkState={{ phase: 'success', message: 'Connected and synced.' }}
+      />,
+    );
+    expect(screen.getByText('Connected and synced.')).toBeTruthy();
+  });
 });

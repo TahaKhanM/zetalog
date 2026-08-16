@@ -627,11 +627,20 @@ body {
   background: color-mix(in srgb, var(--zl-display) 8%, transparent);
 }
 
+.zl-sync:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .zl-footer__note {
   margin-top: 7px;
   font-size: 10px;
   color: var(--zl-faint);
   text-align: center;
+}
+
+.zl-footer__note--error {
+  color: var(--zl-warn-text);
 }
 
 /* Signed-in account row: status label + steel dot on the left, Unlink at right. */
