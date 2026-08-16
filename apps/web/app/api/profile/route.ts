@@ -27,5 +27,9 @@ export async function POST(request: Request): Promise<Response> {
       if (error.code === UNIQUE_VIOLATION) return 'taken';
       throw new Error(`setDisplayName: ${error.message}`);
     },
+    setIndependent: async (userId, independent) => {
+      const { error } = await service.from('profiles').update({ independent }).eq('id', userId);
+      if (error !== null) throw new Error(`setIndependent: ${error.message}`);
+    },
   });
 }
