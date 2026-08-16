@@ -1,339 +1,428 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { chromeWebStoreUrl } from '@/lib/chrome-store';
 
 export const metadata: Metadata = {
-  title: 'How it works',
-  description: 'Install the ZetaLog extension in Chrome in about a minute.',
+  title: 'How ZetaLog works',
+  description:
+    'Learn what ZetaLog does, install it from the Chrome Web Store, record your first Zetamac game and optionally sync to the leaderboard.',
 };
 
 /** Static product page. There is no data to revalidate here. */
 export const dynamic = 'force-static';
 
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
-const MS_QUARANTINE_URL = 'https://security.microsoft.com/quarantine';
-// Cache-busted from the pre-hardening archive that used the same manifest
-// version. CI inspects this tracked download and compares its extracted payload
-// with the Store candidate.
-const EXTENSION_ZIP = '/zetalog-chrome-1.0.0-secure.zip';
-const EXTENSION_VERSION = '1.0.0';
+const OFFICIAL_STORE_URL =
+  'https://chromewebstore.google.com/detail/zetalog/bhbpjdngipckdepgblhopdfijnpeefml';
+const EXTENSION_STORE_URL =
+  chromeWebStoreUrl(process.env.NEXT_PUBLIC_CHROME_WEB_STORE_URL) ?? OFFICIAL_STORE_URL;
 
-// The production deployment switches to the auto-updating Store install by
-// setting this after Google assigns the permanent item ID. Until then the
-// cache-busted, CI-inspected ZIP remains available for existing beta testing.
-const EXTENSION_STORE_URL = chromeWebStoreUrl(process.env.NEXT_PUBLIC_CHROME_WEB_STORE_URL);
-
-function DownloadIcon(): React.JSX.Element {
+function StoreButton({ compact = false }: { compact?: boolean }): React.JSX.Element {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <a
+      href={EXTENSION_STORE_URL}
+      target="_blank"
+      rel="noreferrer noopener"
+      className={`hiw-store-button${compact ? ' hiw-store-button--compact' : ''}`}
+      aria-label="Open the ZetaLog listing in the Chrome Web Store"
+    >
+      <Image src="/badges/chrome-reviewer.png" alt="" width={48} height={48} />
+      <span className="hiw-store-button__copy">
+        <span>Available in the Chrome Web Store</span>
+        <strong>Add ZetaLog to Chrome</strong>
+      </span>
+      <span className="hiw-store-button__arrow" aria-hidden="true">
+        ↗
+      </span>
+    </a>
   );
 }
 
-function FolderGlyph(): React.JSX.Element {
-  return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"
-        fill="currentColor"
-        fillOpacity="0.14"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-    </svg>
-  );
-}
-
-function PuzzleGlyph(): React.JSX.Element {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M10 3a2 2 0 0 1 4 0v1h3a1 1 0 0 1 1 1v3h1a2 2 0 1 1 0 4h-1v3a1 1 0 0 1-1 1h-3v1a2 2 0 1 1-4 0v-1H6a1 1 0 0 1-1-1v-3H4a2 2 0 1 1 0-4h1V5a1 1 0 0 1 1-1h4V3Z"
-        fill="currentColor"
-        fillOpacity="0.18"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/**
- * `/how-it-works`: get the extension and load it. The download and the
- * step-by-step install are the whole point of the page; the Chrome mockups
- * are theme-following CSS, not screenshots.
- */
 export default function HowItWorksPage(): React.JSX.Element {
   return (
     <div className="hiw board-enter">
-      <section className="hiw-hero" aria-label="What ZetaLog is">
-        <p className="hiw-hero__eyebrow display">How it works</p>
-        <h1 className="display hiw-hero__title">Track your Zetamac scores. Compare worldwide.</h1>
-        <p className="hiw-hero__lede">
-          Zetamac is the mental arithmetic game people use to build speed for quant interviews.
-          ZetaLog is a Chrome extension that records every game you play and a leaderboard that
-          ranks your best against players around the world.
-        </p>
-        <p className="hiw-hero__actions">
-          <a
-            href={EXTENSION_STORE_URL ?? EXTENSION_ZIP}
-            download={EXTENSION_STORE_URL === null ? true : undefined}
-            target={EXTENSION_STORE_URL === null ? undefined : '_blank'}
-            rel={EXTENSION_STORE_URL === null ? undefined : 'noreferrer noopener'}
-            className="btn btn--primary hiw-download__btn"
-          >
-            <DownloadIcon />{' '}
-            {EXTENSION_STORE_URL === null ? 'Download for Chrome' : 'Add to Chrome'}
-          </a>
-          <a href="#install" className="btn btn--ghost">
-            How to install it
-          </a>
-        </p>
-        <p className="hiw-hero__note meta">
-          <span className="num">v{EXTENSION_VERSION}</span> · Chrome, Edge and Brave
-        </p>
-      </section>
-
-      <section className="hiw-install" id="install" aria-label="Install">
-        <h2 className="display hiw-install__title">
-          {EXTENSION_STORE_URL === null
-            ? 'Load it into Chrome'
-            : 'Add it from the Chrome Web Store'}
-        </h2>
-        {EXTENSION_STORE_URL === null ? (
-          <>
-            <p className="meta hiw-install__intro">
-              It is not on the Chrome Web Store yet, so download the file above and load it by hand.
-              Five steps, about a minute.
-            </p>
-
-            <ol className="walk" aria-label="How to load the extension">
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">1</span>
-                  <h3 className="walk-step__title">Unzip the download</h3>
-                  <p className="meta">
-                    Double-click the file. You get a folder called zetalog-chrome. Keep it somewhere
-                    you will not delete by accident.
-                  </p>
-                </div>
-                <div className="walk-art walk-art--unzip" aria-hidden="true">
-                  <span className="mock-zip num">ZIP</span>
-                  <span className="mock-into">→</span>
-                  <span className="mock-folder">
-                    <FolderGlyph />
-                    <span className="num">zetalog-chrome</span>
-                  </span>
-                </div>
-              </li>
-
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">2</span>
-                  <h3 className="walk-step__title">Open the extensions page</h3>
-                  <p className="meta">
-                    In Chrome, type <span className="num">chrome://extensions</span> into the
-                    address bar and press Enter.
-                  </p>
-                </div>
-                <div className="walk-art" aria-hidden="true">
-                  <div className="chrome-frame">
-                    <div className="chrome-frame__bar">
-                      <span className="chrome-frame__dots">
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                      <span className="chrome-frame__omni num">chrome://extensions</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">3</span>
-                  <h3 className="walk-step__title">Turn on Developer mode</h3>
-                  <p className="meta">
-                    Flip the Developer mode switch in the top-right corner of the page. Three
-                    buttons appear.
-                  </p>
-                </div>
-                <div className="walk-art" aria-hidden="true">
-                  <div className="chrome-frame">
-                    <div className="chrome-frame__head">
-                      <span className="chrome-frame__title display">Extensions</span>
-                      <span className="mock-dev">
-                        <span className="meta">Developer mode</span>
-                        <span className="mock-switch mock-switch--on">
-                          <span className="mock-switch__thumb" />
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">4</span>
-                  <h3 className="walk-step__title">Load unpacked</h3>
-                  <p className="meta">
-                    Click Load unpacked, then choose the zetalog-chrome folder you unzipped in step
-                    one.
-                  </p>
-                </div>
-                <div className="walk-art" aria-hidden="true">
-                  <div className="chrome-frame">
-                    <div className="chrome-frame__actions">
-                      <span className="mock-btn mock-btn--on">Load unpacked</span>
-                      <span className="mock-btn">Pack extension</span>
-                      <span className="mock-btn">Update</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">5</span>
-                  <h3 className="walk-step__title">Pin it and play</h3>
-                  <p className="meta">
-                    Open the puzzle icon and pin ZetaLog to your toolbar. Play a game on{' '}
-                    <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
-                      Zetamac
-                    </a>{' '}
-                    and click the icon to see your score.
-                  </p>
-                </div>
-                <div className="walk-art" aria-hidden="true">
-                  <div className="chrome-frame">
-                    <div className="chrome-frame__toolbar">
-                      <span className="chrome-frame__omni chrome-frame__omni--sm num">
-                        arithmetic.zetamac.com
-                      </span>
-                      <span className="mock-tool">
-                        <PuzzleGlyph />
-                      </span>
-                      <span className="mock-tool mock-tool--pinned">
-                        <img src="/icon-96.png" alt="" width={18} height={18} />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ol>
-          </>
-        ) : (
-          <>
-            <p className="meta hiw-install__intro">
-              Chrome installs updates automatically. You do not need Developer mode or a downloaded
-              folder.
-            </p>
-            <ol className="walk" aria-label="How to install the extension">
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">1</span>
-                  <h3 className="walk-step__title">Open the Store listing</h3>
-                  <p className="meta">Choose Add to Chrome, then confirm the permission prompt.</p>
-                  <p>
-                    <a
-                      href={EXTENSION_STORE_URL}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="btn btn--primary btn--sm"
-                    >
-                      Add to Chrome
-                    </a>
-                  </p>
-                </div>
-              </li>
-              <li className="walk-step">
-                <div className="walk-step__copy">
-                  <span className="walk-step__n num">2</span>
-                  <h3 className="walk-step__title">Pin it and play</h3>
-                  <p className="meta">
-                    Open Chrome's puzzle icon, pin ZetaLog, then play on{' '}
-                    <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
-                      Zetamac
-                    </a>
-                    . Your scores appear in the popup automatically.
-                  </p>
-                </div>
-                <div className="walk-art" aria-hidden="true">
-                  <span className="mock-tool">
-                    <PuzzleGlyph />
-                  </span>
-                  <span className="mock-tool mock-tool--pinned">
-                    <img src="/icon-96.png" alt="" width={18} height={18} />
-                  </span>
-                </div>
-              </li>
-            </ol>
-          </>
-        )}
-      </section>
-
-      <section className="hiw-after" aria-label="After you install">
-        <h2 className="display hiw-after__title">After you install</h2>
-        <div className="hiw-after__grid">
-          <div className="hiw-block card card--pad">
-            <h3 className="hiw-block__title display">Link your account</h3>
-            <p className="meta">
-              Your games stay on your machine until you connect them. Make a free account, open the
-              popup and press Sync to leaderboard. If this browser needs linking, choose Link the
-              ZetaLog extension once to open its secure browser-owned sign-in window. That links
-              this browser once, and every new game uploads on its own from then on.
-            </p>
-            <p className="hiw-block__cta">
-              <Link href="/signin" className="btn btn--ghost btn--sm">
-                Make an account
-              </Link>
-            </p>
+      <section className="hiw-hero" aria-labelledby="hiw-title">
+        <div className="hiw-hero__copy">
+          <p className="hiw-eyebrow display">How it works</p>
+          <h1 className="display hiw-hero__title" id="hiw-title">
+            Track every Zetamac game. See your progress.
+          </h1>
+          <p className="hiw-hero__lede">
+            ZetaLog is a free Chrome extension for{' '}
+            <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+              Zetamac
+            </a>
+            . Play the usual timed arithmetic game and ZetaLog records the result, shows your
+            progress and—only if you choose—syncs eligible scores to the leaderboard.
+          </p>
+          <div className="hiw-hero__actions">
+            <StoreButton />
+            <a href="#install" className="btn btn--ghost hiw-hero__secondary">
+              Show me how to install it
+            </a>
           </div>
-
-          <div className="hiw-block card card--pad">
-            <h3 className="hiw-block__title display">Add a university badge</h3>
-            <p className="meta">
-              At a UK university? Verify your student email to show your university mark next to
-              your name and open a board for your university alone. In your account, choose Verify
-              email and enter the code sent to your student address.
-            </p>
-            <p className="meta hiw-block__aside">
-              Not at a university, or would rather not say? Choose that in your account instead. You
-              stay on the global board with no badge, and can change it any time.
-            </p>
-          </div>
-        </div>
-
-        <div className="hiw-callout card card--pad">
-          <div className="hiw-callout__intro">
-            <h3 className="hiw-callout__title display">The verification code has not arrived?</h3>
-            <p className="meta">
-              University mail often holds mail from outside senders. Try these:
-            </p>
-          </div>
-          <ul className="hiw-checks">
-            <li>Check your junk or spam folder and mark the message as safe.</li>
-            <li>
-              On a Microsoft or Outlook account, open the{' '}
-              <a href={MS_QUARANTINE_URL} target="_blank" rel="noreferrer noopener">
-                Microsoft quarantine page
-              </a>{' '}
-              and press Release next to the code.
-            </li>
-            <li>Still nothing after a minute? Request a fresh code and try again.</li>
+          <ul className="hiw-trust" aria-label="Key facts">
+            <li>No account needed to start</li>
+            <li>Records completed games automatically</li>
+            <li>Desktop Chrome</li>
           </ul>
         </div>
+
+        <figure className="hiw-hero__figure">
+          <div className="hiw-hero__screens">
+            <Image
+              className="hiw-hero__game"
+              src="/how-it-works/zetamac-game.jpg"
+              alt="A live Zetamac arithmetic game with 120 seconds left"
+              width={1280}
+              height={800}
+              sizes="(max-width: 760px) 92vw, 38rem"
+              preload
+            />
+            <Image
+              className="hiw-hero__popup"
+              src="/how-it-works/extension-overview.png"
+              alt="The real ZetaLog extension popup showing a latest score, personal bests and recent games"
+              width={360}
+              height={620}
+              sizes="(max-width: 520px) 34vw, 13rem"
+              preload
+            />
+          </div>
+          <figcaption>Real screens from the current Zetamac site and ZetaLog extension.</figcaption>
+        </figure>
+      </section>
+
+      <nav className="hiw-jump" aria-label="On this page">
+        <span className="hiw-jump__label display">On this page</span>
+        <a href="#basics">What it does</a>
+        <a href="#install">Install</a>
+        <a href="#first-game">Your first game</a>
+        <a href="#leaderboard">Leaderboard sync</a>
+        <a href="#questions">Questions</a>
+      </nav>
+
+      <section className="hiw-section" id="basics" aria-labelledby="basics-title">
+        <div className="hiw-section__heading">
+          <p className="hiw-eyebrow display">The simple version</p>
+          <h2 className="display" id="basics-title">
+            Zetamac is the game. ZetaLog remembers it.
+          </h2>
+          <p>
+            Zetamac is a browser-based mental arithmetic drill: choose a time, solve as many
+            questions as you can and finish with a score. ZetaLog does not replace or alter that
+            game. It adds the history, progress view and optional leaderboard that Zetamac does not
+            keep for you.
+          </p>
+        </div>
+
+        <ol className="hiw-flow" aria-label="The ZetaLog workflow">
+          <li>
+            <span className="hiw-flow__number num">1</span>
+            <div>
+              <h3>Play on Zetamac</h3>
+              <p>Use Zetamac normally. You do not need to start a game from ZetaLog.</p>
+            </div>
+          </li>
+          <li>
+            <span className="hiw-flow__number num">2</span>
+            <div>
+              <h3>Your result is saved</h3>
+              <p>When the timed game finishes, the extension records the score and settings.</p>
+            </div>
+          </li>
+          <li>
+            <span className="hiw-flow__number num">3</span>
+            <div>
+              <h3>Review or sync it</h3>
+              <p>See recent games locally, or link an account to join the leaderboards.</p>
+            </div>
+          </li>
+        </ol>
+
+        <aside className="hiw-new card" aria-label="New to Zetamac">
+          <span className="hiw-new__label display">Never used Zetamac?</span>
+          <p>
+            Start with the default <span className="num">120s</span> game. Press Start, type each
+            answer and press Enter; a new question appears after every correct answer. Your final
+            score is the number you answered correctly before time ran out.
+          </p>
+          <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+            Open Zetamac to see the game ↗
+          </a>
+        </aside>
+      </section>
+
+      <section className="hiw-section hiw-install" id="install" aria-labelledby="install-title">
+        <div className="hiw-section__heading hiw-section__heading--center">
+          <p className="hiw-eyebrow display">Install in about 30 seconds</p>
+          <h2 className="display" id="install-title">
+            Add ZetaLog from the Chrome Web Store
+          </h2>
+          <p>
+            This is a normal Store installation. There is no ZIP file, Developer mode or manual
+            update process.
+          </p>
+        </div>
+
+        <div className="hiw-install__store card">
+          <div>
+            <p className="display hiw-install__store-label">Official extension</p>
+            <h3>ZetaLog for Google Chrome</h3>
+            <p>Chrome checks the package and installs future updates automatically.</p>
+          </div>
+          <StoreButton compact />
+        </div>
+
+        <ol className="hiw-install__steps">
+          <li className="card">
+            <span className="hiw-install__number num">1</span>
+            <div>
+              <h3>Install it</h3>
+              <p>
+                Open the Store listing above, click <strong>Add to Chrome</strong>, then confirm by
+                clicking <strong>Add extension</strong>. Wait for Chrome to say ZetaLog was added.
+              </p>
+            </div>
+          </li>
+          <li className="card">
+            <span className="hiw-install__number num">2</span>
+            <div>
+              <h3>Find it and pin it</h3>
+              <p>
+                At the top-right of Chrome, click the <strong>Extensions</strong> button (the
+                puzzle-piece icon). Find <strong>ZetaLog</strong> in the menu and click the pin
+                beside it. The ZetaLog logo will then stay next to the address bar.
+              </p>
+              <p className="hiw-install__tip">
+                Pinning is only a shortcut. ZetaLog still records games if its icon is not pinned.
+              </p>
+            </div>
+          </li>
+          <li className="card">
+            <span className="hiw-install__number num">3</span>
+            <div>
+              <h3>Open or refresh Zetamac</h3>
+              <p>
+                Go to{' '}
+                <a href={ZETAMAC_URL} target="_blank" rel="noreferrer noopener">
+                  arithmetic.zetamac.com
+                </a>
+                . If it was already open when you installed ZetaLog, refresh that tab once before
+                starting your first game.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section className="hiw-section" id="first-game" aria-labelledby="first-game-title">
+        <div className="hiw-showcase">
+          <figure className="hiw-screenshot hiw-screenshot--wide">
+            <Image
+              src="/how-it-works/zetamac-game.jpg"
+              alt="A real Zetamac game asking 32 plus 55 with the timer and score visible"
+              width={1280}
+              height={800}
+              sizes="(max-width: 760px) 92vw, 31rem"
+            />
+            <figcaption>
+              The extension watches for a completed game; it does not interrupt play.
+            </figcaption>
+          </figure>
+          <div className="hiw-showcase__copy">
+            <p className="hiw-eyebrow display">Your first game</p>
+            <h2 className="display" id="first-game-title">
+              Just play until the timer ends.
+            </h2>
+            <ol className="hiw-play-list">
+              <li>
+                Choose Zetamac settings or leave the defaults, then press <strong>Start</strong>.
+              </li>
+              <li>Type answers and press Enter. Keep going until the timer reaches zero.</li>
+              <li>
+                Open the ZetaLog icon after the game ends. Your score should appear under Latest and
+                Recent.
+              </li>
+            </ol>
+            <p className="hiw-note">
+              A game has to finish for ZetaLog to save it. Closing the tab or restarting mid-game
+              will not create a normal completed result.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="hiw-section" aria-labelledby="history-title">
+        <div className="hiw-showcase hiw-showcase--reverse">
+          <div className="hiw-showcase__copy">
+            <p className="hiw-eyebrow display">Inside the extension</p>
+            <h2 className="display" id="history-title">
+              See progress without making an account.
+            </h2>
+            <p>
+              Click the ZetaLog icon to open the popup. Local tracking works immediately after
+              installation and keeps your games on this browser.
+            </p>
+            <ul className="hiw-bullets">
+              <li>Your latest score and any new personal best.</li>
+              <li>Your best results for 30, 60 and 120 second games.</li>
+              <li>A trend line and a chronological list of recent games.</li>
+              <li>Clear status labels for saved, synced or reviewed entries.</li>
+            </ul>
+          </div>
+          <figure className="hiw-popup-pair">
+            <Image
+              src="/how-it-works/extension-overview.png"
+              alt="The top of the real ZetaLog popup with score 58, personal bests and a trend line"
+              width={360}
+              height={620}
+              sizes="(max-width: 560px) 44vw, 12rem"
+            />
+            <Image
+              src="/how-it-works/extension-history.png"
+              alt="The real ZetaLog recent-games list with synced, review, removed and restore statuses"
+              width={360}
+              height={620}
+              sizes="(max-width: 560px) 44vw, 12rem"
+            />
+            <figcaption>Real captures of the current extension popup.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section className="hiw-section" id="leaderboard" aria-labelledby="leaderboard-title">
+        <div className="hiw-section__heading">
+          <p className="hiw-eyebrow display">Optional account linking</p>
+          <h2 className="display" id="leaderboard-title">
+            Sync when you want to join the leaderboard.
+          </h2>
+          <p>
+            Signing in to the website does not silently give the extension access to your account.
+            After signing in, you link this Chrome installation once; that explicit step lets the
+            extension upload eligible games and keeps the two sessions secure.
+          </p>
+        </div>
+
+        <div className="hiw-choices">
+          <article className="card">
+            <p className="hiw-choice__label display">Without an account</p>
+            <h3>Keep a local score history</h3>
+            <p>Play, review personal bests and inspect recent games in this browser.</p>
+          </article>
+          <article className="card hiw-choice--accent">
+            <p className="hiw-choice__label display">With a linked account</p>
+            <h3>Sync eligible games automatically</h3>
+            <p>Appear on global and university boards and view progress on the website.</p>
+          </article>
+        </div>
+
+        <div className="hiw-link-steps card">
+          <h3 className="display">How to link it</h3>
+          <ol>
+            <li>Create an account or sign in on ZetaLog.</li>
+            <li>
+              Open the extension and choose <strong>Sync to leaderboard</strong>.
+            </li>
+            <li>
+              If prompted, choose <strong>Link the ZetaLog extension</strong> and finish the secure
+              Chrome sign-in window.
+            </li>
+            <li>
+              Return to the popup. It should say <strong>Linked to leaderboard</strong>.
+            </li>
+          </ol>
+          <p>
+            <Link href="/link" className="btn btn--primary">
+              Link this extension
+            </Link>
+            <Link href="/signin" className="btn btn--ghost">
+              Sign in first
+            </Link>
+          </p>
+        </div>
+
+        <div className="hiw-sync-visuals">
+          <figure className="hiw-screenshot hiw-screenshot--leaderboard">
+            <Image
+              src="/how-it-works/leaderboard.jpg"
+              alt="The real ZetaLog global leaderboard with players ranked by their best 120-second score"
+              width={1280}
+              height={800}
+              sizes="(max-width: 760px) 92vw, 36rem"
+            />
+            <figcaption>Eligible scores can appear on the global and university boards.</figcaption>
+          </figure>
+          <figure className="hiw-screenshot hiw-screenshot--popup">
+            <Image
+              src="/how-it-works/extension-sync.png"
+              alt="The bottom of the real ZetaLog popup showing Linked to leaderboard and synced games"
+              width={360}
+              height={620}
+              sizes="(max-width: 760px) 46vw, 13rem"
+            />
+            <figcaption>The popup shows whether this browser is linked.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section className="hiw-section hiw-faq" id="questions" aria-labelledby="questions-title">
+        <div className="hiw-section__heading hiw-section__heading--center">
+          <p className="hiw-eyebrow display">Common questions</p>
+          <h2 className="display" id="questions-title">
+            Useful things to know
+          </h2>
+        </div>
+        <div className="hiw-faq__list">
+          <details className="card">
+            <summary>Do I need an account?</summary>
+            <p>
+              No. Score tracking, personal bests and recent history work locally without an account.
+              You only need to link an account for website progress and leaderboards.
+            </p>
+          </details>
+          <details className="card">
+            <summary>Does the extension have to stay pinned?</summary>
+            <p>
+              No. Pinning only keeps the popup one click away. Automatic recording works while the
+              extension is installed, whether or not the icon is pinned.
+            </p>
+          </details>
+          <details className="card">
+            <summary>Why did my first score not appear?</summary>
+            <p>
+              Refresh Zetamac once if the tab was open before installation, then complete a full
+              game and reopen the popup. Restarted or abandoned games are not treated like normal
+              completed results.
+            </p>
+          </details>
+          <details className="card">
+            <summary>Does ZetaLog change or control Zetamac?</summary>
+            <p>
+              No. Zetamac remains the game and ZetaLog reads the completed result. ZetaLog is not
+              affiliated with Zetamac.
+            </p>
+          </details>
+          <details className="card">
+            <summary>What gets uploaded?</summary>
+            <p>
+              Nothing is sent to your ZetaLog account until you link the extension. Once linked,
+              eligible game records are uploaded for server validation. Read the{' '}
+              <Link href="/privacy">privacy policy</Link> for the full data description.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section className="hiw-final card" aria-label="Install ZetaLog">
+        <div>
+          <p className="hiw-eyebrow display">Ready to try it?</p>
+          <h2 className="display">Your next Zetamac score can save itself.</h2>
+          <p>Install from the official Store listing, refresh Zetamac once and play as normal.</p>
+        </div>
+        <StoreButton compact />
       </section>
     </div>
   );
