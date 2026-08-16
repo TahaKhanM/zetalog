@@ -7,6 +7,25 @@ const connectSources =
     ? "'self' https://*.supabase.co http://localhost:* http://127.0.0.1:*"
     : "'self' https://*.supabase.co";
 
+/**
+ * Keep browser traffic on the ZetaLog origin. Some managed/campus networks
+ * allow the site but block the separate Supabase project hostname, which made
+ * auth and profile reads look as though the whole site was broken. Server-side
+ * clients still talk to Supabase directly.
+ *
+ * A missing value is valid during the repository's zero-env CI build.
+ */
+export function supabaseProxyDestination(value: string | undefined): string | null {
+  if (value === undefined || value.trim() === '') return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+    return `${url.toString().replace(/\/$/u, '')}/:path*`;
+  } catch {
+    return null;
+  }
+}
+
 const nextConfig: NextConfig = {
   transpilePackages: ['@zetalog/shared'],
   headers() {
@@ -33,6 +52,12 @@ const nextConfig: NextConfig = {
         ],
       },
     ]);
+  },
+  rewrites() {
+    const destination = supabaseProxyDestination(process.env.NEXT_PUBLIC_SUPABASE_URL);
+    return Promise.resolve(
+      destination === null ? [] : [{ source: '/supabase/:path*', destination }],
+    );
   },
   redirects() {
     return Promise.resolve([

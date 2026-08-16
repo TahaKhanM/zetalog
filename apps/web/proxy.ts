@@ -43,7 +43,12 @@ export const config = {
    * personalisation), so they must NOT trigger a per-request auth round-trip.
    *
    *   /me, /admin        — auth-gated dashboards (the redirect above)
-   *   /link, /verify     — session-dependent flows (handoff / OTP)
+   *   /verify            — session-dependent OTP flow
+   *
+   * `/link` is deliberately absent: the install handoff is now a static shell
+   * and sign-in happens inside Chrome Identity, so opening it never depends on a
+   * Supabase round-trip.
+   *
    *   /signin            — reads the session (skips already-signed-in users);
    *                        that getUser can rotate an expired session's refresh
    *                        token, and lib/supabase/server.ts drops cookie writes
@@ -57,7 +62,6 @@ export const config = {
     '/me/:path*',
     '/account/:path*',
     '/admin/:path*',
-    '/link/:path*',
     '/verify/:path*',
     '/signin/:path*',
     '/auth/:path*',
