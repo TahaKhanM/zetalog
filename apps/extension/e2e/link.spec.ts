@@ -40,6 +40,11 @@ async function startProtocolReplica(): Promise<{ server: Server; baseUrl: string
       res.writeHead(204).end();
       return;
     }
+    if (requestUrl.pathname === '/api/extension/link/status') {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ supported: true }));
+      return;
+    }
     if (requestUrl.pathname === '/api/extension/link/authorize') {
       observedChallenge = requestUrl.searchParams.get('code_challenge');
       observedRedirect = requestUrl.searchParams.get('redirect_uri');

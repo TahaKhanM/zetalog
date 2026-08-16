@@ -512,6 +512,7 @@ describe('createAuthController', () => {
       return `https://extension-id.chromiumapp.org/zetalog-link?code=one-time-code&state=${state ?? ''}`;
     });
     const fetchFn = fetchSequence([
+      { status: 200, body: { supported: true } },
       { status: 200, body: { credential: 'zlx_opaque', userId: 'user-7' } },
     ]);
     const controller = createAuthController(area, {
@@ -521,10 +522,13 @@ describe('createAuthController', () => {
       identity,
     });
 
-    expect(await controller.beginLink()).toBe(true);
+    expect(await controller.beginLink()).toEqual({ ok: true });
     expect(identity.authorizeUrls).toHaveLength(1);
-    expect(fetchFn.calls).toEqual(['https://app.test/api/extension/link/token']);
-    const exchangeBody: unknown = JSON.parse(fetchFn.inits[0]?.body as string);
+    expect(fetchFn.calls).toEqual([
+      'https://app.test/api/extension/link/status?redirect_uri=https%3A%2F%2Fextension-id.chromiumapp.org%2Fzetalog-link',
+      'https://app.test/api/extension/link/token',
+    ]);
+    const exchangeBody: unknown = JSON.parse(fetchFn.inits[1]?.body as string);
     expect(exchangeBody).toMatchObject({
       code: 'one-time-code',
       redirectUri: 'https://extension-id.chromiumapp.org/zetalog-link',
@@ -542,7 +546,7 @@ describe('createAuthController', () => {
   });
 
   it('rejects a mismatched identity callback before a code exchange', async () => {
-    const fetchFn = fetchSequence([]);
+    const fetchFn = fetchSequence([{ status: 200, body: { supported: true } }]);
     const controller = createAuthController(fakeArea(), {
       fetch: fetchFn,
       config: CONFIG,
@@ -551,12 +555,12 @@ describe('createAuthController', () => {
       ),
     });
 
-    expect(await controller.beginLink()).toBe(false);
-    expect(fetchFn.calls).toEqual([]);
+    expect(await controller.beginLink()).toEqual({ ok: false, error: 'invalid-callback' });
+    expect(fetchFn.calls).toHaveLength(1);
   });
 
   it('fails closed when Chrome cancels the interactive identity window', async () => {
-    const fetchFn = fetchSequence([]);
+    const fetchFn = fetchSequence([{ status: 200, body: { supported: true } }]);
     const identity: IdentityApi = {
       getRedirectURL: () => 'https://extension-id.chromiumapp.org/zetalog-link',
       launchWebAuthFlow: () => Promise.reject(new Error('user cancelled')),
@@ -567,17 +571,36 @@ describe('createAuthController', () => {
       identity,
     });
 
-    expect(await controller.beginLink()).toBe(false);
-    expect(fetchFn.calls).toEqual([]);
+    expect(await controller.beginLink()).toEqual({ ok: false, error: 'cancelled' });
+    expect(fetchFn.calls).toHaveLength(1);
   });
 
   it('fails closed when link initiation lacks the service-worker identity API', async () => {
     const fetchFn = fetchSequence([]);
     const controller = createAuthController(fakeArea(), { fetch: fetchFn, config: CONFIG });
 
-    expect(await controller.beginLink()).toBe(false);
+    expect(await controller.beginLink()).toEqual({ ok: false, error: 'identity-unavailable' });
     expect(fetchFn.calls).toEqual([]);
   });
+
+  it.each([
+    ['network failure', new Error('offline'), 'network'],
+    ['unconfigured extension id', { status: 409, body: {} }, 'extension-not-enabled'],
+    ['server failure', { status: 503, body: {} }, 'server'],
+  ] as const)(
+    'stops before Chrome Identity when the link preflight has a %s',
+    async (_name, step, error) => {
+      const identity = fakeIdentity(() => undefined);
+      const controller = createAuthController(fakeArea(), {
+        fetch: fetchSequence([step]),
+        config: CONFIG,
+        identity,
+      });
+
+      expect(await controller.beginLink()).toEqual({ ok: false, error });
+      expect(identity.authorizeUrls).toEqual([]);
+    },
+  );
 
   it.each([
     ['network failure', new Error('offline')],
@@ -591,12 +614,12 @@ describe('createAuthController', () => {
     });
     const area = fakeArea();
     const controller = createAuthController(area, {
-      fetch: fetchSequence([step]),
+      fetch: fetchSequence([{ status: 200, body: { supported: true } }, step]),
       config: CONFIG,
       identity,
     });
 
-    expect(await controller.beginLink()).toBe(false);
+    expect(await controller.beginLink()).toEqual({ ok: false, error: 'exchange-failed' });
     expect(area.data.has(SESSION_KEY)).toBe(false);
   });
 

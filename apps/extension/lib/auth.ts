@@ -51,6 +51,18 @@ export type AuthError =
   | { readonly reason: 'corrupt-session'; readonly detail: string }
   | { readonly reason: 'refresh-failed'; readonly detail: string };
 
+/** Safe, user-actionable outcomes from the interactive account-link flow. */
+export type LinkError =
+  | 'identity-unavailable'
+  | 'extension-not-enabled'
+  | 'network'
+  | 'server'
+  | 'cancelled'
+  | 'invalid-callback'
+  | 'exchange-failed';
+
+export type LinkResult = { readonly ok: true } | { readonly ok: false; readonly error: LinkError };
+
 /** The subset of a `fetch` Response the network layer reads (structural seam). */
 export interface HttpResponse {
   readonly ok: boolean;
@@ -190,7 +202,7 @@ export interface AuthController {
   /** Persist a session (primarily a migration/test seam). */
   save(session: Session): Promise<void>;
   /** Run an explicit, browser-owned PKCE link flow and store its opaque credential. */
-  beginLink(): Promise<boolean>;
+  beginLink(): Promise<LinkResult>;
   /** Forget the session (Unlink). Leaves local game data untouched. */
   clear(): Promise<void>;
   /** Whether a terminal credential failure requires the agreed one-time relink. */
@@ -345,10 +357,22 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
     return refreshed.value.accessToken;
   });
 
-  const beginLinkShared = singleFlight(async (): Promise<boolean> => {
+  const beginLinkShared = singleFlight(async (): Promise<LinkResult> => {
     const identity = deps.identity;
-    if (identity === undefined) return false;
+    if (identity === undefined) return { ok: false, error: 'identity-unavailable' };
     const redirectUri = identity.getRedirectURL('zetalog-link');
+
+    // Fail before opening an interactive window when the deployed website has
+    // not yet allowlisted this Chrome Web Store release id. Previously this
+    // surfaced as a disappearing login window and looked like a broken button.
+    const status = await linkedRequest(
+      `/api/extension/link/status?redirect_uri=${encodeURIComponent(redirectUri)}`,
+      { method: 'GET' },
+    );
+    if (status === null) return { ok: false, error: 'network' };
+    if (status.status === 409) return { ok: false, error: 'extension-not-enabled' };
+    if (!status.ok) return { ok: false, error: 'server' };
+
     const pkce = await createPkceValues();
     const authorizeUrl = new URL('/api/extension/link/authorize', apiBaseUrl);
     authorizeUrl.searchParams.set('redirect_uri', redirectUri);
@@ -363,15 +387,15 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
         interactive: true,
       });
     } catch {
-      return false;
+      return { ok: false, error: 'cancelled' };
     }
     const code = codeFromLinkCallback(callback, redirectUri, pkce.state);
-    if (code === null) return false;
+    if (code === null) return { ok: false, error: 'invalid-callback' };
     const session = await exchangeLinkCode(code, pkce.verifier, redirectUri);
-    if (session === null) return false;
+    if (session === null) return { ok: false, error: 'exchange-failed' };
     await area.set({ [SESSION_KEY]: session });
     await setNeedsRelink(false);
-    return true;
+    return { ok: true };
   });
 
   return {
