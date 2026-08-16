@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }): React
         <header className="site-header">
           <div className="shell site-header__row">
             <Link href="/" className="brand-link" aria-label="ZetaLog home">
-              <BrandMark variant="lockup" />
+              <BrandMark variant="lockup" size={44} />
             </Link>
             <HeaderNav />
           </div>
