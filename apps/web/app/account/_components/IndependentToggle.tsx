@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 /**
- * The "not at a university" choice (CO-11). Setting it stops the badge
+ * The "not at a university" choice. Setting it stops the badge
  * prompts; independent players appear on the global board only. Choosing a
  * university later clears the flag and goes to /verify.
  */

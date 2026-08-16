@@ -6,10 +6,9 @@ import { configLabel, formatRelativeTime } from '@/lib/format';
 import type { MeGame } from '@/lib/me';
 
 /**
- * Adaptive score-over-time chart (spec §3.3): a recent-scores list under 5
+ * Adaptive score-over-time chart: a recent-scores list under 5
  * games on a config, a sparkline for 5–19, and a full line chart with a range
- * selector at 20+. Single steel-blue series — stroke only (CO-2: no large
- * fills), Azeret Mono axes, PB point in maroon, crosshair + tooltip on hover.
+ * selector at 20+. Single steel-blue series — stroke only, Azeret Mono axes, PB point in maroon, crosshair + tooltip on hover.
  */
 
 interface Point {

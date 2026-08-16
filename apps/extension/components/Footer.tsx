@@ -10,9 +10,9 @@ interface FooterProps {
 }
 
 /**
- * The footer account affordance (spec §3.4). Signed out, it offers "Sync to
+ * The footer account affordance. Signed out, it offers "Sync to
  * leaderboard" (opens /link). Signed in, it shows the sync status and an Unlink
- * control — a ghost/outlined treatment throughout, never a solid fill (§8, CO-2).
+ * control — a ghost/outlined treatment throughout, never a solid fill.
  */
 export function Footer({ linked, onSync, onUnlink }: FooterProps): JSX.Element {
   if (linked) {

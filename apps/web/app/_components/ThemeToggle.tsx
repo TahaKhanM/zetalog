@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Paper/blackboard switch (CO-9, refined in CO-10): a sliding pill with
+ * Paper/blackboard switch: a sliding pill with
  * stroke-drawn sun and moon marks — no emoji, so the icons render identically
  * on every platform and take the ink colours of the theme they sit in. The OS
  * preference is the default; a click pins `html[data-theme]` and persists it,

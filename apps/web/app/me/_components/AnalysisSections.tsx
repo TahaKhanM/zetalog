@@ -6,7 +6,7 @@ import { formatSolveMs } from '@/lib/format';
  * the times-table ledger, named weak spots, and the toughest individual
  * problems. Server-rendered, zero client JS — every figure is set in Azeret
  * numerals on ruled paper; steel carries the data, maroon marks the weakest
- * (CO-2/CO-3 colour roles).
+ *.
  */
 
 const OP_NAMES: Record<Analysis['ops'][number]['op'], string> = {

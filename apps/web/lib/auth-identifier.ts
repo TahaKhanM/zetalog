@@ -4,7 +4,7 @@ import type { IdentifierMatch } from './auth-modes';
 import type { Db } from './supabase/database';
 
 /**
- * Service-role wiring for `public.auth_identifier_lookup` (the W8 migration):
+ * Service-role wiring for `public.auth_identifier_lookup` (the alias-login migration):
  * resolve a sign-in identifier — primary email or VERIFIED uni alias — to its
  * account. The SQL function is the single audited reader of `auth.users`; this
  * module just calls it and zod-validates the boundary.

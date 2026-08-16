@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: 'Link the extension' };
 /**
  * `/link` — the extension opens this to link an account. Signed-out users see
  * the sign-in form (returning here); signed-in users see the handoff state that
- * the extension picks up (its internals are W4's LinkHandoff).
+ * the extension picks up (its internals live in LinkHandoff).
  */
 export default async function LinkPage(): Promise<React.JSX.Element> {
   const supabase = await createClient();
