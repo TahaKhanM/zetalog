@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { CodeDeliveryHelp } from '@/app/_components/CodeDeliveryHelp';
 import { lookupResponseSchema } from '@/lib/auth-modes';
 import { MIN_PASSWORD_LENGTH, checkPassword, passwordStrength } from '@/lib/password';
 import { isCompleteCode, normaliseCode, signInErrorMessage } from '@/lib/signin';
@@ -102,6 +103,7 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
   const [confirm, setConfirm] = useState('');
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -205,17 +207,26 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
 
   async function resendSignupCode(): Promise<void> {
     if (step.name !== 'signup-code') return;
+    setResending(true);
     setError(null);
-    const supabase = createClient();
-    const { error: resendError } = await supabase.auth.resend({
-      type: 'signup',
-      email: step.email,
-    });
-    if (resendError !== null) {
-      setError(signInErrorMessage('send', resendError));
-      return;
+    setNotice(null);
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: step.email,
+      });
+      if (resendError !== null) {
+        setError(signInErrorMessage('send', resendError));
+        return;
+      }
+      setCode('');
+      setNotice('New code sent. Check your inbox and junk folder.');
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setResending(false);
     }
-    setNotice('New code sent.');
   }
 
   async function verifySignupCode(): Promise<void> {
@@ -486,27 +497,40 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
           <button
             type="submit"
             className="btn btn--primary"
-            disabled={busy || !isCompleteCode(code)}
+            disabled={busy || resending || !isCompleteCode(code)}
           >
             {busy ? 'Verifying…' : 'Continue'}
           </button>
         </form>
+        {isSignup ? (
+          <CodeDeliveryHelp
+            disabled={busy}
+            sending={resending}
+            onResend={() => void resendSignupCode()}
+          />
+        ) : (
+          <div className="auth-form__row">
+            <button
+              type="button"
+              className="btn btn--ghost"
+              disabled={busy}
+              onClick={() => {
+                void startRecovery(step.email, step.intent).then((sent) => {
+                  if (sent) setNotice('New code sent.');
+                });
+              }}
+            >
+              Send a new code
+            </button>
+          </div>
+        )}
         <div className="auth-form__row">
           <button
             type="button"
             className="btn btn--ghost"
-            disabled={busy}
-            onClick={() => {
-              void (isSignup
-                ? resendSignupCode()
-                : startRecovery(step.email, step.intent).then((sent) => {
-                    if (sent) setNotice('New code sent.');
-                  }));
-            }}
+            disabled={busy || resending}
+            onClick={backToEmail}
           >
-            Send a new code
-          </button>
-          <button type="button" className="btn btn--ghost" disabled={busy} onClick={backToEmail}>
             Use a different email
           </button>
         </div>

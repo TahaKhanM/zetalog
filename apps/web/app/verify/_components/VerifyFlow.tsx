@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { CodeDeliveryHelp } from '@/app/_components/CodeDeliveryHelp';
+
 /**
  * Two-step university verification: request a code for a uni email,
  * then confirm the 6 digits. Every API failure maps to a specific, plain
@@ -42,12 +44,15 @@ export function VerifyFlow(): React.JSX.Element {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
 
   async function requestCode(event: React.SyntheticEvent): Promise<void> {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    setNotice(null);
     try {
       const response = await fetch('/api/verify/request', {
         method: 'POST',
@@ -71,6 +76,7 @@ export function VerifyFlow(): React.JSX.Element {
     event.preventDefault();
     setBusy(true);
     setError(null);
+    setNotice(null);
     try {
       const response = await fetch('/api/verify/confirm', {
         method: 'POST',
@@ -89,6 +95,30 @@ export function VerifyFlow(): React.JSX.Element {
       setError('Network error. Please try again.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function resendCode(): Promise<void> {
+    if (step.name !== 'code') return;
+    setResending(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const response = await fetch('/api/verify/request', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: step.email }),
+      });
+      if (response.ok) {
+        setCode('');
+        setNotice('New code sent. Check your inbox and junk folder.');
+        return;
+      }
+      setError((await readError(response)).message);
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setResending(false);
     }
   }
 
@@ -130,19 +160,31 @@ export function VerifyFlow(): React.JSX.Element {
             setCode(event.target.value.replace(/\D/g, '').slice(0, 6));
           }}
         />
-        <button type="submit" className="btn btn--primary" disabled={busy || code.length !== 6}>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={busy || resending || code.length !== 6}
+        >
           {busy ? 'Checking…' : 'Verify'}
         </button>
+        <CodeDeliveryHelp disabled={busy} sending={resending} onResend={() => void resendCode()} />
         <button
           type="button"
           className="auth-form__forgot"
+          disabled={busy || resending}
           onClick={() => {
             setError(null);
+            setNotice(null);
             setStep({ name: 'email' });
           }}
         >
           Use a different email
         </button>
+        {notice !== null && error === null ? (
+          <p className="meta" role="status" aria-live="polite">
+            {notice}
+          </p>
+        ) : null}
         {error !== null ? (
           <p className="text-danger" role="alert">
             {error}
