@@ -159,6 +159,12 @@ export interface Store {
   markSync(id: string, sync: GameSync): Promise<Result<StoredGame | null, StoreError>>;
   /** Drop all sync bookkeeping (Unlink). Leaves scores/status/records untouched. */
   clearAllSync(): Promise<Result<void, StoreError>>;
+  /**
+   * Merge server-fetched games into local history, keyed by `record.id`. A game
+   * already stored locally wins (it holds the real events and live sync state);
+   * only games not present locally are added. Returns the merged list.
+   */
+  importBackfill(remote: readonly StoredGame[]): Promise<Result<StoredGame[], StoreError>>;
   listGames(): Promise<Result<StoredGame[], StoreError>>;
   getPrefs(): Promise<Result<Prefs, StoreError>>;
   setPrefs(prefs: Prefs): Promise<Result<Prefs, StoreError>>;
@@ -307,6 +313,17 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
       if (!games.ok) return games;
       await writeGames(games.value.map((game) => ({ ...game, sync: undefined })));
       return ok(undefined);
+    },
+
+    async importBackfill(remote) {
+      const games = await readGames();
+      if (!games.ok) return games;
+      const localIds = new Set(games.value.map((game) => game.record.id));
+      const additions = remote.filter((game) => !localIds.has(game.record.id));
+      if (additions.length === 0) return ok(games.value);
+      const merged = [...games.value, ...additions];
+      await writeGames(merged);
+      return ok(merged);
     },
 
     listGames() {

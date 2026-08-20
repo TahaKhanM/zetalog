@@ -7,12 +7,14 @@ import { isLinkAck, isLinkReady, linkPingMessage, linkSessionMessage } from '@/l
 import { createClient } from '@/lib/supabase/browser';
 
 /**
- * Extension link handoff. On an explicit click — never on load — it
- * reads the current Supabase session and `window.postMessage`s its tokens,
- * scoped to this exact origin. The extension's content script (which the browser
- * runs only on this origin) forwards them to the extension and posts back a
- * `zl-link-ack`, which flips this to the "Linked" state. If no ack arrives, a
- * fallback note explains the extension was not detected. Tokens are posted only
+ * Extension link handoff. As soon as the extension announces itself (the
+ * content script the browser runs only on this origin answers the presence
+ * ping), this reads the current Supabase session and `window.postMessage`s its
+ * tokens, scoped to this exact origin — so signing in links the extension with
+ * no extra click. The content script forwards the tokens to the extension and
+ * posts back a `zl-link-ack`, which flips this to the "Linked" state. A manual
+ * button remains for the case where the extension is detected late; if no ack
+ * arrives, a fallback note explains it was not detected. Tokens are posted only
  * to this window at its own origin — never to a third party.
  */
 
@@ -65,6 +67,12 @@ export function LinkHandoff(): React.JSX.Element {
     }, ACK_TIMEOUT_MS);
   }, []);
 
+  // Auto-link the moment the extension is detected, so signing in is enough.
+  // Guarded on `idle` so it fires once; the manual button covers late detection.
+  useEffect(() => {
+    if (present && phase === 'idle') void link();
+  }, [present, phase, link]);
+
   if (phase === 'linked') {
     return (
       <div className="auth-sent">
@@ -85,12 +93,17 @@ export function LinkHandoff(): React.JSX.Element {
     <div className="auth-sent">
       <p className="auth-sent__title num">Signed in</p>
       <p className="meta">
-        Connect this browser&apos;s ZetaLog extension to your account. Your recorded games will sync
-        to the leaderboard.
+        Connecting this browser&apos;s ZetaLog extension to your account. Your recorded games sync
+        to the leaderboard on their own.
       </p>
       <p style={{ marginTop: '1.25rem' }}>
-        <button type="button" className="btn btn--primary" onClick={() => void link()}>
-          Link the ZetaLog extension
+        <button
+          type="button"
+          className="btn btn--primary"
+          onClick={() => void link()}
+          disabled={phase === 'waiting'}
+        >
+          {phase === 'waiting' ? 'Linking…' : 'Link the ZetaLog extension'}
         </button>
       </p>
       <p className="meta" role="status" style={{ marginTop: '0.75rem' }}>

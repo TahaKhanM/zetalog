@@ -4,6 +4,10 @@ import { z } from 'zod';
 import { type FetchLike } from './auth.js';
 import { WEB_APP_URL } from './config.js';
 
+/** The subset of `GET /api/profile` the extension reads (extra fields ignored). */
+export const profileViewSchema = z.object({ leaderboardOptOut: z.boolean() });
+export type ProfileView = z.infer<typeof profileViewSchema>;
+
 /**
  * Typed client for the game API.
  * Bearer-authenticated; on a 401 it performs exactly one token refresh and
@@ -23,6 +27,20 @@ export const submitSuccessSchema = z.object({
   serverScore: z.number().int().nonnegative(),
 });
 export type SubmitSuccess = z.infer<typeof submitSuccessSchema>;
+
+/** One game as `GET /api/games` returns it, for backfilling the popup history. */
+export const remoteGameSchema = z.object({
+  clientGameId: z.string().min(1),
+  playedAt: z.string().min(1),
+  settingsFingerprint: z.string().min(1),
+  rankableDuration: z.union([z.literal(30), z.literal(60), z.literal(120), z.null()]),
+  claimedScore: z.number().int().nonnegative(),
+  serverScore: z.number().int().nonnegative(),
+  status: submitOutcomeSchema,
+});
+export type RemoteGame = z.infer<typeof remoteGameSchema>;
+
+const listGamesResponseSchema = z.object({ games: z.array(remoteGameSchema) });
 
 /**
  * A typed API failure. `auth` means the session is invalid even after a refresh
@@ -52,10 +70,16 @@ export interface ApiDeps {
   readonly baseUrl?: string;
 }
 
-/** The game API surface the sync queue drives. */
+/** The API surface the sync queue and the popup drive. */
 export interface ApiClient {
   submitGame(record: GameRecord): Promise<Result<SubmitSuccess, ApiError>>;
   revokeGame(clientGameId: string): Promise<Result<null, ApiError>>;
+  /** The caller's own leaderboard-privacy state (defaults to visible if no row yet). */
+  getProfile(): Promise<Result<ProfileView, ApiError>>;
+  /** Set the leaderboard opt-out (true keeps the account off the public boards). */
+  setLeaderboardOptOut(optOut: boolean): Promise<Result<null, ApiError>>;
+  /** The account's recent games, to backfill the popup history after linking. */
+  listGames(): Promise<Result<RemoteGame[], ApiError>>;
 }
 
 /** A completed request: HTTP status and best-effort parsed JSON body. */
@@ -72,7 +96,7 @@ export function createApiClient(deps: ApiDeps): ApiClient {
     method: string,
     path: string,
     token: string,
-    body: GameRecord | undefined,
+    body: object | undefined,
   ): Promise<Result<RawResponse, ApiError>> {
     let response;
     try {
@@ -97,7 +121,7 @@ export function createApiClient(deps: ApiDeps): ApiClient {
   async function authed(
     method: string,
     path: string,
-    body: GameRecord | undefined,
+    body: object | undefined,
   ): Promise<Result<RawResponse, ApiError>> {
     const token = await deps.auth.accessToken();
     if (token === null) return err({ kind: 'auth' });
@@ -150,6 +174,46 @@ export function createApiClient(deps: ApiDeps): ApiClient {
         default:
           return err({ kind: 'server', status });
       }
+    },
+
+    async getProfile() {
+      const response = await authed('GET', '/api/profile', undefined);
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      switch (status) {
+        case 200: {
+          const body = profileViewSchema.safeParse(parsed);
+          return body.success ? ok(body.data) : err({ kind: 'network' });
+        }
+        // No profile row yet: treat as visible (the default) rather than an error.
+        case 404:
+          return ok({ leaderboardOptOut: false });
+        default:
+          return err({ kind: 'server', status });
+      }
+    },
+
+    async setLeaderboardOptOut(optOut) {
+      const response = await authed('POST', '/api/profile', { leaderboardOptOut: optOut });
+      if (!response.ok) return response;
+      const { status } = response.value;
+      switch (status) {
+        case 200:
+          return ok(null);
+        case 400:
+          return err({ kind: 'bad-request' });
+        default:
+          return err({ kind: 'server', status });
+      }
+    },
+
+    async listGames() {
+      const response = await authed('GET', '/api/games', undefined);
+      if (!response.ok) return response;
+      const { status, parsed } = response.value;
+      if (status !== 200) return err({ kind: 'server', status });
+      const body = listGamesResponseSchema.safeParse(parsed);
+      return body.success ? ok(body.data.games) : err({ kind: 'network' });
     },
   };
 }
