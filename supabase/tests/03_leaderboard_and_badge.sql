@@ -9,7 +9,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions, pg_catalog;
 
-select plan(16);
+select plan(17);
 
 -- Fixtures -----------------------------------------------------------------
 insert into public.universities (name, slug, domains)
@@ -28,7 +28,8 @@ values
 update public.profiles
    set display_name = 'verivera',
        university_id = (select id from public.universities where slug = 'lb-test-uni-a'),
-       uni_verified_at = now()
+       uni_verified_at = now(),
+       leaderboard_badge = 'chrome-reviewer'
  where id = '11111111-1111-1111-1111-111111111111';
 
 -- Unverified user: has a university set but no verification timestamp.
@@ -80,6 +81,10 @@ select is(
   (select university_slug from public.leaderboard_entries
     where user_id = '11111111-1111-1111-1111-111111111111' and duration = 60),
   'lb-test-uni-a', 'verified profile shows university_slug');
+select is(
+  (select leaderboard_badge from public.leaderboard_entries
+    where user_id = '11111111-1111-1111-1111-111111111111' and duration = 60),
+  'chrome-reviewer', 'service-managed leaderboard badge is projected');
 
 -- Distinct duration rows -----------------------------------------------------
 select is(
