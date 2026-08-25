@@ -63,12 +63,15 @@ function game(id: string, over: Partial<StoredGame> = {}): StoredGame {
 function fakeApi(handlers: {
   submit?: (r: GameRecord) => Result<SubmitSuccess, ApiError>;
   revoke?: (id: string) => Result<null, ApiError>;
-}): ApiClient & { submitted: string[]; revoked: string[] } {
+  restore?: (id: string) => Result<SubmitSuccess, ApiError>;
+}): ApiClient & { submitted: string[]; revoked: string[]; restored: string[] } {
   const submitted: string[] = [];
   const revoked: string[] = [];
+  const restored: string[] = [];
   return {
     submitted,
     revoked,
+    restored,
     submitGame: (r) => {
       submitted.push(r.id);
       return Promise.resolve(
@@ -79,6 +82,18 @@ function fakeApi(handlers: {
       revoked.push(id);
       return Promise.resolve(handlers.revoke?.(id) ?? ok(null));
     },
+    restoreGame: (id) => {
+      restored.push(id);
+      return Promise.resolve(
+        handlers.restore?.(id) ?? ok({ id, outcome: 'accepted' as const, serverScore: 30 }),
+      );
+    },
+    startChallenge: () =>
+      Promise.resolve(
+        ok({ challengeId: '44444444-4444-4444-8444-444444444444', nonce: 'zlc_nonce-123456789' }),
+      ),
+    revokeSession: () => Promise.resolve(ok(null)),
+    revokeCredential: () => Promise.resolve(ok(null)),
     getProfile: () => Promise.resolve(ok({ leaderboardOptOut: false })),
     setLeaderboardOptOut: () => Promise.resolve(ok(null)),
     listGames: () => Promise.resolve(ok([])),
@@ -145,10 +160,10 @@ describe('reconcileJobs / reconcileQueue', () => {
     expect(reconcileQueue([revoked], [], 0)).toEqual([]);
   });
 
-  it('queues a re-submit for a restored (kept) game whose upload was revoked', () => {
+  it('queues a server restore for a kept game whose upload was revoked', () => {
     const restored = game('r', { status: 'kept', sync: { state: 'revoked' } });
     expect(reconcileQueue([restored], [], 0)).toEqual([
-      { clientGameId: 'r', kind: 'submit', attempts: 0, nextAttemptAtMs: 0 },
+      { clientGameId: 'r', kind: 'restore', attempts: 0, nextAttemptAtMs: 0 },
     ]);
   });
 
@@ -160,6 +175,28 @@ describe('reconcileJobs / reconcileQueue', () => {
       nextAttemptAtMs: 9_999,
     };
     expect(reconcileQueue([game('a')], [prior], 0)).toEqual([prior]);
+  });
+
+  it('syncs only games owned by the linked user and skips retired submit telemetry', () => {
+    const games = [
+      game('mine', { ownerUserId: 'user-1' }),
+      game('theirs', { ownerUserId: 'user-2' }),
+      game('retired', { ownerUserId: 'user-1', telemetryPruned: true }),
+    ];
+    expect(reconcileQueue(games, [], 0, 'user-1').map((entry) => entry.clientGameId)).toEqual([
+      'mine',
+    ]);
+  });
+
+  it('still restores a revoked server row after its uploaded telemetry was retired', () => {
+    const restored = game('restored', {
+      ownerUserId: 'user-1',
+      telemetryPruned: true,
+      sync: { state: 'revoked' },
+    });
+    expect(reconcileQueue([restored], [], 0, 'user-1')).toEqual([
+      { clientGameId: 'restored', kind: 'restore', attempts: 0, nextAttemptAtMs: 0 },
+    ]);
   });
 });
 
@@ -186,6 +223,33 @@ describe('createSyncQueueStore', () => {
 });
 
 describe('drainSync', () => {
+  it('never uploads a stale-session capture after terminal auth failure and a different-account relink', async () => {
+    const area = fakeArea({ [GAMES_KEY]: [game(A, { ownerUserId: 'user-original' })] });
+    const store = createStore(area);
+    const expiredApi = fakeApi({ submit: () => err({ kind: 'auth' }) });
+
+    const failed = await drainSync({
+      ...deps(area, expiredApi),
+      userId: () => Promise.resolve('user-original'),
+    });
+    expect(failed.authFailed).toBe(true);
+    expect(expiredApi.submitted).toEqual([A]);
+
+    // Terminal auth clears only sync metadata. It deliberately preserves the
+    // owner captured before expiry, so a subsequent link cannot cross accounts.
+    expect((await store.clearAllSync()).ok).toBe(true);
+    const differentAccountApi = fakeApi({});
+    const relinked = await drainSync({
+      ...deps(area, differentAccountApi),
+      userId: () => Promise.resolve('user-different'),
+    });
+
+    expect(relinked.processed).toBe(0);
+    expect(differentAccountApi.submitted).toEqual([]);
+    const listed = await store.listGames();
+    expect(listed.ok && listed.value[0]?.ownerUserId).toBe('user-original');
+  });
+
   it('does nothing when signed out', async () => {
     const area = fakeArea({ [GAMES_KEY]: [game(A)] });
     const api = fakeApi({});
@@ -200,6 +264,26 @@ describe('drainSync', () => {
     const summary = await drainSync(deps(area, api));
     expect(summary.processed).toBe(0);
     expect(api.submitted).toEqual([]);
+  });
+
+  it('fails closed when a linked installation cannot resolve its owner id', async () => {
+    const area = fakeArea({ [GAMES_KEY]: [game(A)] });
+    const api = fakeApi({});
+    const d = { ...deps(area, api), userId: () => Promise.resolve(null) };
+    const summary = await drainSync(d);
+
+    expect(summary).toMatchObject({ processed: 0, authFailed: true, remaining: 0 });
+    expect(api.submitted).toEqual([]);
+  });
+
+  it('passes the resolved owner through reconciliation', async () => {
+    const area = fakeArea({
+      [GAMES_KEY]: [game(A, { ownerUserId: 'user-1' }), game(B, { ownerUserId: 'user-2' })],
+    });
+    const api = fakeApi({});
+    const d = { ...deps(area, api), userId: () => Promise.resolve('user-1') };
+    await drainSync(d);
+    expect(api.submitted).toEqual([A]);
   });
 
   it('backfills every kept rankable game on first drain and writes the verdict back', async () => {
@@ -294,7 +378,7 @@ describe('drainSync', () => {
     expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
   });
 
-  it('re-submits a restored game whose upload was revoked', async () => {
+  it('calls the server restore operation for a restored revoked game', async () => {
     const removed = game(R, { status: 'removed', sync: { state: 'uploaded' } });
     const area = fakeArea({ [GAMES_KEY]: [removed] });
     const api = fakeApi({});
@@ -308,11 +392,49 @@ describe('drainSync', () => {
 
     const summary = await drainSync(d);
 
-    expect(api.submitted).toEqual([R]); // re-submitted through validation
+    expect(api.submitted).toEqual([]);
+    expect(api.restored).toEqual([R]);
     expect(summary.uploaded).toBe(1);
     const row = (area.data[GAMES_KEY] as StoredGame[])[0];
     expect(row?.sync?.state).toBe('uploaded');
     expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
+  });
+
+  it('stops on an auth failure during restore and keeps the job queued', async () => {
+    const restored = game(R, { status: 'kept', sync: { state: 'revoked' } });
+    const area = fakeArea({ [GAMES_KEY]: [restored] });
+    const api = fakeApi({ restore: () => err({ kind: 'auth' }) });
+
+    const summary = await drainSync(deps(area, api));
+
+    expect(summary.authFailed).toBe(true);
+    expect((area.data[SYNC_QUEUE_KEY] as SyncEntry[])[0]?.kind).toBe('restore');
+  });
+
+  it('marks a missing server row failed during restore', async () => {
+    const restored = game(R, { status: 'kept', sync: { state: 'revoked' } });
+    const area = fakeArea({ [GAMES_KEY]: [restored] });
+    const api = fakeApi({ restore: () => err({ kind: 'not-found' }) });
+
+    const summary = await drainSync(deps(area, api));
+
+    expect(summary.failed).toBe(1);
+    expect((area.data[GAMES_KEY] as StoredGame[])[0]?.sync).toEqual({ state: 'failed' });
+    expect(area.data[SYNC_QUEUE_KEY]).toEqual([]);
+  });
+
+  it('reschedules a transient restore failure', async () => {
+    const restored = game(R, { status: 'kept', sync: { state: 'revoked' } });
+    const area = fakeArea({ [GAMES_KEY]: [restored] });
+    const api = fakeApi({ restore: () => err({ kind: 'network' }) });
+
+    const summary = await drainSync(deps(area, api));
+
+    expect(summary.retryScheduled).toBe(1);
+    expect((area.data[SYNC_QUEUE_KEY] as SyncEntry[])[0]).toMatchObject({
+      kind: 'restore',
+      attempts: 1,
+    });
   });
 
   it('reschedules a transient revoke failure', async () => {

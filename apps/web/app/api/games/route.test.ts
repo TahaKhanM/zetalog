@@ -2,7 +2,12 @@ import { ZETAMAC_DEFAULT_SETTINGS, type GameRecord } from '@zetalog/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { GameToInsert, SubmitPort } from '@/lib/games/submit';
-import { handleGamesGet, handleGamesPost, type GamesPostDeps } from './handler';
+import {
+  MAX_GAME_BODY_BYTES,
+  handleGamesGet,
+  handleGamesPost,
+  type GamesPostDeps,
+} from './handler';
 import { OPTIONS } from './route';
 
 const record: GameRecord = {
@@ -67,6 +72,38 @@ describe('POST /api/games', () => {
     );
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ error: { code: 'bad-request' } });
+  });
+
+  it('rejects a declared oversized body before reading or parsing it', async () => {
+    const response = await handleGamesPost(
+      request(record, {
+        authorization: 'Bearer good',
+        'content-length': String(MAX_GAME_BODY_BYTES + 1),
+      }),
+      deps(),
+    );
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({ error: { code: 'payload-too-large' } });
+  });
+
+  it('rejects an actually oversized body when content-length is absent or dishonest', async () => {
+    const oversized = new Request('http://localhost/api/games', {
+      method: 'POST',
+      headers: { authorization: 'Bearer good', 'content-type': 'application/json' },
+      body: JSON.stringify({ padding: 'x'.repeat(MAX_GAME_BODY_BYTES) }),
+    });
+    const response = await handleGamesPost(oversized, deps());
+    expect(response.status).toBe(413);
+  });
+
+  it('returns 400 for malformed JSON', async () => {
+    const malformed = new Request('http://localhost/api/games', {
+      method: 'POST',
+      headers: { authorization: 'Bearer good', 'content-type': 'application/json' },
+      body: '{',
+    });
+    const response = await handleGamesPost(malformed, deps());
+    expect(response.status).toBe(400);
   });
 
   it('accepts a valid submission and returns 201 with the outcome', async () => {

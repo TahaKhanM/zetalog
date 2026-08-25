@@ -1,27 +1,43 @@
 import { err, ok, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from './config.js';
+import { SUPABASE_ANON_KEY, SUPABASE_URL, WEB_APP_URL } from './config.js';
+import { codeFromLinkCallback, createPkceValues } from './pkce.js';
 import { singleFlight } from './single-flight.js';
 
 /**
- * Extension account session and Supabase token refresh. supabase-js stays OUT of the bundle: the one thing the
- * extension needs from Supabase — trading a refresh token for a fresh access
- * token — is a single raw `fetch` to the GoTrue token endpoint. Tokens are only
- * ever sent to {@link SUPABASE_URL} and are NEVER written to an error detail or
- * a log.
+ * Extension account sessions. New links use a revocable installation credential
+ * that is independent of the website session. The small raw Supabase refresh
+ * client remains only to migrate pre-v2 installations without interrupting
+ * users; refresh material is never logged and is removed after migration.
  */
 
 /** Versioned storage key for the persisted account session. */
 export const SESSION_KEY = 'zl:v1:session';
+export const AUTH_STATE_KEY = 'zl:v2:authState';
 
 /** The persisted account session — the minimum needed to authenticate uploads. */
-export const sessionSchema = z.object({
+export const legacySessionSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(1),
   userId: z.string().min(1),
 });
+export const extensionSessionSchema = z.object({
+  kind: z.literal('extension'),
+  token: z.string().min(1),
+  userId: z.string().min(1),
+});
+export const sessionSchema = z.union([extensionSessionSchema, legacySessionSchema]);
 export type Session = z.infer<typeof sessionSchema>;
+export type LegacySession = z.infer<typeof legacySessionSchema>;
+export type ExtensionSession = z.infer<typeof extensionSessionSchema>;
+
+const authStateSchema = z.object({ needsRelink: z.boolean() });
+const linkedResponseSchema = z.object({ token: z.string().min(1), userId: z.string().min(1) });
+const tokenExchangeResponseSchema = z.object({
+  credential: z.string().min(1),
+  userId: z.string().min(1),
+});
 
 /** The subset of the GoTrue token response the extension depends on. */
 const tokenResponseSchema = z.object({
@@ -54,6 +70,15 @@ export interface AuthStorageArea {
   get(key: string): Promise<Record<string, unknown>>;
   set(items: Record<string, unknown>): Promise<void>;
   remove(key: string): Promise<void>;
+}
+
+/** The small identity API surface required for a browser-owned redirect flow. */
+export interface IdentityApi {
+  getRedirectURL(path?: string): string;
+  launchWebAuthFlow(details: {
+    readonly url: string;
+    readonly interactive: boolean;
+  }): Promise<string | undefined>;
 }
 
 /** The Supabase endpoint + anon key the refresh call targets. */
@@ -98,7 +123,7 @@ export function decodeUserId(accessToken: string): string | null {
  * token. Returns null when the access token is malformed (an invalid token is
  * not worth persisting).
  */
-export function sessionFromTokens(accessToken: string, refreshToken: string): Session | null {
+export function sessionFromTokens(accessToken: string, refreshToken: string): LegacySession | null {
   const userId = decodeUserId(accessToken);
   if (userId === null) return null;
   return { accessToken, refreshToken, userId };
@@ -113,7 +138,7 @@ export async function requestRefresh(
   refreshToken: string,
   fetchFn: FetchLike,
   config: AuthConfig = DEFAULT_CONFIG,
-): Promise<Result<Session, AuthError>> {
+): Promise<Result<LegacySession, AuthError>> {
   let response: HttpResponse;
   try {
     response = await fetchFn(`${config.supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
@@ -154,17 +179,22 @@ export interface AuthController {
   read(): Promise<Result<Session | null, AuthError>>;
   /** The current access token, or `null` if signed out / unreadable. */
   accessToken(): Promise<string | null>;
+  /** Stored owner id without network migration; safe on the capture hot path. */
+  storedUserId(): Promise<string | null>;
+  /** Stored opaque credential only; never migrates, refreshes, or performs network I/O. */
+  extensionCredential(): Promise<string | null>;
+  /** Owning user id, after silently migrating a readable legacy session. */
+  userId(): Promise<string | null>;
   /** Whether a (readable) session is stored. */
   isLinked(): Promise<boolean>;
-  /** Persist a session (from the link handoff). */
+  /** Persist a session (primarily a migration/test seam). */
   save(session: Session): Promise<void>;
-  /**
-   * Build a session from handoff tokens and persist it. Returns `true` on
-   * success, `false` if the access token is malformed (nothing is stored).
-   */
-  link(accessToken: string, refreshToken: string): Promise<boolean>;
+  /** Run an explicit, browser-owned PKCE link flow and store its opaque credential. */
+  beginLink(): Promise<boolean>;
   /** Forget the session (Unlink). Leaves local game data untouched. */
   clear(): Promise<void>;
+  /** Whether a terminal credential failure requires the agreed one-time relink. */
+  needsRelink(): Promise<boolean>;
   /**
    * Refresh the stored session and persist the result. Returns the new access
    * token, or `null` if there is no (readable) session or the exchange failed —
@@ -177,11 +207,15 @@ export interface AuthController {
 export interface AuthDeps {
   readonly fetch: FetchLike;
   readonly config?: AuthConfig;
+  readonly apiBaseUrl?: string;
+  /** Omit outside the service worker; link initiation then fails closed. */
+  readonly identity?: IdentityApi;
 }
 
 /** Create the session controller over a `browser.storage.local`-shaped area. */
 export function createAuthController(area: AuthStorageArea, deps: AuthDeps): AuthController {
   const config = deps.config ?? DEFAULT_CONFIG;
+  const apiBaseUrl = deps.apiBaseUrl ?? WEB_APP_URL;
 
   async function read(): Promise<Result<Session | null, AuthError>> {
     const raw = await area.get(SESSION_KEY);
@@ -192,16 +226,152 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
     return ok(parsed.data);
   }
 
+  async function setNeedsRelink(value: boolean): Promise<void> {
+    await area.set({ [AUTH_STATE_KEY]: { needsRelink: value } });
+  }
+
+  async function clearAndRequireRelink(): Promise<void> {
+    await area.remove(SESSION_KEY);
+    await setNeedsRelink(true);
+  }
+
+  async function linkedRequest(path: string, init: RequestInit): Promise<HttpResponse | null> {
+    try {
+      return await deps.fetch(`${apiBaseUrl}${path}`, init);
+    } catch {
+      return null;
+    }
+  }
+
+  async function parseLinked(response: HttpResponse): Promise<ExtensionSession | null> {
+    if (!response.ok) return null;
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      return null;
+    }
+    const parsed = linkedResponseSchema.safeParse(body);
+    return parsed.success ? { kind: 'extension', ...parsed.data } : null;
+  }
+
+  async function exchangeLinkCode(
+    code: string,
+    verifier: string,
+    redirectUri: string,
+  ): Promise<ExtensionSession | null> {
+    const response = await linkedRequest('/api/extension/link/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code, codeVerifier: verifier, redirectUri }),
+    });
+    if (!response?.ok) return null;
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      return null;
+    }
+    const parsed = tokenExchangeResponseSchema.safeParse(body);
+    return parsed.success
+      ? { kind: 'extension', token: parsed.data.credential, userId: parsed.data.userId }
+      : null;
+  }
+
+  async function migrateWithAccessToken(accessToken: string): Promise<{
+    readonly status: 'migrated' | 'invalid' | 'temporary';
+    readonly session?: ExtensionSession;
+  }> {
+    const response = await linkedRequest('/api/extension/migrate', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${accessToken}`, 'content-type': 'application/json' },
+    });
+    if (response === null || response.status >= 500) return { status: 'temporary' };
+    if (response.status === 401) return { status: 'invalid' };
+    const migrated = await parseLinked(response);
+    return migrated === null ? { status: 'temporary' } : { status: 'migrated', session: migrated };
+  }
+
   // Single-flight: refresh tokens are single-use, so two concurrent 401
   // handlers racing two exchanges would invalidate the session — concurrent
   // callers share one exchange and receive the same new access token.
-  const refreshShared = singleFlight(async (): Promise<string | null> => {
+  const migrateShared = singleFlight(async (): Promise<string | null> => {
     const current = await read();
     if (!current.ok || current.value === null) return null;
+    if ('kind' in current.value) return current.value.token;
+
+    const direct = await migrateWithAccessToken(current.value.accessToken);
+    if (direct.status === 'migrated' && direct.session !== undefined) {
+      await area.set({ [SESSION_KEY]: direct.session });
+      await setNeedsRelink(false);
+      return direct.session.token;
+    }
+    if (direct.status === 'temporary') {
+      // Compatibility fallback: the existing API still accepts a valid legacy
+      // JWT, so a transient migration outage must not interrupt normal syncing.
+      return current.value.accessToken;
+    }
+
     const refreshed = await requestRefresh(current.value.refreshToken, deps.fetch, config);
-    if (!refreshed.ok) return null;
+    if (!refreshed.ok) {
+      if (refreshed.error.detail.startsWith('status 4')) await clearAndRequireRelink();
+      return null;
+    }
+    await area.set({ [SESSION_KEY]: refreshed.value });
+    const retry = await migrateWithAccessToken(refreshed.value.accessToken);
+    if (retry.status === 'migrated' && retry.session !== undefined) {
+      await area.set({ [SESSION_KEY]: retry.session });
+      await setNeedsRelink(false);
+      return retry.session.token;
+    }
+    if (retry.status === 'temporary') return refreshed.value.accessToken;
+    await clearAndRequireRelink();
+    return null;
+  });
+
+  const refreshLegacyShared = singleFlight(async (): Promise<string | null> => {
+    const current = await read();
+    if (!current.ok || current.value === null) return null;
+    if ('kind' in current.value) {
+      await clearAndRequireRelink();
+      return null;
+    }
+    const refreshed = await requestRefresh(current.value.refreshToken, deps.fetch, config);
+    if (!refreshed.ok) {
+      if (refreshed.error.detail.startsWith('status 4')) await clearAndRequireRelink();
+      return null;
+    }
     await area.set({ [SESSION_KEY]: refreshed.value });
     return refreshed.value.accessToken;
+  });
+
+  const beginLinkShared = singleFlight(async (): Promise<boolean> => {
+    const identity = deps.identity;
+    if (identity === undefined) return false;
+    const redirectUri = identity.getRedirectURL('zetalog-link');
+    const pkce = await createPkceValues();
+    const authorizeUrl = new URL('/api/extension/link/authorize', apiBaseUrl);
+    authorizeUrl.searchParams.set('redirect_uri', redirectUri);
+    authorizeUrl.searchParams.set('code_challenge', pkce.challenge);
+    authorizeUrl.searchParams.set('code_challenge_method', 'S256');
+    authorizeUrl.searchParams.set('state', pkce.state);
+
+    let callback: string | undefined;
+    try {
+      callback = await identity.launchWebAuthFlow({
+        url: authorizeUrl.toString(),
+        interactive: true,
+      });
+    } catch {
+      return false;
+    }
+    const code = codeFromLinkCallback(callback, redirectUri, pkce.state);
+    if (code === null) return false;
+    const session = await exchangeLinkCode(code, pkce.verifier, redirectUri);
+    if (session === null) return false;
+    await area.set({ [SESSION_KEY]: session });
+    await setNeedsRelink(false);
+    return true;
   });
 
   return {
@@ -209,29 +379,55 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
 
     async accessToken() {
       const result = await read();
-      return result.ok && result.value !== null ? result.value.accessToken : null;
+      if (!result.ok || result.value === null) return null;
+      return 'kind' in result.value ? result.value.token : migrateShared();
+    },
+
+    async storedUserId() {
+      const result = await read();
+      return result.ok && result.value !== null ? result.value.userId : null;
+    },
+
+    async extensionCredential() {
+      const result = await read();
+      if (!result.ok || result.value === null || !('kind' in result.value)) return null;
+      return result.value.token;
+    },
+
+    async userId() {
+      const token = await migrateShared();
+      if (token === null) return null;
+      const result = await read();
+      return result.ok && result.value !== null ? result.value.userId : null;
     },
 
     async isLinked() {
       const result = await read();
-      return result.ok && result.value !== null;
+      if (!result.ok) {
+        await clearAndRequireRelink();
+        return false;
+      }
+      return result.value !== null;
     },
 
     async save(session) {
       await area.set({ [SESSION_KEY]: session });
+      await setNeedsRelink(false);
     },
 
-    async link(accessToken, refreshToken) {
-      const session = sessionFromTokens(accessToken, refreshToken);
-      if (session === null) return false;
-      await area.set({ [SESSION_KEY]: session });
-      return true;
-    },
+    beginLink: beginLinkShared,
 
     async clear() {
       await area.remove(SESSION_KEY);
+      await setNeedsRelink(false);
     },
 
-    refresh: refreshShared,
+    async needsRelink() {
+      const raw = await area.get(AUTH_STATE_KEY);
+      const parsed = authStateSchema.safeParse(raw[AUTH_STATE_KEY]);
+      return parsed.success && parsed.data.needsRelink;
+    },
+
+    refresh: refreshLegacyShared,
   };
 }

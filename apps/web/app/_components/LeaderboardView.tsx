@@ -61,13 +61,12 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
       <div className="board-layout">
         <div>
           <div className="board-controls">
-            <nav className="index-tabs" role="tablist" aria-label="Game duration">
+            <nav className="index-tabs" aria-label="Game duration">
               {DURATION_TABS.map((duration) => (
                 <Link
                   key={duration}
                   href={`${basePath}?d=${String(duration)}`}
-                  role="tab"
-                  aria-selected={duration === props.duration}
+                  aria-current={duration === props.duration ? 'page' : undefined}
                   className="index-tab num"
                 >
                   {duration}
@@ -152,10 +151,8 @@ function LeaderboardRow({
   rank: number;
   showBadges: boolean;
 }): React.JSX.Element {
-  // data-uid lets the client ViewerRowHighlight find and decorate the viewer's
-  // own row after hydration (the cached HTML carries no viewer identity).
   return (
-    <tr data-uid={entry.user_id}>
+    <tr>
       <td className={`num ltable__rank${rank <= 3 ? ' rank-top' : ''}`}>{rank}</td>
       <td>
         <span className="player">

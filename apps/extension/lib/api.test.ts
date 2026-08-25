@@ -233,6 +233,175 @@ describe('createApiClient.revokeGame', () => {
   });
 });
 
+describe('createApiClient.restoreGame', () => {
+  it('PATCHes the encoded game id and parses the restored server verdict', async () => {
+    const { fetch, calls } = scriptedFetch([
+      { status: 200, body: { id: 'server-id', outcome: 'quarantined', serverScore: 41 } },
+    ]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+
+    expect(await client.restoreGame('a/b c')).toEqual({
+      ok: true,
+      value: { id: 'server-id', outcome: 'quarantined', serverScore: 41 },
+    });
+    expect(calls[0]).toMatchObject({
+      url: 'https://app.test/api/games/a%2Fb%20c',
+      method: 'PATCH',
+      body: undefined,
+    });
+  });
+
+  it('rejects a malformed success body', async () => {
+    const { fetch } = scriptedFetch([{ status: 200, body: { id: 'server-id' } }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.restoreGame('g')).toEqual({ ok: false, error: { kind: 'network' } });
+  });
+
+  it('maps 404 and unexpected statuses', async () => {
+    const missing = scriptedFetch([{ status: 404, body: {} }]);
+    const missingClient = createApiClient({
+      fetch: missing.fetch,
+      auth: fakeAuth('t'),
+      baseUrl: 'https://app.test',
+    });
+    expect(await missingClient.restoreGame('g')).toEqual({
+      ok: false,
+      error: { kind: 'not-found' },
+    });
+
+    const failed = scriptedFetch([{ status: 503, body: {} }]);
+    const failedClient = createApiClient({
+      fetch: failed.fetch,
+      auth: fakeAuth('t'),
+      baseUrl: 'https://app.test',
+    });
+    expect(await failedClient.restoreGame('g')).toEqual({
+      ok: false,
+      error: { kind: 'server', status: 503 },
+    });
+  });
+
+  it('propagates an auth failure', async () => {
+    const { fetch, calls } = scriptedFetch([]);
+    const client = createApiClient({ fetch, auth: fakeAuth(null), baseUrl: 'https://app.test' });
+    expect(await client.restoreGame('g')).toEqual({ ok: false, error: { kind: 'auth' } });
+    expect(calls).toHaveLength(0);
+  });
+});
+
+describe('createApiClient.startChallenge', () => {
+  const challenge = {
+    challengeId: '44444444-4444-4444-8444-444444444444',
+    nonce: 'zlc_nonce-123456789',
+  };
+
+  it('POSTs without a body and parses a challenge', async () => {
+    const { fetch, calls } = scriptedFetch([{ status: 201, body: challenge }]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.startChallenge()).toEqual({ ok: true, value: challenge });
+    expect(calls[0]).toMatchObject({
+      url: 'https://app.test/api/games/challenge',
+      method: 'POST',
+      body: undefined,
+    });
+  });
+
+  it('rejects a malformed challenge body', async () => {
+    const { fetch } = scriptedFetch([
+      { status: 201, body: { challengeId: 'bad', nonce: 'short' } },
+    ]);
+    const client = createApiClient({ fetch, auth: fakeAuth('t'), baseUrl: 'https://app.test' });
+    expect(await client.startChallenge()).toEqual({ ok: false, error: { kind: 'network' } });
+  });
+
+  it('maps a non-201 response and propagates auth failures', async () => {
+    const failed = scriptedFetch([{ status: 503, body: {} }]);
+    const failedClient = createApiClient({
+      fetch: failed.fetch,
+      auth: fakeAuth('t'),
+      baseUrl: 'https://app.test',
+    });
+    expect(await failedClient.startChallenge()).toEqual({
+      ok: false,
+      error: { kind: 'server', status: 503 },
+    });
+
+    const signedOut = scriptedFetch([]);
+    const signedOutClient = createApiClient({
+      fetch: signedOut.fetch,
+      auth: fakeAuth(null),
+      baseUrl: 'https://app.test',
+    });
+    expect(await signedOutClient.startChallenge()).toEqual({ ok: false, error: { kind: 'auth' } });
+  });
+});
+
+describe('createApiClient.revokeCredential', () => {
+  it.each([200, 401, 404])('treats status %s as a terminal success', async (status) => {
+    const { fetch, calls } = scriptedFetch([{ status, body: {} }]);
+    const client = createApiClient({ fetch, auth: fakeAuth(null), baseUrl: 'https://app.test' });
+    expect(await client.revokeCredential('zlx_pending')).toEqual({ ok: true, value: null });
+    expect(calls[0]).toMatchObject({
+      url: 'https://app.test/api/extension/session',
+      method: 'DELETE',
+      body: undefined,
+    });
+  });
+
+  it('revokes a retained credential without reading or refreshing the active session', async () => {
+    const { fetch, calls } = scriptedFetch([{ status: 200, body: {} }]);
+    const auth: ApiAuth = {
+      accessToken: () => Promise.reject(new Error('must not read active auth')),
+      refresh: () => Promise.reject(new Error('must not refresh active auth')),
+    };
+    const client = createApiClient({ fetch, auth, baseUrl: 'https://app.test' });
+
+    expect(await client.revokeCredential('zlx_pending')).toEqual({ ok: true, value: null });
+    expect(calls[0]?.headers).toMatchObject({ authorization: 'Bearer zlx_pending' });
+  });
+
+  it('retains a credential when its direct revocation request cannot reach the server', async () => {
+    const { fetch } = scriptedFetch([new Error('offline')]);
+    const client = createApiClient({ fetch, auth: fakeAuth(null), baseUrl: 'https://app.test' });
+    expect(await client.revokeCredential('zlx_pending')).toEqual({
+      ok: false,
+      error: { kind: 'network' },
+    });
+  });
+
+  it('maps an unexpected status to a retryable server failure', async () => {
+    const failed = scriptedFetch([{ status: 500, body: {} }]);
+    const failedClient = createApiClient({
+      fetch: failed.fetch,
+      auth: fakeAuth('t'),
+      baseUrl: 'https://app.test',
+    });
+    expect(await failedClient.revokeCredential('zlx_pending')).toEqual({
+      ok: false,
+      error: { kind: 'server', status: 500 },
+    });
+  });
+
+  it('can revoke the active credential and fails closed when none is stored', async () => {
+    const active = scriptedFetch([{ status: 200, body: {} }]);
+    const activeClient = createApiClient({
+      fetch: active.fetch,
+      auth: fakeAuth('zlx_active'),
+      baseUrl: 'https://app.test',
+    });
+    expect(await activeClient.revokeSession()).toEqual({ ok: true, value: null });
+
+    const signedOut = scriptedFetch([]);
+    const signedOutClient = createApiClient({
+      fetch: signedOut.fetch,
+      auth: fakeAuth(null),
+      baseUrl: 'https://app.test',
+    });
+    expect(await signedOutClient.revokeSession()).toEqual({ ok: false, error: { kind: 'auth' } });
+    expect(signedOut.calls).toHaveLength(0);
+  });
+});
+
 describe('createApiClient.getProfile', () => {
   it('GETs the profile and parses the opt-out flag', async () => {
     const { fetch, calls } = scriptedFetch([

@@ -29,12 +29,15 @@ describe('remoteGameToStored', () => {
     expect(stored.savedAtMs).toBe(Date.parse(base.playedAt));
   });
 
-  it.each(['quarantined', 'rejected'] as const)('keeps status for a %s verdict', (status) => {
-    const stored = remoteGameToStored({ ...base, status });
-    expect(stored.status).toBe('kept');
-    expect(stored.sync?.state).toBe('uploaded');
-    expect(stored.sync?.outcome).toBe(status);
-  });
+  it.each(['quarantined', 'rejected'] as const)(
+    'excludes a server-%s game from local statistics',
+    (status) => {
+      const stored = remoteGameToStored({ ...base, status });
+      expect(stored.status).toBe('quarantined');
+      expect(stored.sync?.state).toBe('uploaded');
+      expect(stored.sync?.outcome).toBe(status);
+    },
+  );
 
   it('maps a user_removed game to a revoked, removed row', () => {
     const stored = remoteGameToStored({ ...base, status: 'user_removed' });

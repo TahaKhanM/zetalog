@@ -28,8 +28,8 @@ FEATURES
 • Progress over time. A trend that adapts to your history: a recent-scores list, then a sparkline, then a full chart as you play more.
 • Personal bests. Your best score at each standard duration (30s, 60s, 120s) for the default settings.
 • Skill analysis. Your solve times broken down by operation and times table, with the specific problems that slow you down.
-• Works offline. Everything runs on your device and the extension is fully functional without an account.
-• Optional leaderboard. Link a ZetaLog account to compare your best scores worldwide, with a per-university board if you verify a UK student email. Every submitted score is re-checked on the server so only genuine games rank.
+• Works offline. Everything runs on your device and the extension is fully functional without an account. An otherwise eligible game played offline is considered for ranking when it later syncs.
+• Optional leaderboard. Link a ZetaLog account to compare your best scores worldwide, with a per-university board if you verify a UK student email. Submitted telemetry is recomputed and checked for consistency; suspicious scores can be held for review.
 
 HOW TO USE
 
@@ -43,10 +43,16 @@ you link an account, and even then only your game results are sent, never your
 browsing. Full details are in the privacy policy linked below.
 
 PERMISSIONS
-• Storage. Saves your recorded games, preferences and (if you link an account) your session on your device.
+• Storage. Saves your recorded games, preferences and (if you link an account) a revocable extension credential on your device.
+• Unlimited storage. Prevents Chrome’s normal local quota from discarding legitimate scores or pending offline game evidence as your history grows.
 • Alarms. Schedules background retries so that, when leaderboard sync is on, a score that failed to upload is retried later.
+• Identity. Opens a secure, browser-owned account-link redirect after one explicit Link click; it carries no Chrome install warning.
 • Access to arithmetic.zetamac.com. Reads the running game (problems, answers, score, timer) to record your result. This is the core feature and the only site ZetaLog reads.
-• Access to the ZetaLog link page (www.zetalog.co.uk/link). Receives the sign-in handoff after you press Link the ZetaLog extension. Used only to connect your account.
+• Access to the ZetaLog link page (www.zetalog.co.uk/link). Receives only your explicit request to start the browser-owned link flow; credentials, website session tokens, authorization codes, and the PKCE verifier are never exposed to the page or content script.
+
+Requires Chrome 116 or later.
+
+ZetaLog is an independent project and is not affiliated with Zetamac.
 
 SUPPORT
 Questions or bugs: contact.mtaha@gmail.com
@@ -62,16 +68,18 @@ ZetaLog leaderboard.
 Write one specific justification per permission. "Needed for the extension to
 work" is rejected.
 
-- **storage**. Persists the user's recorded games, popup preferences (selected configuration and trend range) and, when an account is linked, the session and the pending-upload queue. All of this lives in `chrome.storage.local` on the user's device.
-- **alarms**. When leaderboard sync is on, uploads run in the background service worker. `alarms` schedules the retry drain (exponential backoff, capped at two hours) so a score that could not be uploaded, for example because the device was offline, is retried without keeping a page open.
-- **Host access, `*://arithmetic.zetamac.com/*`**. The content script reads the live game (the current problem, the answer field, the running score and the countdown) to record each finished game. This is ZetaLog's core function. It reads no other site through this permission.
-- **Host access, `https://www.zetalog.co.uk/link*`**. A content script on the ZetaLog link page receives the account session the page hands off after the user presses Link the ZetaLog extension. It reads nothing else on the page and runs on no other URL. The published build ships this production origin only. The `http://localhost:3000/link*` match used for local development is stripped from every non-development build by the `wxt.config.ts` `build:manifestGenerated` hook.
+- **storage**. Persists the user's recorded games, popup preferences (selected configuration and trend range) and, when an account is linked, a revocable extension credential and pending-upload queue. After an offline Unlink, it retains only the now-inactive credential until a background revocation retry succeeds. All of this lives in `chrome.storage.local` on the user's device.
+- **unlimitedStorage**. Chrome normally limits `chrome.storage.local` to 10 MB. ZetaLog retains unsynced rankable event streams so legitimate offline scores are not destroyed before upload; this permission removes that quota and carries no Chrome permission warning. It grants no access to files, other extensions, or websites.
+- **alarms**. When leaderboard sync is on, uploads run in the background service worker. `alarms` schedules the retry drain (exponential backoff, capped at two hours) so a score that could not be uploaded, for example because the device was offline, is retried without keeping a page open. An otherwise eligible offline game is assessed under the same ranking rules once it reaches the service.
+- **identity**. After one explicit Link click, `chrome.identity.launchWebAuthFlow` owns a PKCE redirect to ZetaLog. The extension validates the exact callback and exchanges its code directly for a revocable installation credential. This permission carries no Chrome install warning; Chrome 116 or later is required for reliable Manifest V3 worker keepalive during the flow.
+- **Host access, `https://arithmetic.zetamac.com/*`**. The content script reads the live game (the current problem, the answer field, the running score and the countdown) to record each finished game. This is ZetaLog's core function. It reads no other site through this permission.
+- **Host access, `https://www.zetalog.co.uk/link*`**. After the user presses Link the ZetaLog extension, this content script forwards only that explicit action to the background worker. The worker generates the PKCE verifier and completes a browser-owned identity redirect; authorization codes, the verifier, credentials, and website session tokens are never exposed to the page or content script. A still-valid legacy installation migrates silently; only an already-broken legacy session needs this one action. The script reads nothing else and the published manifest ships only this production origin.
 
 ## Screenshots to capture (1280×800 or 640×400, no placeholders)
 
 1. **Popup, main view**. The popup open next to a Zetamac game, showing the latest score, the 30/60/120 personal-best row and the adaptive trend chart. Use real recorded games so the numerals are populated.
 2. **Popup, recent games with statuses**. The recent-games list showing kept games and one quarantined (Restart) row, demonstrating review-not-delete and the Restore/Remove controls.
-3. **Popup, signed-in footer**. The footer in its Syncing to leaderboard state with per-game Synced chips, showing that sync is opt-in and visible.
+3. **Popup, signed-in footer**. The steady Linked to leaderboard footer with per-game Synced and Under review chips, showing that sync is opt-in and visible.
 4. **Web leaderboard**. The ZetaLog site's leaderboard (global or a university board) with the ranked table, to show where synced scores appear.
 5. **How it works page**. The `/how-it-works` page, showing what the product does at a glance.
 
@@ -83,12 +91,16 @@ results when an account is linked. Keep it in sync with
 
 ## Data-use disclosure form (dashboard)
 
-- Collects: "Website content" (the Zetamac game state) and "User activity" (game
-  results and play times). Does NOT collect personally identifiable information,
-  health, financial, authentication, personal communications, location or web
-  history.
-- "Is this data transferred off the user's device?": YES, only game results, and
-  only after the user links an account.
+- Collects/handles: "Website content" (the Zetamac game state), "User activity"
+  (game results and play times), and "Authentication information" (a revocable
+  extension credential while linked). The credential is stored locally and sent
+  only to ZetaLog's HTTPS API. The extension does not collect health, financial,
+  personal communications, location, advertising identifiers, or general web
+  browsing history.
+- "Is this data transferred off the user's device?": YES. A linked extension
+  sends the credential to authenticate ZetaLog API requests and sends game
+  results/telemetry for leaderboard and account-history features. No data is
+  transferred while the extension is unlinked.
 - "Is this data used or sold for purposes unrelated to the single purpose?": NO.
 - "Is this data used to determine creditworthiness or for lending?": NO.
 - Certify the three compliance statements (limited use, no unrelated sale, no

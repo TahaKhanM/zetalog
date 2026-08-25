@@ -11,7 +11,6 @@ export default tseslint.config(
       '**/.wxt/',
       '**/.next/',
       '**/coverage/',
-
       '.playwright-mcp/',
       'apps/extension/test/fixtures/',
       'apps/extension/test/replica/',

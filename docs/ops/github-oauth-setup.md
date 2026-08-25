@@ -1,11 +1,11 @@
-# W8 auth overhaul — dashboard runbook
+# Authentication dashboard runbook
 
-Owner actions required to activate the W8 flows (passwords, GitHub login,
-recovery emails) on the hosted project. The code is live the moment these are
-done; nothing here is optional.
+Owner actions required to activate password sign-in, GitHub login and recovery
+emails on the hosted project. The code is live as soon as these are complete;
+nothing here is optional.
 
-> **Paste the regenerated email templates first.** W8 regenerated ALL auth
-> templates and added **Reset Password** — the recovery flow cannot deliver a
+> **Paste the generated email templates first.** The authentication release
+> updates every template and adds **Reset Password**. The recovery flow cannot deliver a
 > code until it is pasted. Every subject and body lives in
 > [`auth-email-templates.md`](./auth-email-templates.md) (generated,
 > byte-sync-tested against `apps/web/lib/email/template.ts`).
@@ -55,12 +55,14 @@ The local stack already renders these exact bytes from
 
 ## 5. URL configuration sanity check (Dashboard → Authentication → URL Configuration)
 
-Unchanged by W8, but GitHub round-trips through the same `/auth/callback`
-route, so confirm:
+GitHub round-trips through the same `/auth/callback` route, so confirm:
 
 - **Site URL** = deployed web origin,
-- **Redirect URLs** still include the deployed `/auth/callback`, the `/link`
-  page, and preview deployments.
+- **Redirect URLs** include the deployed `/auth/callback` and preview deployments.
+  The extension's Chrome Identity callback is not a Supabase Auth redirect. After
+  the Chrome Web Store assigns the extension ID, configure its exact
+  `https://<extension-id>.chromiumapp.org/zetalog-link` value in the web server's
+  `EXTENSION_OAUTH_REDIRECT_URIS` environment variable instead.
 
 ## 6. Database migration
 

@@ -4,17 +4,15 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { applyOwnRowHighlight } from '@/lib/own-row';
 import { createClient } from '@/lib/supabase/browser';
 
 /**
  * Personalises the cached leaderboard for the signed-in viewer, after
  * hydration. The board itself is a cacheable server render with no viewer
  * identity in it (so signed-out visitors cost zero auth work); this reads the
- * browser session locally — `getSession()`, no network round-trip — highlights
- * the viewer's row, and portals a real next/link "＋ add badge" affordance into
- * it when eligible (Link, not a raw anchor, so navigation stays client-side
- * with prefetch).
+ * browser session locally, reads only the viewer's own display name under RLS,
+ * and finds the matching public row. This avoids publishing raw account UUIDs
+ * in the cached HTML just to implement a cosmetic own-row highlight.
  */
 export function ViewerRowHighlight({
   showAddBadge,
@@ -31,20 +29,21 @@ export function ViewerRowHighlight({
       // Users who chose "not at a university" opted out of the badge
       // flow; do not offer the affordance to them.
       let offerBadge = showAddBadge;
-      if (userId !== null && offerBadge) {
+      let displayName: string | null = null;
+      if (userId !== null) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('independent')
+          .select('display_name, independent')
           .eq('id', userId)
           .maybeSingle();
-        if ((profile as { independent?: unknown } | null)?.independent === true) {
+        const ownProfile = profile as { display_name?: unknown; independent?: unknown } | null;
+        displayName = typeof ownProfile?.display_name === 'string' ? ownProfile.display_name : null;
+        if (ownProfile?.independent === true) {
           offerBadge = false;
         }
       }
-      // The single side effect happens here, so one staleness check suffices.
       if (cancelled) return;
-      const decoration = applyOwnRowHighlight(document, userId, offerBadge);
-      setBadgeMount(decoration.badgeMount);
+      setBadgeMount(decorateOwnRow(document, displayName, offerBadge));
     });
     return () => {
       cancelled = true;
@@ -58,4 +57,23 @@ export function ViewerRowHighlight({
     </Link>,
     badgeMount,
   );
+}
+
+function decorateOwnRow(
+  container: Document,
+  displayName: string | null,
+  showAddBadge: boolean,
+): HTMLElement | null {
+  if (displayName === null) return null;
+  const name = [...container.querySelectorAll<HTMLElement>('.player__name')].find(
+    (node) => node.textContent === displayName,
+  );
+  const row = name?.closest('tr');
+  if (row === null || row === undefined) return null;
+  row.classList.add('row-self');
+  if (!showAddBadge || row.querySelector('.chip--badge, .uni-badge, .chip--add') !== null) {
+    return null;
+  }
+  const player = row.querySelector('.player');
+  return player instanceof HTMLElement ? player : null;
 }
