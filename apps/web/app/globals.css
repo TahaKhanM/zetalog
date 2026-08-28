@@ -1556,469 +1556,761 @@ th.ltable__rank {
 }
 
 /* ── /how-it-works ─────────────────────────────────────────────── */
-.hiw-hero {
-  text-align: center;
-  padding-block: clamp(2rem, 8vw, 4.5rem) clamp(1.5rem, 5vw, 3rem);
-  max-width: 44rem;
-  margin-inline: auto;
-}
-
-.hiw-hero__eyebrow {
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  margin-bottom: 0.9rem;
-}
-
-.hiw-hero__title {
-  font-size: clamp(1.9rem, 5.4vw, 3rem);
-  line-height: 1.08;
-}
-
-/* Long-form prose (privacy policy). */
-.prose {
-  max-width: 44rem;
-  line-height: 1.65;
-}
-
-.prose p,
-.prose ul {
-  color: var(--surface-text);
-  margin: 0.9rem 0;
-}
-
-.prose ul {
-  padding-left: 1.2rem;
+.hiw {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: clamp(3.5rem, 8vw, 6rem);
+  padding-bottom: clamp(1rem, 4vw, 2.5rem);
 }
 
-.prose__h2 {
-  font-size: 1.15rem;
-  margin-top: 2rem;
-  color: var(--surface-heading);
-}
-
-.prose a {
+.hiw a:not(.btn, .hiw-store-button) {
   color: var(--accent);
   border-bottom: 1px solid var(--accent-border);
 }
 
+.hiw-eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+}
+
+.hiw-hero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 6vw, 4rem);
+  align-items: center;
+  padding-top: clamp(1rem, 5vw, 3rem);
+}
+
+.hiw-hero__copy {
+  min-width: 0;
+}
+
+.hiw-hero__title {
+  max-width: 32rem;
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
+  line-height: 1;
+  text-wrap: balance;
+}
+
 .hiw-hero__lede {
-  margin: 1.1rem auto 0;
-  max-width: 36rem;
-  color: var(--meta-text);
-  font-size: 1.02rem;
+  max-width: 35rem;
+  margin: 1.15rem 0 0;
+  color: var(--surface-text);
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.65;
 }
 
 .hiw-hero__actions {
   display: flex;
-  gap: 0.8rem;
-  justify-content: center;
-  margin-top: 1.6rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
-/* A small caption under the hero download button. */
-.hiw-hero__note {
-  margin-top: 0.9rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+.hiw-hero__secondary {
+  width: min(100%, 22rem);
 }
 
-/* The download button, sized up as the hero's primary action. */
-.hiw-download__btn {
-  display: inline-flex;
+.hiw-store-button {
+  width: min(100%, 22rem);
+  min-height: 4.65rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  padding-inline: 1.3rem;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  color: var(--surface-heading);
+  background: var(--surface-card);
+  border: 1.5px solid var(--surface-border);
+  border-radius: 14px;
+  box-shadow: 0 7px 20px var(--surface-shadow);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.hiw-download__btn svg {
-  margin-left: -0.15rem;
+.hiw-store-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-strong);
+  box-shadow: 0 10px 26px var(--surface-shadow);
 }
 
-.hiw-install {
-  margin-top: clamp(2.5rem, 6vw, 4rem);
+.hiw-store-button img {
+  width: 3rem;
+  height: 3rem;
+  display: block;
 }
 
-.hiw-install__title {
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.hiw-install__intro {
-  margin: 0.5rem auto 0;
-  text-align: center;
-}
-
-/* Visual walkthrough: numbered steps paired with CSS Chrome mockups. */
-.walk {
-  list-style: none;
-  counter-reset: walk;
-  margin: 2rem 0 0;
-  padding: 0;
+.hiw-store-button__copy {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  min-width: 0;
 }
 
-.walk-step {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 4vw, 2.5rem);
+.hiw-store-button__copy > span {
+  color: var(--meta-text);
+  font-size: 0.69rem;
+  line-height: 1.25;
+}
+
+.hiw-store-button__copy strong {
+  margin-top: 0.12rem;
+  color: var(--surface-heading);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-stretch: 115%;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.015em;
+}
+
+.hiw-store-button__arrow {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.hiw-store-button--compact {
+  width: min(100%, 20rem);
+  min-height: 4rem;
+}
+
+.hiw-store-button--compact img {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.hiw-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--meta-text);
+  font-size: 0.76rem;
+}
+
+.hiw-trust li {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.hiw-trust li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.hiw-hero__figure,
+.hiw-screenshot,
+.hiw-popup-pair {
+  margin: 0;
+}
+
+.hiw-hero__screens {
+  position: relative;
+  min-height: clamp(22rem, 43vw, 27.5rem);
+}
+
+.hiw-hero__game {
+  width: 90%;
+  height: auto;
+  display: block;
+  margin-top: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 15px;
+  box-shadow: 0 18px 45px var(--surface-shadow);
+}
+
+.hiw-hero__popup {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(38%, 13rem);
+  height: auto;
+  display: block;
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 22px 50px color-mix(in srgb, var(--color-zl-navy) 20%, transparent);
+}
+
+.hiw-hero__figure figcaption,
+.hiw-screenshot figcaption,
+.hiw-popup-pair figcaption {
+  margin-top: 0.65rem;
+  color: var(--meta-text);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.hiw-hero__figure > figcaption {
+  text-align: right;
+}
+
+.hiw-jump {
+  display: flex;
   align-items: center;
-  padding: 1.4rem clamp(1rem, 3vw, 1.75rem);
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-block: calc(clamp(3.5rem, 8vw, 6rem) * -0.45);
+  padding: 0.55rem;
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: 14px;
   box-shadow: 0 1px 2px var(--surface-shadow);
 }
 
-.walk-step__copy {
-  position: relative;
-  padding-left: 2.6rem;
+.hiw-jump__label {
+  padding: 0.45rem 0.7rem;
+  color: var(--meta-text);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
 }
 
-.walk-step__n {
-  counter-increment: walk;
+.hiw-jump a:not(.btn, .hiw-store-button) {
+  padding: 0.45rem 0.7rem;
+  color: var(--surface-text);
+  border: 0;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.hiw-jump a:hover {
+  color: var(--surface-heading);
+  background: var(--surface-raised);
+}
+
+.hiw-section {
+  scroll-margin-top: 6rem;
+}
+
+.hiw-section__heading {
+  max-width: 45rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.hiw-section__heading--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.hiw-section__heading h2,
+.hiw-showcase__copy h2,
+.hiw-final h2 {
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.hiw-section__heading > p:last-child,
+.hiw-showcase__copy > p,
+.hiw-final > div > p:last-child {
+  margin: 0.85rem 0 0;
+  color: var(--meta-text);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.hiw-flow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  background: var(--surface-border);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+}
+
+.hiw-flow li {
+  display: flex;
+  gap: 0.85rem;
+  min-width: 0;
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+  background: var(--surface-card);
+}
+
+.hiw-flow__number,
+.hiw-install__number {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.hiw-flow h3,
+.hiw-install__steps h3,
+.hiw-install__store h3,
+.hiw-choices h3 {
+  margin: 0;
+  color: var(--surface-heading);
+  font-size: 1rem;
+}
+
+.hiw-flow p,
+.hiw-install__steps p,
+.hiw-install__store p,
+.hiw-choices p {
+  margin: 0.35rem 0 0;
+  color: var(--meta-text);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.hiw-new {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+}
+
+.hiw-new__label {
+  color: var(--accent);
+  font-size: 0.67rem;
+  letter-spacing: 0.11em;
+  white-space: nowrap;
+}
+
+.hiw-new p {
+  margin: 0;
+  color: var(--surface-text);
+  font-size: 0.86rem;
+}
+
+.hiw-new > a {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.hiw-install__store {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+  background: linear-gradient(115deg, var(--accent-soft), transparent 48%), var(--surface-card);
+}
+
+.hiw-install__store-label,
+.hiw-choice__label {
+  margin: 0 0 0.3rem;
+  color: var(--accent);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+}
+
+.hiw-install__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hiw-install__steps > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+.hiw-install__steps strong {
+  color: var(--surface-heading);
+}
+
+.hiw-install__steps a {
+  overflow-wrap: anywhere;
+}
+
+.hiw-install__tip,
+.hiw-note {
+  padding: 0.75rem 0.85rem;
+  color: var(--surface-text) !important;
+  background: var(--surface-raised);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+}
+
+.hiw-showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+  gap: clamp(2rem, 6vw, 4rem);
+  align-items: center;
+}
+
+.hiw-showcase--reverse {
+  grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.1fr);
+}
+
+.hiw-screenshot img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px var(--surface-shadow);
+}
+
+.hiw-play-list,
+.hiw-link-steps ol {
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: hiw-play;
+}
+
+.hiw-play-list li,
+.hiw-link-steps li {
+  position: relative;
+  min-height: 2rem;
+  padding: 0.15rem 0 0.9rem 2.65rem;
+  color: var(--surface-text);
+  line-height: 1.55;
+  counter-increment: hiw-play;
+}
+
+.hiw-play-list li::before,
+.hiw-link-steps li::before {
+  content: counter(hiw-play);
   position: absolute;
   left: 0;
-  top: 0.1rem;
+  top: 0;
   width: 1.8rem;
   height: 1.8rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  font-size: 0.82rem;
-  font-weight: 700;
   color: var(--accent);
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
-}
-
-.walk-step__title {
-  font-size: 1.05rem;
-  color: var(--surface-heading);
-  margin-bottom: 0.3rem;
-}
-
-.walk-step__copy .meta {
-  line-height: 1.55;
-}
-
-.walk-step__copy a {
-  color: var(--accent);
-  border-bottom: 1px solid var(--accent-border);
-}
-
-/* The illustration side of each step. */
-.walk-art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 5.5rem;
-}
-
-/* Step 1: the downloaded zip becoming an unzipped folder. */
-.walk-art--unzip {
-  gap: 0.85rem;
-}
-
-.mock-zip,
-.mock-folder {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: 10px;
-  background: var(--surface-raised);
-  border: 1px solid var(--surface-border);
-  color: var(--surface-text);
-  font-size: 0.82rem;
-}
-
-.mock-zip {
+  border-radius: 50%;
+  font-family: var(--font-numeric);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--meta-text);
 }
 
-.mock-folder {
-  color: var(--accent);
+.hiw-note {
+  margin-top: 0.5rem !important;
+  font-size: 0.86rem !important;
+  line-height: 1.5 !important;
 }
 
-.mock-into {
-  color: var(--meta-text);
-  font-size: 1.1rem;
-}
-
-/* A small browser window that frames steps two through five. */
-.chrome-frame {
-  width: 100%;
-  max-width: 20rem;
-  border-radius: 12px;
-  background: var(--surface-raised);
-  border: 1px solid var(--surface-border);
-  box-shadow: 0 6px 18px var(--surface-shadow);
-  overflow: hidden;
-}
-
-.chrome-frame__bar {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.75rem;
-}
-
-.chrome-frame__dots {
-  display: inline-flex;
-  gap: 0.3rem;
-  flex-shrink: 0;
-}
-
-.chrome-frame__dots i {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--rule-strong);
-}
-
-.chrome-frame__omni {
-  flex: 1;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: var(--surface-card);
-  border: 1px solid var(--surface-hairline);
-  font-size: 0.76rem;
-  color: var(--surface-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Step 3: the page header carrying the Developer mode toggle. */
-.chrome-frame__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.85rem 0.9rem;
-}
-
-.chrome-frame__title {
-  font-size: 0.95rem;
-  color: var(--surface-heading);
-}
-
-.mock-dev {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.mock-dev .meta {
-  font-size: 0.72rem;
-}
-
-.mock-switch {
-  width: 1.9rem;
-  height: 1.05rem;
-  border-radius: 999px;
-  background: var(--rule-strong);
-  position: relative;
-  flex-shrink: 0;
-}
-
-.mock-switch--on {
-  background: var(--accent);
-}
-
-.mock-switch__thumb {
-  position: absolute;
-  top: 0.12rem;
-  left: 0.12rem;
-  width: 0.8rem;
-  height: 0.8rem;
-  border-radius: 50%;
-  background: var(--surface-card);
-}
-
-.mock-switch--on .mock-switch__thumb {
-  left: auto;
-  right: 0.12rem;
-  background: var(--accent-contrast);
-}
-
-/* Step 4: the row of buttons Developer mode reveals. */
-.chrome-frame__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0.85rem 0.9rem;
-}
-
-.mock-btn {
-  padding: 0.4rem 0.7rem;
-  border-radius: 7px;
-  font-size: 0.74rem;
-  color: var(--meta-text);
-  background: var(--surface-card);
-  border: 1px solid var(--surface-hairline);
-}
-
-.mock-btn--on {
-  color: var(--accent-contrast);
-  background: var(--accent);
-  border-color: var(--accent);
-  font-weight: 600;
-}
-
-/* Step 5: the toolbar with ZetaLog pinned next to the puzzle icon. */
-.chrome-frame__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.7rem;
-}
-
-.chrome-frame__omni--sm {
-  font-size: 0.72rem;
-}
-
-.mock-tool {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 7px;
-  color: var(--meta-text);
-  flex-shrink: 0;
-}
-
-.mock-tool--pinned {
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-}
-
-.mock-tool--pinned img {
-  border-radius: 4px;
-  display: block;
-}
-
-/* Post-install detail: linking an account and the university badge. */
-.hiw-after {
-  margin-top: clamp(2.5rem, 6vw, 4rem);
-}
-
-.hiw-after__title {
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 1.4rem;
-}
-
-/* Two equal-height cards (stretch), each with its action pinned to the base. */
-.hiw-after__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
-  gap: 1rem;
-}
-
-.hiw-block {
+.hiw-bullets {
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.hiw-block__title {
-  font-size: 1.15rem;
-  margin-bottom: 0.5rem;
+.hiw-bullets li {
+  position: relative;
+  padding-left: 1.25rem;
+  color: var(--surface-text);
+  line-height: 1.5;
 }
 
-.hiw-block .meta {
-  line-height: 1.6;
+.hiw-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0.1rem;
+  top: 0.58em;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
-.hiw-block__cta {
-  margin-top: auto;
-  padding-top: 1.1rem;
-}
-
-/* The quieter "not at a university" footnote, set off from the copy above. */
-.hiw-block__aside {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid var(--surface-hairline);
-  font-size: 0.92rem;
-}
-
-/* Full-width helper: the copy sits beside a single vertical checklist. */
-.hiw-callout {
-  margin-top: 1rem;
+.hiw-popup-pair {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 1rem 2.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
   align-items: start;
 }
 
-.hiw-callout__title {
-  font-size: 1.1rem;
-  margin-bottom: 0.35rem;
+.hiw-popup-pair img {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: white;
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 14px 34px var(--surface-shadow);
 }
 
-/* The checklist: accent dot markers, always a single vertical column. */
-.hiw-checks {
-  list-style: none;
+.hiw-popup-pair img:first-child {
+  margin-top: 2rem;
+}
+
+.hiw-popup-pair figcaption {
+  grid-column: 1 / -1;
+  text-align: right;
+}
+
+.hiw-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.hiw-choices article {
+  padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+.hiw-choice--accent {
+  background: linear-gradient(120deg, var(--accent-soft), transparent 75%), var(--surface-card);
+  border-color: var(--accent-border);
+}
+
+.hiw-link-steps {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.35fr) minmax(0, 1fr);
+  gap: 1rem 2.5rem;
+  margin-top: 1rem;
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+.hiw-link-steps > h3 {
+  font-size: 1rem;
+}
+
+.hiw-link-steps ol {
   margin: 0;
-  padding: 0;
+}
+
+.hiw-link-steps > p {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: -0.25rem 0 0;
+}
+
+.hiw-sync-visuals {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: end;
+  margin-top: 1rem;
+}
+
+.hiw-screenshot--popup img {
+  border-radius: 0;
+}
+
+.hiw-faq__list {
+  max-width: 46rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
+  margin-inline: auto;
 }
 
-.hiw-checks li {
-  position: relative;
-  padding-left: 1.5rem;
-  line-height: 1.5;
-  font-size: 0.92rem;
-  color: var(--surface-text);
+.hiw-faq details {
+  padding: 0;
+  overflow: hidden;
 }
 
-.hiw-checks li::before {
-  content: '';
-  position: absolute;
-  left: 0.15rem;
-  top: 0.5em;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--accent);
+.hiw-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  color: var(--surface-heading);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
 }
 
-.hiw-checks a {
+.hiw-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.hiw-faq summary::after {
+  content: '+';
   color: var(--accent);
-  border-bottom: 1px solid var(--accent-border);
+  font-family: var(--font-numeric);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.hiw-faq details[open] summary::after {
+  content: '−';
+}
+
+.hiw-faq details p {
+  margin: 0;
+  padding: 0 1.15rem 1.1rem;
+  color: var(--meta-text);
+  line-height: 1.6;
+}
+
+.hiw-final {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(1.3rem, 4vw, 2rem);
+  background: linear-gradient(120deg, var(--accent-soft), transparent 62%), var(--surface-card);
+}
+
+.hiw-final > div {
+  max-width: 34rem;
+}
+
+@media (max-width: 820px) {
+  .hiw-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hiw-hero__copy {
+    max-width: 40rem;
+  }
+
+  .hiw-hero__title {
+    max-width: 40rem;
+  }
+
+  .hiw-hero__screens {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+
+  .hiw-install__steps {
+    grid-template-columns: 1fr;
+  }
+
+  .hiw-showcase,
+  .hiw-showcase--reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .hiw-showcase--reverse .hiw-showcase__copy {
+    order: 1;
+  }
+
+  .hiw-showcase--reverse .hiw-popup-pair {
+    order: 2;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
 }
 
 @media (max-width: 680px) {
-  .hiw-callout {
+  .hiw {
+    gap: 3.75rem;
+  }
+
+  .hiw-jump {
+    justify-content: flex-start;
+    margin-block: -1.5rem;
+  }
+
+  .hiw-jump__label {
+    width: 100%;
+  }
+
+  .hiw-flow {
     grid-template-columns: 1fr;
-    gap: 0.9rem;
+  }
+
+  .hiw-new {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .hiw-install__store,
+  .hiw-final {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hiw-link-steps {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .hiw-link-steps > p {
+    grid-column: 1;
   }
 }
 
-@media (max-width: 640px) {
-  .walk-step {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+@media (max-width: 520px) {
+  .hiw-hero__title {
+    font-size: clamp(2rem, 11vw, 2.75rem);
   }
 
-  .walk-art {
-    min-height: 0;
-    order: 2;
-    justify-content: flex-start;
+  .hiw-hero__screens {
+    min-height: 17.5rem;
+  }
+
+  .hiw-hero__game {
+    width: 92%;
+  }
+
+  .hiw-hero__popup {
+    width: 36%;
+  }
+
+  .hiw-trust {
+    flex-direction: column;
+  }
+
+  .hiw-choices,
+  .hiw-sync-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .hiw-screenshot--popup {
+    width: min(65%, 13rem);
+    margin-inline: auto;
+  }
+
+  .hiw-popup-pair {
+    gap: 0.65rem;
+  }
+
+  .hiw-popup-pair img:first-child {
+    margin-top: 1rem;
+  }
+
+  .hiw-store-button {
+    min-height: 4.25rem;
+  }
+
+  .hiw-store-button img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .hiw-store-button__copy strong {
+    font-size: 0.88rem;
+  }
+
+  .hiw-store-button__arrow {
+    display: none;
   }
 }
 
