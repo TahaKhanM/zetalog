@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
 
 import { LinkHandoff } from '@/app/_components/LinkHandoff';
-import { SignInForm } from '@/app/_components/SignInForm';
-import { userIdFromCookies } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Link the extension' };
 
@@ -14,24 +9,12 @@ export const metadata: Metadata = { title: 'Link the extension' };
  * owns every OAuth/PKCE value and starts the authorization flow only after the
  * trusted click exposed by LinkHandoff.
  */
-export default async function LinkPage(): Promise<React.JSX.Element> {
-  const supabase = await createClient();
-  const signedIn = (await userIdFromCookies(supabase)) !== null;
-
+export default function LinkPage(): React.JSX.Element {
   return (
     <div className="auth-page">
       <div className="card card--pad auth-card">
         <h1 className="display auth-card__title">Link extension</h1>
-        {signedIn ? (
-          <LinkHandoff />
-        ) : (
-          <>
-            <p className="meta auth-card__lede">
-              Sign in to connect this browser&apos;s ZetaLog extension to your account.
-            </p>
-            <SignInForm next="/link" />
-          </>
-        )}
+        <LinkHandoff />
       </div>
     </div>
   );

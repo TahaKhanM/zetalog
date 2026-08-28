@@ -1,6 +1,8 @@
 import { gameRecordSchema } from '@zetalog/shared';
 import { z } from 'zod';
 
+import type { LinkError } from './auth.js';
+
 export const CAPTURE_PORT_NAME = 'zl-capture-v1';
 export const CAPTURE_MOUNT_TYPE = 'zl-capture-mounted';
 export const CAPTURE_READY_TYPE = 'zl-capture-ready';
@@ -60,6 +62,10 @@ export type BgRequest = z.infer<typeof bgRequestSchema>;
  */
 export interface BgResponse {
   readonly ok: boolean;
+  /** Present when an interactive link failed before a credential was stored. */
+  readonly error?: LinkError | 'internal';
+  /** Linked successfully, but one or more scores will retry in the background. */
+  readonly syncPending?: boolean;
   readonly leaderboardOptOut?: boolean;
   readonly challenge?: { readonly challengeId: string; readonly nonce: string };
 }

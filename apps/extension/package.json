@@ -7,6 +7,7 @@
     "dev": "wxt",
     "build": "wxt build",
     "postinstall": "wxt prepare",
+    "store:assets": "node scripts/capture-store-assets.mjs",
     "test": "vitest run --coverage",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
