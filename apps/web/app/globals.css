@@ -2270,6 +2270,35 @@ th.ltable__rank {
   flex-wrap: wrap;
 }
 
+.auth-code-help {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+}
+
+.auth-code-help h3 {
+  color: var(--surface-heading);
+  font-size: 0.98rem;
+}
+
+.auth-code-help p {
+  margin: 0.45rem 0 0;
+  color: var(--meta-text);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.auth-code-help a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent-border);
+}
+
+.auth-code-help .btn {
+  margin-top: 0.8rem;
+}
+
 .auth-form__google {
   width: 100%;
 }
