@@ -81,3 +81,12 @@ export {
   type HistoryContext,
 } from './validation/history';
 export { judge, type ValidationOutcome, type Verdict } from './validation/verdict';
+export {
+  LINK_FAILURE_MESSAGES,
+  linkErrorSchema,
+  linkFailureMessage,
+  linkFailureSchema,
+  normalizeLinkFailure,
+  type LinkError,
+  type LinkFailure,
+} from './link';

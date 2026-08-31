@@ -227,6 +227,32 @@ describe('createStore.checkpointGame', () => {
     expect(completed.ok && completed.value.verifiedScore).toBe(2);
   });
 
+  it('keeps the checkpoint owner when the active account changes before completion', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const id = crypto.randomUUID();
+    await store.checkpointGame({ ...gameRecord({ playedMs: 1000 }), id }, 'owner-at-start');
+
+    const completed = await store.saveGame(
+      { ...gameRecord({ playedMs: 120_000, events: verifiedEvents(2) }), id },
+      'owner-at-finish',
+    );
+
+    expect(completed.ok && completed.value.ownerUserId).toBe('owner-at-start');
+  });
+
+  it('keeps an explicitly unowned checkpoint unowned until the normal link migration', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const id = crypto.randomUUID();
+    await store.checkpointGame({ ...gameRecord({ playedMs: 1000 }), id }, null);
+
+    const completed = await store.saveGame(
+      { ...gameRecord({ playedMs: 120_000, events: verifiedEvents(2) }), id },
+      'new-owner',
+    );
+
+    expect(completed.ok && completed.value.ownerUserId).toBeNull();
+  });
+
   it('does not overwrite a server-synchronised game with a late checkpoint', async () => {
     const store = createStore(fakeArea(), tickingClock());
     const saved = await store.saveGame(gameRecord({ events: verifiedEvents(1) }));
@@ -893,6 +919,40 @@ describe('createStore.importBackfill', () => {
     expect(list.value[0]?.sync?.outcome).toBe('rejected');
     expect(list.value[0]?.ownerUserId).toBe('owner-server');
     expect(list.value[0]?.record.events).toEqual(localRecord.events);
+  });
+
+  it('preserves a local quarantine reason while the server still has the game under review', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const local = await store.saveGame(gameRecord({ playedMs: 10_000 }));
+    if (!local.ok) throw new Error('setup failed');
+    expect(local.value.quarantineReason).toBe('restart');
+
+    await store.importBackfill([
+      {
+        ...backfilled(local.value.record.id, local.value.verifiedScore),
+        status: 'quarantined',
+        sync: {
+          state: 'uploaded',
+          outcome: 'quarantined',
+          serverScore: local.value.verifiedScore,
+        },
+      },
+    ]);
+
+    const list = await store.listGames();
+    expect(list.ok && list.value[0]?.quarantineReason).toBe('restart');
+  });
+
+  it('clears a local quarantine reason when the server accepts the game', async () => {
+    const store = createStore(fakeArea(), tickingClock());
+    const local = await store.saveGame(gameRecord({ playedMs: 10_000 }));
+    if (!local.ok) throw new Error('setup failed');
+
+    await store.importBackfill([backfilled(local.value.record.id, local.value.verifiedScore)]);
+
+    const list = await store.listGames();
+    expect(list.ok && list.value[0]?.status).toBe('kept');
+    expect(list.ok && list.value[0]?.quarantineReason).toBeUndefined();
   });
 
   it('preserves a local removal while importing the server row so revoke remains queued', async () => {
