@@ -10,7 +10,7 @@ import { type BgRequest, type BgResponse } from '../lib/messages.js';
  * material crosses the page/content-script boundary.
  *
  * The localhost match exists for local development ONLY — the wxt.config.ts
- * `build:manifest:generated` hook strips it from every non-development build,
+ * `build:manifestGenerated` hook strips it from every non-development build,
  * so the published extension ships the production origin alone.
  */
 export default defineContentScript({

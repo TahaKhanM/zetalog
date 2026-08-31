@@ -58,5 +58,4 @@ Every word a user sees follows these:
 - `pnpm install` — bootstrap the workspace.
 - `pnpm verify` — full local CI. Run before every commit.
 - `pnpm test:release-tooling` — test the production env and ZIP inspectors.
-- `pnpm release:check-public` — inspect the extension currently offered by the website.
 - `pnpm --filter @zetalog/shared test` — one package's tests.

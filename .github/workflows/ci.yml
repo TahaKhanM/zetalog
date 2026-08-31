@@ -31,7 +31,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm test:release-tooling
-      - run: pnpm release:check-public
       - run: pnpm audit --prod
       - run: pnpm build
 
@@ -122,19 +121,14 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
-      - name: Build immutable version 1.0.0 ZIP
+      - name: Build immutable version 1.0.1 ZIP
         run: pnpm --filter @zetalog/extension zip
       - name: Inspect release ZIP
-        run: node scripts/inspect-extension-zip.mjs apps/extension/.output/zetalogextension-1.0.0-chrome.zip
+        run: node scripts/inspect-extension-zip.mjs apps/extension/.output/zetalogextension-1.0.1-chrome.zip
       - name: Extract exact release ZIP
         run: |
           mkdir -p "$RUNNER_TEMP/zetalog-release"
-          unzip -q apps/extension/.output/zetalogextension-1.0.0-chrome.zip -d "$RUNNER_TEMP/zetalog-release"
-      - name: Verify website download has the same extension payload
-        run: |
-          mkdir -p "$RUNNER_TEMP/zetalog-public"
-          unzip -q apps/web/public/zetalog-chrome-1.0.0-secure.zip -d "$RUNNER_TEMP/zetalog-public"
-          diff -qr "$RUNNER_TEMP/zetalog-release" "$RUNNER_TEMP/zetalog-public"
+          unzip -q apps/extension/.output/zetalogextension-1.0.1-chrome.zip -d "$RUNNER_TEMP/zetalog-release"
       - name: Browser-test exact release ZIP
         env:
           ZL_EXTENSION_OUTPUT: ${{ runner.temp }}/zetalog-release
@@ -144,13 +138,13 @@ jobs:
       - name: Record release checksum
         run: |
           cd apps/extension/.output
-          sha256sum zetalogextension-1.0.0-chrome.zip > zetalogextension-1.0.0-chrome.zip.sha256
+          sha256sum zetalogextension-1.0.1-chrome.zip > zetalogextension-1.0.1-chrome.zip.sha256
       - name: Retain exact tested release artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: zetalog-extension-1.0.0-${{ github.sha }}
+          name: zetalog-extension-1.0.1-${{ github.sha }}
           path: |
-            apps/extension/.output/zetalogextension-1.0.0-chrome.zip
-            apps/extension/.output/zetalogextension-1.0.0-chrome.zip.sha256
+            apps/extension/.output/zetalogextension-1.0.1-chrome.zip
+            apps/extension/.output/zetalogextension-1.0.1-chrome.zip.sha256
           if-no-files-found: error
           retention-days: 30

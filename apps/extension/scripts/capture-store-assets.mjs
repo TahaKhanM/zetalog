@@ -354,6 +354,7 @@ async function main() {
       async ({ games, userId }) => {
         const extension = globalThis;
         await extension.chrome.storage.local.set({
+          'zl-theme': 'light',
           'zl:v1:games': games,
           'zl:v1:prefs': { selectedFingerprint: null, range: 'all' },
           'zl:v1:session': {
@@ -397,7 +398,6 @@ async function main() {
 
     const popup = await context.newPage();
     await popup.setViewportSize({ width: 360, height: 620 });
-    await popup.addInitScript(() => globalThis.localStorage.setItem('zl-theme', 'light'));
     await popup.goto(`chrome-extension://${extensionId}/popup.html`);
     await popup.getByTestId('hero-score').waitFor({ state: 'visible' });
     await popup.getByText('Linked to leaderboard').waitFor({ state: 'visible' });
