@@ -14,7 +14,6 @@
     "format:fix": "prettier --write .",
     "test:release-tooling": "node --test scripts/*.test.mjs",
     "release:check-env": "node scripts/check-release-env.mjs",
-    "release:check-public": "node scripts/inspect-extension-zip.mjs apps/web/public/zetalog-chrome-1.0.0-secure.zip",
     "verify": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "pnpm": {

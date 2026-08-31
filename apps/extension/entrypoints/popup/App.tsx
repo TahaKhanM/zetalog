@@ -1,4 +1,5 @@
 import { browser } from '#imports';
+import { linkFailureMessage } from '@zetalog/shared';
 import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AdaptiveTrend } from '../../components/AdaptiveTrend.js';
@@ -58,27 +59,6 @@ const RECENT_LIMIT = 10;
 interface LinkUiState {
   readonly phase: 'idle' | 'linking' | 'success' | 'error';
   readonly message?: string;
-}
-
-function linkErrorMessage(error: BgResponse['error']): string {
-  switch (error) {
-    case 'extension-not-enabled':
-      return 'This Web Store release is not enabled on ZetaLog yet.';
-    case 'network':
-      return 'Could not reach ZetaLog. Check your connection and retry.';
-    case 'cancelled':
-      return 'Secure sign-in was cancelled or could not finish.';
-    case 'identity-unavailable':
-      return 'Chrome could not start secure sign-in. Restart Chrome and retry.';
-    case 'server':
-    case 'exchange-failed':
-      return 'Secure sign-in is temporarily unavailable. Please retry.';
-    case 'invalid-callback':
-      return 'Chrome returned an invalid response. Update the extension and retry.';
-    case 'internal':
-    case undefined:
-      return 'The extension could not finish linking. Your saved scores are safe.';
-  }
 }
 
 /** Distinct configurations present in history, first-seen order, with labels. */
@@ -205,7 +185,7 @@ export function App(): JSX.Element {
         await reload();
         return;
       }
-      setLinkState({ phase: 'error', message: linkErrorMessage(reply?.error) });
+      setLinkState({ phase: 'error', message: linkFailureMessage(reply?.error) });
     });
   }
   function unlink(): void {

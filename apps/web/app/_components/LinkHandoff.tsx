@@ -1,39 +1,10 @@
 'use client';
 
+import { LINK_FAILURE_MESSAGES, normalizeLinkFailure, type LinkFailure } from '@zetalog/shared';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-type LinkFailure =
-  | 'identity-unavailable'
-  | 'extension-not-enabled'
-  | 'network'
-  | 'server'
-  | 'cancelled'
-  | 'invalid-callback'
-  | 'exchange-failed'
-  | 'internal';
 type Phase = 'detecting' | 'idle' | 'missing' | 'waiting' | 'linked' | 'error';
-
-const failureMessages: Record<LinkFailure, string> = {
-  'identity-unavailable':
-    'Chrome could not start secure extension sign-in. Restart Chrome and try again.',
-  'extension-not-enabled':
-    'This Chrome Web Store release is not enabled on ZetaLog yet. Please update the extension or contact support.',
-  network: 'ZetaLog could not be reached. Check your connection, then try again.',
-  server: 'ZetaLog sign-in is temporarily unavailable. Your recorded scores are safe.',
-  cancelled: 'Secure sign-in was cancelled or could not finish. You can safely try again.',
-  'invalid-callback':
-    'Chrome returned an invalid sign-in response. Please update the extension and retry.',
-  'exchange-failed': 'The secure sign-in expired or could not be completed. Please try again.',
-  internal:
-    'The extension could not finish linking. Restart Chrome and try again; your scores are safe.',
-};
-
-function linkFailure(value: unknown): LinkFailure {
-  return typeof value === 'string' && value in failureMessages
-    ? (value as LinkFailure)
-    : 'internal';
-}
 
 /**
  * One-click entry point for the extension-owned OAuth/PKCE flow. This page
@@ -63,7 +34,7 @@ export function LinkHandoff(): React.JSX.Element {
         setPhase('linked');
       }
       if (message.type === 'zl-link-failed') {
-        setFailure(linkFailure(message.error));
+        setFailure(normalizeLinkFailure(message.error));
         setPhase('error');
       }
     }
@@ -128,7 +99,7 @@ export function LinkHandoff(): React.JSX.Element {
       </p>
       {phase === 'error' ? (
         <p className="text-danger" role="alert" style={{ marginTop: '0.75rem' }}>
-          {failureMessages[failure]}
+          {LINK_FAILURE_MESSAGES[failure]}
         </p>
       ) : phase === 'missing' ? (
         <p className="meta" role="status" style={{ marginTop: '0.75rem' }}>

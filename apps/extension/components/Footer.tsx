@@ -10,7 +10,7 @@ interface FooterProps {
    * visible, `null` while it is still being read.
    */
   readonly optedOut: boolean | null;
-  /** Signed-out affordance: opens the web app's /link page to connect an account. */
+  /** Signed-out affordance: starts the browser-owned account-link flow. */
   readonly onSync: () => void;
   /** Signed-in affordance: forget the session and stop syncing (keeps local games). */
   readonly onUnlink: () => void;
@@ -24,10 +24,10 @@ interface FooterProps {
 }
 
 /**
- * The footer account affordance. Signed out, it offers "Sync to
- * leaderboard" (opens /link). Signed in, it shows the linked status (a steady
- * state, not a spinner), a leaderboard privacy checkbox, and an Unlink control —
- * a ghost/outlined treatment throughout, never a solid fill.
+ * The footer account affordance. Signed out, it offers "Sync to leaderboard"
+ * and starts the browser-owned link flow. Signed in, it shows the linked status
+ * (a steady state, not a spinner), a leaderboard privacy checkbox, and an
+ * Unlink control — a ghost/outlined treatment throughout, never a solid fill.
  */
 export function Footer({
   linked,
