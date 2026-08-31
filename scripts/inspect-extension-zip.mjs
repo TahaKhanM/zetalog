@@ -8,7 +8,7 @@
  * package that would itself become part of the release toolchain.
  *
  * Usage:
- *   node scripts/inspect-extension-zip.mjs path/to/zetalogextension-1.0.0-chrome.zip
+ *   node scripts/inspect-extension-zip.mjs path/to/zetalogextension-1.0.1-chrome.zip
  */
 
 import { createHash } from 'node:crypto';
@@ -19,7 +19,7 @@ import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 
-export const RELEASE_VERSION = '1.0.0';
+export const RELEASE_VERSION = '1.0.1';
 
 const MAX_ARCHIVE_BYTES = 5 * 1024 * 1024;
 const MAX_UNCOMPRESSED_BYTES = 10 * 1024 * 1024;

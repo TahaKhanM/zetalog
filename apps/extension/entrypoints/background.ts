@@ -3,7 +3,7 @@ import { browser, defineBackground } from '#imports';
 import { createApiClient } from '../lib/api.js';
 import { createAuthController, type FetchLike } from '../lib/auth.js';
 import { remoteGameToStored } from '../lib/backfill.js';
-import { WEB_APP_URL } from '../lib/config.js';
+import { WEB_APP_URL } from '../lib/endpoints.js';
 import {
   bgRequestSchema,
   CAPTURE_PORT_NAME,
@@ -14,6 +14,7 @@ import {
 } from '../lib/messages.js';
 import { singleFlight } from '../lib/single-flight.js';
 import { createPendingRevocationStore } from '../lib/pending-revocations.js';
+import { nextRetryAlarmAt } from '../lib/retry-scheduler.js';
 import { createStore } from '../lib/store.js';
 import { createSyncQueueStore, drainSync } from '../lib/sync.js';
 
@@ -25,7 +26,7 @@ import { createSyncQueueStore, drainSync } from '../lib/sync.js';
  * queue, and games all live in `browser.storage.local`, re-read on every event.
  */
 
-/** Fires the backoff retry drain; 1 min matches the base backoff granularity. */
+/** One-shot alarm derived from the next durable sync/revocation retry. */
 const RETRY_ALARM = 'zl-sync-retry';
 
 /** Real `fetch` narrowed to the {@link FetchLike} seam the lib cores expect. */
@@ -33,8 +34,8 @@ const httpFetch: FetchLike = (url, init) => fetch(url, init);
 
 export default defineBackground(() => {
   const area = browser.storage.local;
-  // Content scripts communicate through validated background messages; they do
-  // not need direct access to credentials or recorded telemetry.
+  // Content scripts communicate through validated background channels; they
+  // do not need direct access to credentials or recorded telemetry.
   void area.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' }).catch(() => undefined);
   const store = createStore(area);
   const auth = createAuthController(area, {
@@ -48,11 +49,41 @@ export default defineBackground(() => {
   const queue = createSyncQueueStore(area);
   const pendingRevocations = createPendingRevocationStore(area);
 
+  // Keep an idle MV3 worker asleep. A one-shot alarm exists only while there is
+  // durable work, and is moved to the earliest queue/revocation retry.
+  const scheduleRetryAlarm = singleFlight(async (): Promise<void> => {
+    try {
+      const linked = await auth.isLinked();
+      const [entries, revocations] = await Promise.all([
+        linked ? queue.read() : Promise.resolve([]),
+        pendingRevocations.read(),
+      ]);
+      const when = nextRetryAlarmAt({
+        nowMs: Date.now(),
+        linked,
+        queue: entries,
+        pendingRevocations: revocations.length,
+      });
+      if (when === null) {
+        await browser.alarms.clear(RETRY_ALARM);
+      } else {
+        await browser.alarms.create(RETRY_ALARM, { when });
+      }
+    } catch {
+      // Scheduling is recoverable: capture, popup open, or worker startup will
+      // derive the queue and try again without risking an unhandled rejection.
+    }
+  });
+
   // Credentials survive a transient unlink failure without preserving an active
   // account session. Single-flight keeps startup and alarm retries from racing.
-  const retryPendingRevocations = singleFlight(() =>
-    pendingRevocations.retry((token) => api.revokeCredential(token)),
-  );
+  const retryPendingRevocations = singleFlight(async () => {
+    try {
+      await pendingRevocations.retry((token) => api.revokeCredential(token));
+    } finally {
+      await scheduleRetryAlarm();
+    }
+  });
 
   /** Make a rare storage failure visible without interrupting normal capture. */
   async function showStorageHealth(healthy: boolean): Promise<void> {
@@ -70,19 +101,23 @@ export default defineBackground(() => {
   // Single-flight: a message-triggered drain and the retry alarm can coincide;
   // concurrent triggers share one pass instead of double-submitting.
   const drain = singleFlight(async () => {
-    const userId = await auth.userId();
-    if (userId !== null) {
-      const assigned = await store.assignUnownedGames(userId);
-      if (!assigned.ok) await showStorageHealth(false);
+    try {
+      const userId = await auth.userId();
+      if (userId !== null) {
+        const assigned = await store.assignUnownedGames(userId);
+        if (!assigned.ok) await showStorageHealth(false);
+      }
+      return await drainSync({
+        api,
+        store,
+        queue,
+        now: () => Date.now(),
+        isLinked: () => auth.isLinked(),
+        userId: () => Promise.resolve(userId),
+      });
+    } finally {
+      await scheduleRetryAlarm();
     }
-    return drainSync({
-      api,
-      store,
-      queue,
-      now: () => Date.now(),
-      isLinked: () => auth.isLinked(),
-      userId: () => Promise.resolve(userId),
-    });
   });
 
   // Pull the account's game history and merge it into local storage so the
@@ -191,21 +226,6 @@ export default defineBackground(() => {
           );
           break;
         }
-        case 'zl-save-game': {
-          const saved = await persistCapture(parsed.data);
-          sendResponse({ ok: saved } satisfies BgResponse);
-          break;
-        }
-        case 'zl-checkpoint-game': {
-          const saved = await persistCapture(parsed.data);
-          sendResponse({ ok: saved } satisfies BgResponse);
-          break;
-        }
-        case 'zl-save-capture-failed': {
-          const saved = await persistCapture(parsed.data);
-          sendResponse({ ok: saved } satisfies BgResponse);
-          break;
-        }
         case 'zl-remove-game': {
           const changed = await store.remove(parsed.data.id);
           await showStorageHealth(changed.ok);
@@ -238,7 +258,7 @@ export default defineBackground(() => {
           await queue.write([]);
           const cleared = await store.clearAllSync();
           await showStorageHealth(cleared.ok);
-          void retryPendingRevocations();
+          void retryPendingRevocations().catch(() => undefined);
           sendResponse({ ok: cleared.ok } satisfies BgResponse);
           break;
         }
@@ -269,12 +289,14 @@ export default defineBackground(() => {
     return true; // keep the message channel open for the async sendResponse
   });
 
-  void retryPendingRevocations();
-  void browser.alarms.create(RETRY_ALARM, { periodInMinutes: 1 });
+  // Worker startup reconciles any game persisted just before a prior worker was
+  // suspended; each pass then derives (or clears) the next one-shot alarm.
+  void drain().catch(() => undefined);
+  void retryPendingRevocations().catch(() => undefined);
   browser.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === RETRY_ALARM) {
-      void drain();
-      void retryPendingRevocations();
+      void drain().catch(() => undefined);
+      void retryPendingRevocations().catch(() => undefined);
     }
   });
 

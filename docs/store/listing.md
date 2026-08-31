@@ -11,11 +11,11 @@ ZetaLog
 
 ## Category
 
-Productivity
+Education (matches the live listing)
 
 ## Short description (≤ 132 characters)
 
-Track your Zetamac arithmetic scores and compare your best on a worldwide leaderboard. Progress charts included.
+Track your Zetamac scores and compare them on a worldwide leaderboard.
 
 ## Detailed description
 

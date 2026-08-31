@@ -1,7 +1,7 @@
 import { execFileSync, execSync } from 'node:child_process';
 import { type Server } from 'node:http';
 import { createServer } from 'node:https';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,9 +40,12 @@ const replicaDir = path.join(extensionRoot, 'test', 'replica');
 
 const GAME_URL = 'https://arithmetic.zetamac.com/game';
 const ABORT_GAME_URL = `${GAME_URL}?duration=10`;
+const THEME_STORAGE_KEY = 'zl-theme';
+const RETRY_ALARM = 'zl-sync-retry';
 
 let server: Server;
 let context: BrowserContext;
+let worker: Worker;
 let extensionId: string;
 let tlsDir: string;
 
@@ -75,6 +78,11 @@ async function startReplica(): Promise<{ server: Server; port: number }> {
   const srv = createServer({ key, cert }, (req, res) => {
     const requestUrl = new URL(req.url ?? '/', 'http://replica');
     const pathname = requestUrl.pathname;
+    if (pathname === '/favicon.ico') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
     const route =
       routes[pathname] ??
       (pathname.startsWith('/game') ? { file: 'game.html', type: 'text/html' } : null);
@@ -197,7 +205,7 @@ test.beforeAll(async () => {
     ],
   });
 
-  const worker: Worker =
+  worker =
     context.serviceWorkers()[0] ??
     (await context.waitForEvent('serviceworker', { timeout: 20_000 }));
   extensionId = new URL(worker.url()).host;
@@ -214,7 +222,16 @@ test.afterAll(async () => {
 });
 
 test('records games from the replica and reflects them in the popup', async () => {
+  const consoleErrors: string[] = [];
+  worker.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(`worker: ${message.text()}`);
+  });
+
   const game = await context.newPage();
+  game.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(`game: ${message.text()}`);
+  });
+  game.on('pageerror', (error) => consoleErrors.push(`game: ${error.message}`));
 
   // One aborted game (restart-quarantined), then five completed games (kept) —
   // enough kept games on one config to drive the trend into sparkline mode.
@@ -225,6 +242,11 @@ test('records games from the replica and reflects them in the popup', async () =
   await game.close();
 
   const popup = await context.newPage();
+  await popup.setViewportSize({ width: 360, height: 720 });
+  popup.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(`popup: ${message.text()}`);
+  });
+  popup.on('pageerror', (error) => consoleErrors.push(`popup: ${error.message}`));
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
   // Recorded score: the hero shows the latest kept game's recomputed verified
@@ -239,6 +261,64 @@ test('records games from the replica and reflects them in the popup', async () =
 
   // Graph mode: five kept games on one config render the adaptive sparkline.
   await expect(popup.getByTestId('trend-sparkline')).toBeVisible();
+
+  const evidenceDir = process.env.ZL_RELEASE_EVIDENCE_DIR;
+  if (evidenceDir !== undefined) {
+    await mkdir(evidenceDir, { recursive: true });
+    // Evidence must show the settled interface, not a partially transparent
+    // frame from the staggered entrance animation. This mirrors the Store
+    // asset capture workflow without changing product motion.
+    await popup.addStyleTag({
+      content:
+        '*, *::before, *::after { animation: none !important; transition: none !important; }',
+    });
+    await popup.screenshot({ path: path.join(evidenceDir, 'offline-game-popup.png') });
+  }
+  expect(consoleErrors).toEqual([]);
+
+  // A signed-out installation with no revocation work has no periodic worker
+  // wakeup; retries are represented by one-shot alarms only while work exists.
+  const retryAlarm = await worker.evaluate(async (alarmName) => {
+    const extensionGlobal = globalThis as typeof globalThis & {
+      chrome: { alarms: { get(name: string): Promise<unknown> } };
+    };
+    return extensionGlobal.chrome.alarms.get(alarmName);
+  }, RETRY_ALARM);
+  expect(retryAlarm).toBeUndefined();
+
+  await popup.close();
+});
+
+test('migrates a pinned 1.0.0 popup theme into extension storage', async () => {
+  await worker.evaluate(async (key) => {
+    const extensionGlobal = globalThis as typeof globalThis & {
+      chrome: { storage: { local: { remove(name: string): Promise<void> } } };
+    };
+    await extensionGlobal.chrome.storage.local.remove(key);
+  }, THEME_STORAGE_KEY);
+
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await popup.evaluate((key) => {
+    globalThis.localStorage.setItem(key, 'dark');
+  }, THEME_STORAGE_KEY);
+  await popup.reload();
+
+  await expect
+    .poll(() => popup.evaluate(() => document.documentElement.dataset.theme))
+    .toBe('dark');
+  const migrated = await worker.evaluate(async (key) => {
+    const extensionGlobal = globalThis as typeof globalThis & {
+      chrome: {
+        storage: { local: { get(name: string): Promise<Record<string, unknown>> } };
+      };
+    };
+    return extensionGlobal.chrome.storage.local.get(key);
+  }, THEME_STORAGE_KEY);
+  expect(migrated).toEqual({ [THEME_STORAGE_KEY]: 'dark' });
+  expect(
+    await popup.evaluate((key) => globalThis.localStorage.getItem(key), THEME_STORAGE_KEY),
+  ).toBeNull();
 
   await popup.close();
 });

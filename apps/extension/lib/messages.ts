@@ -1,7 +1,5 @@
-import { gameRecordSchema } from '@zetalog/shared';
+import { gameRecordSchema, type LinkFailure } from '@zetalog/shared';
 import { z } from 'zod';
-
-import type { LinkError } from './auth.js';
 
 export const CAPTURE_PORT_NAME = 'zl-capture-v1';
 export const CAPTURE_MOUNT_TYPE = 'zl-capture-mounted';
@@ -35,15 +33,16 @@ export const capturePortResponseSchema = z.object({ type: z.literal(CAPTURE_READ
  * `zl-get-profile` / `zl-set-privacy`, and `zl-backfill` (pull the account's
  * game history); the Zetamac content script sends completed records to the
  * background for durable storage and queueing. Profile requests are routed through the
- * background because it owns token refresh. The background validates every
- * message with {@link bgRequestSchema} before acting. Credentials never cross
- * this message protocol or appear in logs.
+ * background because it owns token refresh. Capture records use only the
+ * separately validated, navigation-safe port above; they are deliberately not
+ * accepted on this broader one-off message channel. The background validates
+ * every message with {@link bgRequestSchema} before acting. Credentials never
+ * cross this message protocol or appear in logs.
  */
 export const bgRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('zl-begin-link') }),
   z.object({ type: z.literal('zl-drain') }),
   z.object({ type: z.literal('zl-start-challenge') }),
-  ...captureRequestSchemas,
   z.object({ type: z.literal('zl-remove-game'), id: z.uuid() }),
   z.object({ type: z.literal('zl-restore-game'), id: z.uuid() }),
   z.object({ type: z.literal('zl-unlink') }),
@@ -63,7 +62,7 @@ export type BgRequest = z.infer<typeof bgRequestSchema>;
 export interface BgResponse {
   readonly ok: boolean;
   /** Present when an interactive link failed before a credential was stored. */
-  readonly error?: LinkError | 'internal';
+  readonly error?: LinkFailure;
   /** Linked successfully, but one or more scores will retry in the background. */
   readonly syncPending?: boolean;
   readonly leaderboardOptOut?: boolean;

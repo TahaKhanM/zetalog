@@ -42,7 +42,8 @@ export const config = {
    * are cacheable, identity-free renders (they do their own client-side
    * personalisation), so they must NOT trigger a per-request auth round-trip.
    *
-   *   /me, /admin        — auth-gated dashboards (the redirect above)
+   *   /me, /account,
+   *   /admin             — auth-gated account areas (the redirect above)
    *   /verify            — session-dependent OTP flow
    *
    * `/link` is deliberately absent: the install handoff is now a static shell

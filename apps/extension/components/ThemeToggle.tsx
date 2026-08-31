@@ -3,15 +3,49 @@ import { useEffect, useState, type JSX } from 'react';
 /**
  * The popup's light/dark switch, matching the site's sliding pill.
  * The OS preference is the default; a click pins `html[data-theme]` and
- * persists it in localStorage, which main.tsx re-applies before first paint.
+ * persists it in extension storage, which main.tsx re-applies before first paint.
  */
 
 export const THEME_STORAGE_KEY = 'zl-theme';
 
 type Theme = 'light' | 'dark';
 
-function effectiveTheme(): Theme {
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+function parseTheme(value: unknown): Theme | null {
+  return value === 'light' || value === 'dark' ? value : null;
+}
+
+/**
+ * Read the extension-wide preference, migrating the 1.0.0 popup-local value on
+ * first use. The legacy value is removed only after the durable write lands,
+ * so a transient storage failure cannot silently discard the user's choice.
+ */
+export async function readThemePreference(): Promise<Theme | null> {
+  try {
+    const stored = await browser.storage.local.get(THEME_STORAGE_KEY);
+    const current = parseTheme(stored[THEME_STORAGE_KEY]);
+    if (current !== null) return current;
+  } catch {
+    // A legacy popup preference may still be readable below.
+  }
+
+  let legacy: Theme | null;
+  try {
+    legacy = parseTheme(window.localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+  if (legacy === null) return null;
+
+  try {
+    await browser.storage.local.set({ [THEME_STORAGE_KEY]: legacy });
+    window.localStorage.removeItem(THEME_STORAGE_KEY);
+  } catch {
+    // Keep the legacy value so a later popup can retry the migration.
+  }
+  return legacy;
+}
+
+function effectiveTheme(stored: Theme | null): Theme {
   if (stored === 'light' || stored === 'dark') return stored;
   // matchMedia is absent in some test environments; default to light there.
   if (typeof window.matchMedia !== 'function') return 'light';
@@ -49,18 +83,22 @@ export function ThemeToggle(): JSX.Element {
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    setTheme(effectiveTheme());
+    void readThemePreference()
+      .then((stored) => {
+        setTheme(effectiveTheme(stored));
+      })
+      .catch(() => {
+        setTheme(effectiveTheme(null));
+      });
   }, []);
 
   function toggle(): void {
     if (theme === null) return;
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
-    try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch {
+    void browser.storage.local.set({ [THEME_STORAGE_KEY]: next }).catch(() => {
       // Storage failure only loses persistence, never the switch itself.
-    }
+    });
     setTheme(next);
   }
 

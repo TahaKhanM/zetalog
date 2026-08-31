@@ -8,14 +8,14 @@ review.
 From the repository root, after the extension has been built and zipped:
 
 ```bash
-node scripts/inspect-extension-zip.mjs apps/extension/.output/zetalogextension-1.0.0-chrome.zip
+node scripts/inspect-extension-zip.mjs apps/extension/.output/zetalogextension-1.0.1-chrome.zip
 ```
 
 The command exits non-zero unless the archive is valid, is bounded in size,
 contains the required manifest/code/icon files, has genuine PNG icons, and has
 the release contract below:
 
-- Manifest V3 and version `1.0.0`.
+- Manifest V3 and version `1.0.1`.
 - Only the expected permissions and content-script hosts.
 - No `localhost`, loopback address, development-runtime marker, source map,
   source/test/env file, or `node_modules` path.

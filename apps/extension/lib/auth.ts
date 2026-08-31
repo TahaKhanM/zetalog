@@ -1,7 +1,7 @@
-import { err, ok, type Result } from '@zetalog/shared';
+import { err, ok, type LinkError, type Result } from '@zetalog/shared';
 import { z } from 'zod';
 
-import { SUPABASE_ANON_KEY, SUPABASE_URL, WEB_APP_URL } from './config.js';
+import { SUPABASE_ANON_KEY, SUPABASE_URL, WEB_APP_URL } from './endpoints.js';
 import { codeFromLinkCallback, createPkceValues } from './pkce.js';
 import { singleFlight } from './single-flight.js';
 
@@ -51,17 +51,22 @@ export type AuthError =
   | { readonly reason: 'corrupt-session'; readonly detail: string }
   | { readonly reason: 'refresh-failed'; readonly detail: string };
 
-/** Safe, user-actionable outcomes from the interactive account-link flow. */
-export type LinkError =
-  | 'identity-unavailable'
-  | 'extension-not-enabled'
-  | 'network'
-  | 'server'
-  | 'cancelled'
-  | 'invalid-callback'
-  | 'exchange-failed';
-
 export type LinkResult = { readonly ok: true } | { readonly ok: false; readonly error: LinkError };
+
+/**
+ * Translate Chrome's documented WebAuthFlow failures into the stable link
+ * protocol. Unknown errors stay distinct from a deliberate window close.
+ */
+export function classifyIdentityFailure(error: unknown): LinkError {
+  const message = error instanceof Error ? error.message : '';
+  if (message.includes('The user did not approve access.')) return 'cancelled';
+  if (message.includes('Authorization page could not be loaded.')) return 'network';
+  if (message.includes('Did not redirect to the right URL.')) return 'invalid-callback';
+  if (message.includes('Identity API is disabled in incognito windows.')) {
+    return 'identity-unavailable';
+  }
+  return 'identity-failed';
+}
 
 /** The subset of a `fetch` Response the network layer reads (structural seam). */
 export interface HttpResponse {
@@ -386,8 +391,8 @@ export function createAuthController(area: AuthStorageArea, deps: AuthDeps): Aut
         url: authorizeUrl.toString(),
         interactive: true,
       });
-    } catch {
-      return { ok: false, error: 'cancelled' };
+    } catch (error) {
+      return { ok: false, error: classifyIdentityFailure(error) };
     }
     const code = codeFromLinkCallback(callback, redirectUri, pkce.state);
     if (code === null) return { ok: false, error: 'invalid-callback' };

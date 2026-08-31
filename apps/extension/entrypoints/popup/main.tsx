@@ -15,6 +15,7 @@ import { palette, typography } from '@zetalog/shared';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { readThemePreference } from '../../components/ThemeToggle.js';
 import { App } from './App.js';
 
 // Palette hexes and font families come from the shared design tokens — the only
@@ -33,20 +34,22 @@ root.setProperty(
 root.setProperty('--zl-font-body', `'${typography.body.family}', sans-serif`);
 root.setProperty('--zl-font-mono', `'${typography.numeric.family}', monospace`);
 
-// Apply a pinned theme before first paint (the ThemeToggle persists it).
-try {
-  const storedTheme = window.localStorage.getItem('zl-theme');
-  if (storedTheme === 'light' || storedTheme === 'dark') {
-    document.documentElement.dataset.theme = storedTheme;
+async function renderPopup(): Promise<void> {
+  // Apply a pinned theme before first paint (the ThemeToggle persists it).
+  try {
+    const storedTheme = await readThemePreference();
+    if (storedTheme !== null) document.documentElement.dataset.theme = storedTheme;
+  } catch {
+    // No storage access means no pinned theme; the OS preference applies.
   }
-} catch {
-  // No storage access means no pinned theme; the OS preference applies.
+
+  const container = document.getElementById('root');
+  if (container === null) throw new Error('popup root element missing');
+  createRoot(container).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
 }
 
-const container = document.getElementById('root');
-if (container === null) throw new Error('popup root element missing');
-createRoot(container).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+void renderPopup();

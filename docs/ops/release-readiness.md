@@ -1,6 +1,6 @@
 # Phase 8 and 9 release runbook
 
-This is the final release gate for ZetaLog `1.0.0`. Phase 8 is complete only
+This is the final release gate for ZetaLog `1.0.1`. Phase 8 is complete only
 when the protected CI run is green. Phase 9 is complete only when the owner has
 performed the credentialled Chrome Web Store and production steps below. Never
 substitute a locally rebuilt ZIP for the CI artifact.
@@ -11,17 +11,15 @@ The `CI` workflow runs four required jobs. A branch must not be merged or
 released unless all four pass:
 
 1. `verify`: formatting, lint, type checking, all 900+ unit/integration tests,
-   release-tool tests, inspection of the website's cache-busted secure download,
-   a production dependency audit, and production builds.
+   release-tool tests, a production dependency audit, and production builds.
 2. `extension-e2e`: current source in real Chromium against the offline Zetamac
    replica.
 3. `fullstack`: a fresh local Supabase stack, every migration, database lint,
    pgTAP, real website auth/dashboard E2E, and real extension link/upload E2E.
    `ZL_FULLSTACK=1` is mandatory in this job.
-4. `release-artifact`: creates `1.0.0` once, inspects it, proves that its extracted
-   payload matches the website download, loads the exact Store ZIP in Chromium,
-   records SHA-256, and uploads the same Store bytes plus the checksum as a
-   30-day CI artifact.
+4. `release-artifact`: creates `1.0.1` once, inspects it, loads the exact Store
+   ZIP in Chromium, records SHA-256, and uploads the same Store bytes plus the
+   checksum as a 30-day CI artifact.
 
 ### Coverage map
 
@@ -43,9 +41,8 @@ released unless all four pass:
 | Complete account deletion and 30-day anonymous-event retention                     | account-route tests, pgTAP, and full-stack erasure                                   |
 | Apex canonical redirect                                                            | real Next.js host-header E2E                                                         |
 | ZIP secrets, dev URLs, maps, remote code, permissions and manifest                 | `scripts/inspect-extension-zip.mjs` and exact-ZIP Chromium test                      |
-| Website beta download drifting from the Store candidate                            | extracted-payload comparison in `release-artifact`                                   |
 
-After CI passes, download `zetalog-extension-1.0.0-<commit SHA>` from that run.
+After CI passes, download `zetalog-extension-1.0.1-<commit SHA>` from that run.
 Run the inspector locally and compare its printed checksum to the included
 `.sha256` file. If either differs, stop.
 
@@ -71,39 +68,36 @@ available; it does not move local storage between extension IDs.
 
 ### 1. Freeze ownership and version
 
-- [ ] Confirm in the Chrome Web Store dashboard that **no `1.0.0` ZIP has ever
-      been uploaded**. Chrome will not accept a replacement with the same
-      version. If one exists, stop and choose the next version everywhere.
+- [ ] Confirm in the Chrome Web Store dashboard that **no `1.0.1` ZIP has ever
+      been uploaded**. Version `1.0.0` is already published and Chrome will not
+      accept a replacement with the same version. If a `1.0.1` exists, stop and
+      choose the next version everywhere.
 - [ ] Freeze one reviewed commit. Record its commit SHA, CI run URL, ZIP SHA-256,
       database migration list, and intended Vercel deployment.
 - [ ] Protect `main` so `verify`, `extension-e2e`, `fullstack`, and
       `release-artifact` are required and cannot be bypassed by one person.
 - [ ] Enable GitHub private vulnerability reporting and secret scanning.
 
-### 2. Establish the publisher account
+### 2. Confirm the publisher account
 
-- [ ] Use an organisation-controlled Google account, not a personal account;
-      enable phishing-resistant 2FA and store recovery codes in the organisation
-      password manager.
-- [ ] Pay Google's one-time developer registration fee.
-- [ ] Add a second trusted owner/admin so loss of one account cannot strand the
-      extension.
-- [ ] Verify `zetalog.co.uk` in Google Search Console using the same organisation
-      and complete any Chrome Web Store trader/contact declarations that apply.
+- [ ] Confirm the publisher account still has phishing-resistant 2FA and that
+      recovery codes remain in the organisation password manager.
+- [ ] Confirm a second trusted owner/admin exists so loss of one account cannot
+      strand the extension.
+- [ ] Confirm `zetalog.co.uk` remains verified in Google Search Console and that
+      any Chrome Web Store trader/contact declarations are current.
 
-### 3. Create the draft and configure the exact callback
+### 3. Upload the draft to the existing item
 
-- [ ] Upload the CI ZIP as a **draft only**. Do not rebuild it. Copy the permanent
-      32-character extension ID assigned by Google.
-- [ ] Set `EXTENSION_OAUTH_REDIRECT_URIS` in staging to exactly
-      `https://<extension-id>.chromiumapp.org/zetalog-link`; wildcards and
-      additional origins are forbidden.
-- [ ] Set `NEXT_PUBLIC_CHROME_WEB_STORE_URL` in staging to the final listing URL
-      containing that same ID. Prepare the equivalent production deployment,
-      but do not promote it while the Store item is still private.
+- [ ] Open the existing item (`bhbpjdngipckdepgblhopdfijnpeefml`) and upload the
+      CI ZIP as a **draft only**. Do not rebuild it and do not create a new
+      item; a new item gets a new ID and breaks the configured link callback.
+- [ ] Confirm `EXTENSION_OAUTH_REDIRECT_URIS` in staging and production is
+      exactly `https://bhbpjdngipckdepgblhopdfijnpeefml.chromiumapp.org/zetalog-link`;
+      wildcards and additional origins are forbidden.
 - [ ] In the fully populated staging environment run `pnpm release:check-env`.
       It validates presence and callback shape without printing secret values.
-- [ ] Deploy the server/migrations to staging and install the exact draft ZIP in
+- [ ] Deploy any server changes to staging and install the exact draft ZIP in
       a clean Chrome profile. Test capture, browser restart, link, independent
       session use, forced revocation/relink, offline replay, remove/restore,
       account switching, account deletion, and uninstall.
@@ -111,15 +105,14 @@ available; it does not move local storage between extension IDs.
 ### 4. Database and production preflight
 
 - [ ] Confirm Supabase backups/PITR are enabled and record a restore point before
-      applying migrations. Confirm the Cron integration (`pg_cron`) is available.
-- [ ] Apply migrations to staging first; run pgTAP and verify the
+      applying any new migrations. Confirm the Cron integration (`pg_cron`) is
+      still enabled.
+- [ ] Apply any new migrations to staging first; run pgTAP and verify the
       `zetalog-operational-data-retention` job calls
       `public.purge_expired_operational_data()` successfully.
-- [ ] Configure the exact callback in production. Apply the already-tested
-      additive migrations, then deploy the website/API support. Do not expose a
-      private Store URL or publish the extension yet.
-- [ ] Build and verify a production website deployment containing the final Store
-      URL, but leave it unpromoted until the listing is publicly installable.
+- [ ] Deploy the website/API changes to production before publishing the
+      extension update; the API must stay compatible with the live 1.0.0
+      extension throughout the rollout.
 - [ ] Confirm apex → `www` redirect, privacy policy, sign-in/recovery, link,
       challenge, submit, backfill, remove/restore, erasure, and the cron job in
       production using test-owned accounts only.
@@ -140,10 +133,9 @@ available; it does not move local storage between extension IDs.
 
 ### 6. Publish, observe, and roll back safely
 
-- [ ] Publish `1.0.0` gradually if the dashboard offers staged rollout.
-- [ ] Confirm the listing works in a signed-out clean profile, then immediately
-      promote the prepared website deployment and publish the approved beta-user
-      announcement and transition instructions.
+- [ ] Publish `1.0.1` gradually if the dashboard offers staged rollout. Existing
+      Store installations auto-update to it.
+- [ ] Confirm the listing shows `1.0.1` and works in a signed-out clean profile.
 - [ ] Create provider-side alerts before publishing: Vercel API 5xx above 2% for
       five minutes; Supabase database/API errors above baseline; Auth 5xx or
       token failures above 2%; connection/storage saturation above 80%; and a

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   AUTH_STATE_KEY,
   SESSION_KEY,
+  classifyIdentityFailure,
   createAuthController,
   decodeUserId,
   requestRefresh,
@@ -12,7 +13,7 @@ import {
   type IdentityApi,
   type Session,
 } from './auth.js';
-import { SUPABASE_URL } from './config.js';
+import { SUPABASE_URL } from './endpoints.js';
 
 /** Build a JWT-shaped token whose payload is the given claims (unsigned; ok for decode tests). */
 function jwt(claims: Record<string, unknown>): string {
@@ -124,6 +125,24 @@ describe('sessionSchema', () => {
     expect(
       sessionSchema.safeParse({ accessToken: '', refreshToken: 'r', userId: 'u' }).success,
     ).toBe(false);
+  });
+});
+
+describe('classifyIdentityFailure', () => {
+  it.each([
+    ['The user did not approve access.', 'cancelled'],
+    ['Authorization page could not be loaded.', 'network'],
+    ['Did not redirect to the right URL.', 'invalid-callback'],
+    ['Identity API is disabled in incognito windows.', 'identity-unavailable'],
+    ['An unexpected browser failure occurred.', 'identity-failed'],
+  ] as const)('maps Chrome Identity %s safely', (message, expected) => {
+    expect(classifyIdentityFailure(new Error(message))).toBe(expected);
+  });
+
+  it('does not mistake an untyped rejection for a user cancellation', () => {
+    expect(classifyIdentityFailure({ message: 'The user did not approve access.' })).toBe(
+      'identity-failed',
+    );
   });
 });
 
@@ -563,7 +582,7 @@ describe('createAuthController', () => {
     const fetchFn = fetchSequence([{ status: 200, body: { supported: true } }]);
     const identity: IdentityApi = {
       getRedirectURL: () => 'https://extension-id.chromiumapp.org/zetalog-link',
-      launchWebAuthFlow: () => Promise.reject(new Error('user cancelled')),
+      launchWebAuthFlow: () => Promise.reject(new Error('The user did not approve access.')),
     };
     const controller = createAuthController(fakeArea(), {
       fetch: fetchFn,

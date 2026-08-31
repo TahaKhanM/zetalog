@@ -46,12 +46,12 @@ test('accepts the intended production manifest contract', () => {
 
 test('rejects a version downgrade and an extra host permission', () => {
   const candidate = manifest();
-  candidate.version = '1.1.0';
+  candidate.version = '1.0.0';
   candidate.host_permissions = ['https://example.test/*'];
   candidate.content_scripts[1].matches.push('http://localhost:3000/*');
 
   assert.deepEqual(validateManifest(candidate, requiredEntries), [
-    'manifest version must be 1.0.0, got 1.1.0',
+    `manifest version must be ${RELEASE_VERSION}, got 1.0.0`,
     'unexpected manifest fields: action, background, content_scripts, description, host_permissions, icons, manifest_version, minimum_chrome_version, name, permissions, version',
     'unexpected host permissions: https://example.test/*',
     'unexpected content-script matches: http://localhost:3000/*, https://arithmetic.zetamac.com/*, https://www.zetalog.co.uk/link*',

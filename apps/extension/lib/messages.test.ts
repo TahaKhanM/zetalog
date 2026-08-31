@@ -58,6 +58,12 @@ describe('bgRequestSchema', () => {
     expect(bgRequestSchema.safeParse({ type: 'zl-backfill' }).success).toBe(true);
   });
 
+  it('rejects capture records outside the sender-validated port channel', () => {
+    for (const type of ['zl-checkpoint-game', 'zl-save-game', 'zl-save-capture-failed']) {
+      expect(bgRequestSchema.safeParse({ type, record }).success).toBe(false);
+    }
+  });
+
   it('rejects the obsolete link-claim protocol', () => {
     expect(
       bgRequestSchema.safeParse({ type: 'zl-claim-link', requestId: 'zlr_request' }).success,
