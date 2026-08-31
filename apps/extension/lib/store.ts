@@ -328,7 +328,10 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
         });
         const base = {
           record,
-          ownerUserId,
+          // A checkpoint fixes the account context in which this game began.
+          // Finishing after an unlink/relink must not silently move the row to
+          // the account that happens to be current at completion time.
+          ownerUserId: existing === undefined ? ownerUserId : (existing.ownerUserId ?? null),
           verifiedScore,
           fingerprint: fp,
           rankableDuration: rankableDuration(record.settings),
@@ -457,7 +460,14 @@ export function createStore(area: StorageArea, now: () => number = () => Date.no
             rankableDuration: server.rankableDuration,
             status: server.status,
             removedFrom: server.removedFrom,
-            quarantineReason: server.quarantineReason,
+            // The lightweight backfill projection has no local quarantine
+            // provenance. Preserve a known restart/outlier reason while the
+            // server still has the row under review; clear it when moderation
+            // moves the row to another status.
+            quarantineReason:
+              server.status === 'quarantined'
+                ? (server.quarantineReason ?? local.quarantineReason)
+                : server.quarantineReason,
             sync: server.sync,
           };
         });
