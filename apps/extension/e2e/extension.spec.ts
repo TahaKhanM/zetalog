@@ -298,11 +298,13 @@ test('migrates a pinned 1.0.0 popup theme into extension storage', async () => {
   }, THEME_STORAGE_KEY);
 
   const popup = await context.newPage();
-  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
-  await popup.evaluate((key) => {
+  // Seed the legacy origin before popup code starts. Loading once and then
+  // writing localStorage races the already-mounted ThemeToggle effect, which
+  // can legitimately migrate the value before a subsequent reload.
+  await popup.addInitScript((key) => {
     globalThis.localStorage.setItem(key, 'dark');
   }, THEME_STORAGE_KEY);
-  await popup.reload();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
 
   await expect
     .poll(() => popup.evaluate(() => document.documentElement.dataset.theme))
