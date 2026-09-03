@@ -141,6 +141,9 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   'duke-university': { bg: '#012169', fg: '#ffffff', monogram: 'D' },
   // https://www.washington.edu/brand/brand-elements/colors/ — Spirit Purple
   'university-of-washington': { bg: '#4b2e83', fg: '#ffffff', monogram: 'W' },
+  // https://www.umkc.edu/v2/css/styles.css — UMKC blue + gold; KC not M so the
+  // chip stays distinct from Missouri's Columbia campus if the logo is killed.
+  'university-of-missouri-kansas-city': { bg: '#04487f', fg: '#ffdd00', monogram: 'KC' },
 };
 
 /**
@@ -206,6 +209,7 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
     '/uni-logos/university-of-illinois-urbana-champaign.png',
   'the-university-of-texas-at-austin': '/uni-logos/the-university-of-texas-at-austin.png',
   'duke-university': '/uni-logos/duke-university.png',
+  'university-of-missouri-kansas-city': '/uni-logos/university-of-missouri-kansas-city.png',
 };
 
 /**
