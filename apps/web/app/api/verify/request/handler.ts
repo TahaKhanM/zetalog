@@ -71,7 +71,11 @@ export async function handleVerifyRequest(
 
   const university = findUniversityForEmail(email, await deps.listUniversities());
   if (university === null) {
-    return apiError(404, 'unknown-university', 'That email domain is not a known UK university.');
+    return apiError(
+      404,
+      'unknown-university',
+      'That email domain is not a known UK or US university.',
+    );
   }
 
   // Alias integrity: a verified uni email doubles as a login alias, so an
