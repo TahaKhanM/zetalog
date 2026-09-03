@@ -4,13 +4,15 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  BULK_LOGO_DENYLIST,
   CURATED_BRANDS,
   CURATED_LOGOS,
-  FALLBACK_DUOTONES,
   badgeFor,
   contrastRatio,
+  fallbackColours,
   monogramFor,
 } from './uni-brand';
+import BULK_LOGOS from './uni-logos-bulk.json';
 
 describe('contrastRatio', () => {
   it('reports 21:1 for black on white', () => {
@@ -37,9 +39,12 @@ describe('accessibility of the whole badge system', () => {
     }
   });
 
-  it('every fallback duotone meets WCAG AA for small text (4.5:1)', () => {
-    for (const duotone of FALLBACK_DUOTONES) {
-      expect(contrastRatio(duotone.bg, duotone.fg)).toBeGreaterThanOrEqual(4.5);
+  it('every fallback colour pair meets WCAG AA regardless of the slug-derived hue', () => {
+    // Sweep enough distinct slugs to cover the whole hue wheel.
+    for (let i = 0; i < 720; i += 1) {
+      const { bg, fg } = fallbackColours(`sweep-slug-${String(i)}`);
+      expect(contrastRatio(bg, fg), `${bg} on ${fg}`).toBeGreaterThanOrEqual(4.5);
+      expect(bg).toMatch(/^#[0-9a-f]{6}$/);
     }
   });
 });
@@ -56,13 +61,13 @@ describe('badgeFor', () => {
     const first = badgeFor('unknown-college', 'Unknown College');
     const second = badgeFor('unknown-college', 'Unknown College');
     expect(first).toEqual(second);
-    expect(FALLBACK_DUOTONES.map((d) => d.bg)).toContain(first.bg);
+    expect(first.bg).toBe(fallbackColours('unknown-college').bg);
   });
 
-  it('spreads distinct unknown slugs across more than one duotone', () => {
+  it('gives distinct universities their own fallback colours', () => {
     const slugs = ['aaa-college', 'bbb-college', 'ccc-institute', 'ddd-school', 'eee-academy'];
     const backgrounds = new Set(slugs.map((slug) => badgeFor(slug, slug).bg));
-    expect(backgrounds.size).toBeGreaterThan(1);
+    expect(backgrounds.size).toBe(slugs.length);
   });
 });
 
@@ -185,7 +190,7 @@ describe('curated logos', () => {
     expect(CURATED_BRANDS[slug]).toBeUndefined();
     const badge = badgeFor(slug, 'University of Bath');
     expect(badge.logo).toBe(CURATED_LOGOS[slug]);
-    expect(FALLBACK_DUOTONES.map((duotone) => duotone.bg)).toContain(badge.bg);
+    expect(badge.bg).toBe(fallbackColours(slug).bg);
     expect(badge.monogram).toBe('B');
   });
 
@@ -203,6 +208,41 @@ describe('curated logos', () => {
     ]) {
       expect(CURATED_LOGOS[slug], slug).toBeUndefined();
       expect(CURATED_BRANDS[slug], slug).toBeDefined();
+      // Bulk collection must never override this curated decision.
+      expect(badgeFor(slug, slug).logo, slug).toBeUndefined();
+    }
+  });
+});
+
+describe('bulk-collected marks', () => {
+  const icons = Object.entries(BULK_LOGOS.icons) as [string, { file: string; source: string }][];
+
+  it('collected a substantial share of the seed', () => {
+    expect(icons.length).toBeGreaterThan(500);
+  });
+
+  it('every icon has a served file, a same-provenance source URL, and a seeded slug', () => {
+    const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+    for (const [slug, icon] of icons) {
+      expect(icon.file, slug).toBe(`/uni-logos/bulk/${slug}.png`);
+      expect(existsSync(join(import.meta.dirname, '../public', icon.file)), slug).toBe(true);
+      expect(icon.source, slug).toMatch(/^https:\/\//);
+      expect(seed, `bulk slug not in seed: ${slug}`).toContain(`'${slug}'`);
+    }
+  });
+
+  it('never carries a slug that is hand-curated', () => {
+    for (const [slug] of icons) {
+      expect(CURATED_LOGOS[slug], slug).toBeUndefined();
+      expect(CURATED_BRANDS[slug], slug).toBeUndefined();
+    }
+  });
+
+  it('badgeFor serves the collected mark for an uncurated slug', () => {
+    const [slug, icon] = icons.find(([candidate]) => !BULK_LOGO_DENYLIST.has(candidate)) ?? [];
+    expect(slug).toBeDefined();
+    if (slug !== undefined && icon !== undefined) {
+      expect(badgeFor(slug, slug).logo).toBe(icon.file);
     }
   });
 });
