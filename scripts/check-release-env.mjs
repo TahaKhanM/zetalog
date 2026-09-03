@@ -13,6 +13,8 @@ const REQUIRED = [
   'NEXT_PUBLIC_CHROME_WEB_STORE_URL',
 ];
 
+const OFFICIAL_CHROME_EXTENSION_ID = 'bjleafpcpockiiblhkoddgomhkloaiab';
+
 /** Validate production configuration without ever printing a secret value. */
 export function releaseEnvErrors(env) {
   const errors = [];
@@ -87,6 +89,9 @@ export function releaseEnvErrors(env) {
         errors.push('EXTENSION_OAUTH_REDIRECT_URIS contains an invalid URL');
       }
     }
+    if (redirectsValid && !redirectIds.includes(OFFICIAL_CHROME_EXTENSION_ID)) {
+      errors.push('EXTENSION_OAUTH_REDIRECT_URIS must include the published Store item callback');
+    }
   }
 
   const storeValue = env.NEXT_PUBLIC_CHROME_WEB_STORE_URL;
@@ -109,6 +114,8 @@ export function releaseEnvErrors(env) {
         !/^[a-p]{32}$/u.test(storeId)
       ) {
         errors.push('NEXT_PUBLIC_CHROME_WEB_STORE_URL must be the exact final Store listing URL');
+      } else if (storeId !== OFFICIAL_CHROME_EXTENSION_ID) {
+        errors.push('NEXT_PUBLIC_CHROME_WEB_STORE_URL must target the published Store item');
       } else if (redirectsValid && !redirectIds.includes(storeId)) {
         errors.push('the Store item ID must match an allowed Chrome Identity callback');
       }

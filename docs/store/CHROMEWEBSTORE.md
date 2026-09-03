@@ -10,14 +10,12 @@ monitoring thresholds, and rollback procedure are in
 `docs/ops/release-readiness.md`. Complete that runbook in order; this document
 contains the Store-specific copy and dashboard sequence.
 
-Last updated: 19 August 2026 · Release train: 1.0.1 update
+Last updated: 2 September 2026 · Release train: 1.0.1 update
 
-Version **1.0.0** is live on the Chrome Web Store (item
-`bhbpjdngipckdepgblhopdfijnpeefml`, published 10 August 2026). Chrome does not
-allow the same version to be uploaded twice, so this update ships as **1.0.1**.
-Before generating any release artifact, confirm in the dashboard that no
-`1.0.1` package has previously been uploaded. If it has, stop and choose a
-higher version everywhere before continuing.
+The production Chrome Web Store item is `bjleafpcpockiiblhkoddgomhkloaiab`.
+Chrome does not allow the same version to be uploaded twice. Before generating
+any release artifact, confirm the next version in the dashboard and choose a
+higher version everywhere if that package has already been uploaded.
 
 ## Build the package locally
 
@@ -81,7 +79,7 @@ Re-run these checks against the exact `chrome-mv3` manifest and zip to publish.
 ## Dashboard steps
 
 1. chromewebstore.google.com/devconsole, open the existing **ZetaLog** item
-   (`bhbpjdngipckdepgblhopdfijnpeefml`). Do not create a new item; a new item
+   (`bjleafpcpockiiblhkoddgomhkloaiab`). Do not create a new item; a new item
    gets a new extension ID and breaks the configured link callback.
 2. Package tab: upload the 1.0.1 zip from the retained CI artifact and save it
    as a draft. Do not submit yet.
@@ -101,7 +99,7 @@ Re-run these checks against the exact `chrome-mv3` manifest and zip to publish.
 The 1.0.0 server-side support is already live. For the 1.0.1 update:
 
 1. Confirm `EXTENSION_OAUTH_REDIRECT_URIS` in production is exactly
-   `https://bhbpjdngipckdepgblhopdfijnpeefml.chromiumapp.org/zetalog-link`.
+   `https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link`.
    `GET /api/extension/link/status` must return 200 for that redirect URI; a
    409 means the allowlist is wrong and the Link button will fail closed.
    Do not use a wildcard and do not add this URL to Supabase Auth Redirect URLs.
