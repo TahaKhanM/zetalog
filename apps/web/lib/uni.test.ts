@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { extractDomain, findUniversityForEmail } from './uni';
+import { domainSuffixes, extractDomain, findUniversityForEmail } from './uni';
 
 describe('extractDomain', () => {
   it('lowercases the domain and ignores the local part', () => {
@@ -15,6 +15,32 @@ describe('extractDomain', () => {
   it('returns null for an empty local part or domain', () => {
     expect(extractDomain('@ox.ac.uk')).toBeNull();
     expect(extractDomain('ada@')).toBeNull();
+  });
+});
+
+describe('domainSuffixes', () => {
+  it('lists the domain and every label-boundary suffix down to two labels', () => {
+    expect(domainSuffixes('mail.med.harvard.edu')).toEqual([
+      'mail.med.harvard.edu',
+      'med.harvard.edu',
+      'harvard.edu',
+    ]);
+    expect(domainSuffixes('umsystem.edu')).toEqual(['umsystem.edu']);
+  });
+
+  it('agrees with findUniversityForEmail: a registered domain matches iff it is a suffix', () => {
+    const registered = ['harvard.edu', 'med.harvard.edu', 'notharvard.edu', 'ox.ac.uk'];
+    const emailDomain = 'mail.med.harvard.edu';
+    const viaSuffixes = registered.filter((r) => domainSuffixes(emailDomain).includes(r));
+    const viaMatcher = registered.filter(
+      (r) => findUniversityForEmail(`a@${emailDomain}`, [{ domains: [r] }]) !== null,
+    );
+    expect(viaSuffixes).toEqual(viaMatcher);
+    expect(viaSuffixes).toEqual(['harvard.edu', 'med.harvard.edu']);
+  });
+
+  it('falls back to the bare domain when it has a single label', () => {
+    expect(domainSuffixes('localhost')).toEqual(['localhost']);
   });
 });
 
