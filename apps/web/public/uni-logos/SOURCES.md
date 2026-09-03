@@ -99,6 +99,7 @@ seeklogo, or any other third-party aggregator.
 | `university-of-illinois-urbana-champaign.png` | <https://cdn.brand.illinois.edu/touch-icon-180x180.png>                                                                                       | PNG, 180x180                      | Apple-touch icon (`sizes="180x180"`) declared on <https://illinois.edu/>; cdn.brand.illinois.edu is Illinois's own brand CDN. Block I.                                                                                                                                              |
 | `the-university-of-texas-at-austin.png`       | <https://www.utexas.edu/android-chrome-512x512.png>                                                                                           | PNG, 512x512                      | Listed in UT Austin's web-app manifest, declared on <https://www.utexas.edu/>. Burnt-orange shield.                                                                                                                                                                                 |
 | `duke-university.png`                         | <https://www.duke.edu/wp-content/uploads/2025/12/cropped-dfavicon-1-192x192.png>                                                              | PNG, 192x192                      | WordPress site icon (`sizes="192x192"`) declared on <https://www.duke.edu/>. White serif D on Duke Navy.                                                                                                                                                                            |
+| `university-of-missouri-kansas-city.png`      | <https://library.umkc.edu/wp-content/uploads/2021/10/favicon-300x300.png>                                                                     | PNG, 300x300                      | Apple-touch / 192px site icon declared on <https://library.umkc.edu/> (umkc.edu property). UMKC flame mark on UMKC blue — the homepage itself publishes no link-rel icon (bot-gated 404 without a browser UA). Copied byte-identical.                                               |
 
 ### Skipped (US, 2026-09-03 — own properties publish no usable square mark >= 96 px)
 
@@ -112,3 +113,31 @@ the chips render in official brand colours).
 | `georgia-institute-of-technology`      | Homepage favicon.ico is 48 px. `apple-touch-icon.png` is declared on brand.gatech.edu but returns 404. Logo ZIP downloads require a GT login. Public marks on the brand site are wide wordmarks (the interlocking GT is not published as a standalone square file). |
 | `university-of-california-los-angeles` | Homepage apple-touch-icon is 56x56. brand.ucla.edu publishes the campus wordmark (133x43) and page photos of the seal, not a square avatar. The campus-logo ZIP is referenced via a download wrapper whose S3 host does not resolve.                                |
 | `university-of-washington`             | Homepage apple-touch-icon is 57x57. The official Block W PNG published on the brand logos page (<https://www.washington.edu/brand/brand-elements/logos/>) is 450x303, not square. No touch/manifest icon >=96 px.                                                   |
+
+## Bulk self-served icon collection (`bulk/`, 2026-09-03)
+
+Everything under `bulk/` was collected by `apps/web/scripts/collect-uni-icons.mjs`,
+which fetches each seeded university's OWN homepage and downloads the square
+icon the institution itself publishes (apple-touch/manifest/link-rel icons,
+served from its own web properties) — the same provenance class as the
+hand-collected marks above, applied at scale. Per-file provenance (exact
+source URL and original dimensions) lives in the generated manifest
+`apps/web/lib/uni-logos-bulk.json`.
+
+Method and gates:
+
+- HTTPS only, fetched directly from the university's domain (or its `www.`
+  host); never a third-party aggregator, CDN cache, or scraping service.
+- Source raster at least 32 px on its short side and roughly square
+  (favicons are designed to read at tiny sizes; badges render at 20–46 px).
+  Icons are normalised to 64 px PNG tiles flattened onto white.
+- Flat/blank tiles are rejected; byte-identical icons appearing across more
+  than three unrelated registrable domains are dropped as CMS/template
+  defaults (a university system sharing one mark across its own campuses is
+  kept).
+- Hand curation always outranks collection: slugs present in
+  `CURATED_BRANDS`/`CURATED_LOGOS` are never collected, so a deliberate
+  "monogram chip, no logo" decision stands.
+- Kill-switch: add a slug to `BULK_LOGO_DENYLIST` in `apps/web/lib/uni-brand.ts`
+  (takedown requests, illegible marks) to revert that university to its
+  monogram chip immediately; re-running the collector refreshes the set.

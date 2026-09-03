@@ -9,6 +9,15 @@
  * is the single sanctioned home for non-palette hexes.
  */
 
+// Bulk-collected self-served icons: each university's own published
+// favicon/touch icon, fetched from its own domain by
+// `scripts/collect-uni-icons.mjs` (per-file source URL in the manifest — the
+// same provenance class as the hand-collected marks, applied at scale).
+// Consulted only for slugs with NO curated entry of either kind, so a
+// deliberate curation decision (e.g. keeping a school on its monogram chip)
+// is never overridden by collection.
+import BULK_LOGOS from './uni-logos-bulk.json';
+
 export interface UniBrand {
   /** Chip background — the university's primary brand colour. */
   readonly bg: string;
@@ -132,6 +141,9 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   'duke-university': { bg: '#012169', fg: '#ffffff', monogram: 'D' },
   // https://www.washington.edu/brand/brand-elements/colors/ — Spirit Purple
   'university-of-washington': { bg: '#4b2e83', fg: '#ffffff', monogram: 'W' },
+  // https://www.umkc.edu/v2/css/styles.css — UMKC blue + gold; KC not M so the
+  // chip stays distinct from Missouri's Columbia campus if the logo is killed.
+  'university-of-missouri-kansas-city': { bg: '#04487f', fg: '#ffdd00', monogram: 'KC' },
 };
 
 /**
@@ -197,32 +209,52 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
     '/uni-logos/university-of-illinois-urbana-champaign.png',
   'the-university-of-texas-at-austin': '/uni-logos/the-university-of-texas-at-austin.png',
   'duke-university': '/uni-logos/duke-university.png',
+  'university-of-missouri-kansas-city': '/uni-logos/university-of-missouri-kansas-city.png',
 };
 
 /**
- * Paper-compatible duotones for everything without a curated entry: dark,
- * bookish inks with cream monograms, all AA-safe by construction (tested).
- * Hand-tuned; order is stable — changing it changes fallback assignments.
+ * Kill-switch for bulk-collected marks: add a slug here (takedown request or
+ * an illegible icon) and it instantly reverts to its monogram chip without
+ * touching the generated manifest.
  */
-export const FALLBACK_DUOTONES: readonly { readonly bg: string; readonly fg: string }[] = [
-  { bg: '#1f3a5f', fg: '#fdf0d5' }, // ink blue
-  { bg: '#4a1d3f', fg: '#fdf0d5' }, // mulberry
-  { bg: '#1e4d3b', fg: '#fdf0d5' }, // college green
-  { bg: '#5c3317', fg: '#fdf0d5' }, // oak
-  { bg: '#3d2b56', fg: '#fdf0d5' }, // violet ink
-  { bg: '#284b63', fg: '#fdf0d5' }, // slate
-  { bg: '#6b2737', fg: '#fdf0d5' }, // claret
-  { bg: '#37423d', fg: '#fdf0d5' }, // blackboard green
-];
+export const BULK_LOGO_DENYLIST: ReadonlySet<string> = new Set([]);
+
+/** Convert HSL (deg, %, %) to #rrggbb. */
+function hslToHex(h: number, s: number, l: number): string {
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (n: number): string => {
+    const k = (n + h / 30) % 12;
+    const c = l / 100 - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)));
+    return Math.round(255 * c)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+/**
+ * A university-specific duotone for everything without a curated brand: the
+ * slug hashes to its own hue, rendered as a dark bookish ink (27% lightness
+ * keeps every hue AA-safe against the cream monogram — swept in tests).
+ */
+export function fallbackColours(slug: string): { readonly bg: string; readonly fg: string } {
+  return { bg: hslToHex(hashSlug(slug) % 360, 46, 27), fg: '#fdf0d5' };
+}
 
 /** Words that never carry a university's identity. */
 const FILLER = new Set(['the', 'university', 'of', 'college', 'school', 'institute', 'and']);
 
-/** Monogram: initial of the first significant word of the common name. */
+/**
+ * Monogram: first letter/digit of the first significant word of the common
+ * name. Unicode-aware — legacy non-Latin `.edu` institutions monogram in
+ * their own script — and immune to dataset quirks like names wrapped in
+ * literal quotes.
+ */
 export function monogramFor(name: string): string {
-  const words = name.split(/[\s,]+/).filter((word) => word.length > 0);
-  const significant = words.find((word) => !FILLER.has(word.toLowerCase())) ?? words[0] ?? '?';
-  return (significant[0] ?? '?').toUpperCase();
+  const words = name.split(/[\s,]+/).filter((word) => /[\p{L}\p{N}]/u.test(word));
+  const significant = words.find((word) => !FILLER.has(word.toLowerCase())) ?? words[0];
+  const initial = significant === undefined ? '?' : (/[\p{L}\p{N}]/u.exec(significant)?.[0] ?? '?');
+  return initial.toUpperCase();
 }
 
 /** Deterministic small hash for fallback assignment (stable across runs). */
@@ -232,18 +264,30 @@ function hashSlug(slug: string): number {
   return hash;
 }
 
+const BULK_ICONS: Readonly<Record<string, { readonly file: string } | undefined>> =
+  BULK_LOGOS.icons;
+
 /**
- * The badge for a university: curated brand colours (or a deterministic
- * duotone), plus the official logo when `CURATED_LOGOS` carries one.
+ * The university's own mark: hand-curated first; otherwise its bulk-collected
+ * self-served icon — but only for slugs untouched by curation, so a curated
+ * "monogram chip, no logo" decision stands.
+ */
+function logoFor(slug: string): string | undefined {
+  const curated = CURATED_LOGOS[slug];
+  if (curated !== undefined) return curated;
+  if (CURATED_BRANDS[slug] !== undefined || BULK_LOGO_DENYLIST.has(slug)) return undefined;
+  return BULK_ICONS[slug]?.file;
+}
+
+/**
+ * The badge for a university: curated brand colours (or the university's own
+ * hash-hued duotone), plus its own mark when curation or collection holds one.
  */
 export function badgeFor(slug: string, name: string): UniBrand {
-  const curated = CURATED_BRANDS[slug];
-  const duotone = FALLBACK_DUOTONES[hashSlug(slug) % FALLBACK_DUOTONES.length];
-  const base: UniBrand = curated ?? {
-    bg: duotone?.bg ?? '#1f3a5f',
-    fg: duotone?.fg ?? '#fdf0d5',
+  const base: UniBrand = CURATED_BRANDS[slug] ?? {
+    ...fallbackColours(slug),
     monogram: monogramFor(name),
   };
-  const logo = CURATED_LOGOS[slug];
+  const logo = logoFor(slug);
   return logo === undefined ? base : { ...base, logo };
 }
