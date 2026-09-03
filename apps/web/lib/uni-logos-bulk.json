@@ -31,15 +31,30 @@
       "source": "https://www.adelphi.edu/wp-content/themes/primary/favicons/apple-touch-icon.png?h=9cb434f8",
       "sourceSize": "76x76"
     },
+    "adirondack-community-college": {
+      "file": "/uni-logos/bulk/adirondack-community-college.png",
+      "source": "https://sunyacc.edu/themes/custom/suny/assets/favicons/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "adler-school-of-professional-psychology": {
       "file": "/uni-logos/bulk/adler-school-of-professional-psychology.png",
       "source": "https://www.adler.edu/wp-content/uploads/2025/07/favicon-300x300.png",
       "sourceSize": "300x300"
     },
+    "adventist-international-institute-of-advanced-studies": {
+      "file": "/uni-logos/bulk/adventist-international-institute-of-advanced-studies.png",
+      "source": "https://library.aiias.edu/wp-content/uploads/2025/01/cropped-AIIAS-Emblem-192x192.png",
+      "sourceSize": "192x192"
+    },
     "ahsanullah-university-of-science-amp-technology": {
       "file": "/uni-logos/bulk/ahsanullah-university-of-science-amp-technology.png",
       "source": "https://www.aust.edu/images/aust_logo.svg",
       "sourceSize": "1729x2060"
+    },
+    "aiken-technical-college": {
+      "file": "/uni-logos/bulk/aiken-technical-college.png",
+      "source": "https://www.atc.edu/themes/atc/favicon.ico",
+      "sourceSize": "57x57"
     },
     "aims-community-college": {
       "file": "/uni-logos/bulk/aims-community-college.png",
@@ -80,6 +95,11 @@
       "file": "/uni-logos/bulk/alaska-bible-college.png",
       "source": "https://static.wixstatic.com/media/37702f_f3c7507924f14aeeae78d140f1272452%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/37702f_f3c7507924f14aeeae78d140f1272452%7Emv2.png",
       "sourceSize": "192x192"
+    },
+    "albany-college-of-pharmacy": {
+      "file": "/uni-logos/bulk/albany-college-of-pharmacy.png",
+      "source": "https://www.acp.edu/wp-content/uploads/2020/12/ACP-Favicon.png",
+      "sourceSize": "32x32"
     },
     "albany-law-school": {
       "file": "/uni-logos/bulk/albany-law-school.png",
@@ -186,6 +206,11 @@
       "source": "https://www.apus.edu/images/shared/icons/apple-touch-icon-amu-152x152-precomposed.png",
       "sourceSize": "152x152"
     },
+    "american-river-college": {
+      "file": "/uni-logos/bulk/american-river-college.png",
+      "source": "https://arc.losrios.edu/arc/main/img/logos/favicon/arc-logo.png",
+      "sourceSize": "737x737"
+    },
     "american-university-college-of-technology": {
       "file": "/uni-logos/bulk/american-university-college-of-technology.png",
       "source": "https://www.aut.edu/wp-content/uploads/2024/02/cropped-Favicon-192x192.jpg",
@@ -195,6 +220,11 @@
       "file": "/uni-logos/bulk/american-university-of-sharjah.png",
       "source": "https://www.aus.edu/sites/all/themes/aus/assets/logo-192.png",
       "sourceSize": "192x192"
+    },
+    "american-university-of-the-caribbean-sint-maarten": {
+      "file": "/uni-logos/bulk/american-university-of-the-caribbean-sint-maarten.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/5086/images/AUC_favicon.jpg",
+      "sourceSize": "400x400"
     },
     "amherst-college": {
       "file": "/uni-logos/bulk/amherst-college.png",
@@ -210,6 +240,11 @@
       "file": "/uni-logos/bulk/an-najah-national-university.png",
       "source": "https://www-cdn.najah.edu/static/img/icons/apple-touch-icon-152x152-precomposed.png",
       "sourceSize": "152x152"
+    },
+    "andrew-college": {
+      "file": "/uni-logos/bulk/andrew-college.png",
+      "source": "https://andrewcolleprd.wpenginepowered.com/wp-content/uploads/2019/08/icon.png",
+      "sourceSize": "200x200"
     },
     "andrews-university": {
       "file": "/uni-logos/bulk/andrews-university.png",
@@ -281,6 +316,11 @@
       "source": "https://www.asun.edu/_resources/assets/img/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "arkansas-tech-university": {
+      "file": "/uni-logos/bulk/arkansas-tech-university.png",
+      "source": "https://atu.edu/favicon.png",
+      "sourceSize": "180x180"
+    },
     "art-academy-of-cincinnati": {
       "file": "/uni-logos/bulk/art-academy-of-cincinnati.png",
       "source": "https://www.artacademy.edu/wp-content/uploads/2022/03/cropped-AACfavicon-192x192.png",
@@ -291,6 +331,11 @@
       "source": "https://www.artcenter.edu/img/global/touch-icon.png",
       "sourceSize": "228x228"
     },
+    "asbury-college": {
+      "file": "/uni-logos/bulk/asbury-college.png",
+      "source": "https://b3539896.smushcdn.com/2.0/3539896/wp-content/themes/asbury/favicon/android-chrome-256x256.png?lossy=2&strip=1&webp=1",
+      "sourceSize": "256x256"
+    },
     "asher-college": {
       "file": "/uni-logos/bulk/asher-college.png",
       "source": "https://asher.edu/wp-content/uploads/2024/12/cropped-40x40-Webicon-Asher-192x192.png",
@@ -300,6 +345,11 @@
       "file": "/uni-logos/bulk/aspen-university.png",
       "source": "https://images.aspen.edu/wp/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "atlantic-university": {
+      "file": "/uni-logos/bulk/atlantic-university.png",
+      "source": "https://atlanticuniv.edu/wp-content/uploads/2023/12/avada-university-favicon-01.png",
+      "sourceSize": "64x64"
     },
     "atlantis-university": {
       "file": "/uni-logos/bulk/atlantis-university.png",
@@ -341,6 +391,21 @@
       "source": "https://www.averett.edu/wp-content/uploads/Averett_clumns-300x300.png",
       "sourceSize": "300x300"
     },
+    "avila-college": {
+      "file": "/uni-logos/bulk/avila-college.png",
+      "source": "https://b1806469.assetcdn.net/2.0/1806469/wp-content/uploads/2020/09/cropped-Favicon-192x192.png?lossy=2&strip=1&webp=1",
+      "sourceSize": "192x192"
+    },
+    "bakersfield-college": {
+      "file": "/uni-logos/bulk/bakersfield-college.png",
+      "source": "https://bakersfieldcollege.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
+    "baldwin-wallace-university": {
+      "file": "/uni-logos/bulk/baldwin-wallace-university.png",
+      "source": "https://www.bw.edu/_files/images/icons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "bapuji-institute-of-engineering-and-technology": {
       "file": "/uni-logos/bulk/bapuji-institute-of-engineering-and-technology.png",
       "source": "https://bietdvg.edu/static/assets/images/logo/BIET_logo.png",
@@ -361,35 +426,135 @@
       "source": "https://barnard.edu/themes/custom/barnard/BarnardB_16x16.png",
       "sourceSize": "2400x2400"
     },
+    "barton-college": {
+      "file": "/uni-logos/bulk/barton-college.png",
+      "source": "https://www.barton.edu/wp-content/uploads/2025/09/barton_favicon_circle_tower-300x300.png",
+      "sourceSize": "300x300"
+    },
     "barton-county-community-college": {
       "file": "/uni-logos/bulk/barton-county-community-college.png",
       "source": "https://bartonccc.edu/themes/custom/barton2020/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "bates-college": {
+      "file": "/uni-logos/bulk/bates-college.png",
+      "source": "https://www.bates.edu/wp-content/themes/b/bates-framework/styles/images/bates-favicon.png",
+      "sourceSize": "512x512"
     },
     "bath-spa-university": {
       "file": "/uni-logos/bulk/bath-spa-university.png",
       "source": "https://www.bathspa.ac.uk/media/bathspaacuk/sitewide/logos-and-site-images/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "bay-atlantic-university": {
+      "file": "/uni-logos/bulk/bay-atlantic-university.png",
+      "source": "https://bau.edu/wp-content/uploads/2024/02/favicon.png",
+      "sourceSize": "32x32"
+    },
+    "bay-path-university": {
+      "file": "/uni-logos/bulk/bay-path-university.png",
+      "source": "https://www.baypath.edu/images/favicons/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "baylor-university": {
+      "file": "/uni-logos/bulk/baylor-university.png",
+      "source": "https://www.baylor.edu/themes/custom/baylor_united_2/images/social/bayloruniversity-mobileicon.png",
+      "sourceSize": "152x152"
+    },
     "bellarmine-college": {
       "file": "/uni-logos/bulk/bellarmine-college.png",
       "source": "https://bellarmine.edu/favicon.png",
       "sourceSize": "320x320"
+    },
+    "bellevue-university": {
+      "file": "/uni-logos/bulk/bellevue-university.png",
+      "source": "https://library.bellevue.edu/wp-content/uploads/2024/05/cropped-library-favicon-cropped-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "belmont-abbey-college": {
+      "file": "/uni-logos/bulk/belmont-abbey-college.png",
+      "source": "https://belmontabbeycollege.edu/wp-content/themes/altitude-pro/images/apple-touch-icon-57%C3%9757-precomposed-1.png",
+      "sourceSize": "57x57"
+    },
+    "belmont-university": {
+      "file": "/uni-logos/bulk/belmont-university.png",
+      "source": "https://www.belmont.edu/_assets/favicon/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "beloit-college": {
+      "file": "/uni-logos/bulk/beloit-college.png",
+      "source": "https://www.beloit.edu/_touch-icon/beloit_b_192.png",
+      "sourceSize": "192x192"
+    },
+    "bemidji-state-university": {
+      "file": "/uni-logos/bulk/bemidji-state-university.png",
+      "source": "https://www.bemidjistate.edu/wp-content/themes/bsuwp/assets/images/bsu-favicon-512.a4e73d8d.png",
+      "sourceSize": "512x512"
     },
     "benedictine-university": {
       "file": "/uni-logos/bulk/benedictine-university.png",
       "source": "https://ben.edu/wp-content/uploads/2023/08/cropped-Benedictine-Favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "berea-college": {
+      "file": "/uni-logos/bulk/berea-college.png",
+      "source": "https://berea.edu/android-chrome-512x512.png",
+      "sourceSize": "512x512"
+    },
     "berean-university-of-the-assemblies-of-god": {
       "file": "/uni-logos/bulk/berean-university-of-the-assemblies-of-god.png",
       "source": "https://globaluniversity.edu/wp-content/uploads/2020/03/GU-Knockout-Orange-300x300.webp",
       "sourceSize": "300x300"
     },
+    "berkeley-city-college": {
+      "file": "/uni-logos/bulk/berkeley-city-college.png",
+      "source": "https://berkeleycitycollege.edu/favicon.ico",
+      "sourceSize": "1250x441"
+    },
+    "berklee-college-of-music": {
+      "file": "/uni-logos/bulk/berklee-college-of-music.png",
+      "source": "https://www.berklee.edu/themes/custom/berklee_base/favicon.ico?fv=sdBhYYXU",
+      "sourceSize": "32x32"
+    },
+    "berkshire-community-college": {
+      "file": "/uni-logos/bulk/berkshire-community-college.png",
+      "source": "https://berkshirecc.edu/favicon.ico",
+      "sourceSize": "64x64"
+    },
+    "berry-college": {
+      "file": "/uni-logos/bulk/berry-college.png",
+      "source": "https://berry.edu/favicon.ico",
+      "sourceSize": "95x95"
+    },
     "bethany-college-west-virginia": {
       "file": "/uni-logos/bulk/bethany-college-west-virginia.png",
       "source": "https://wvnet.edu/wp-content/uploads/2023/10/cropped-wvnet-footer-logo-192x192.png",
       "sourceSize": "192x192"
+    },
+    "bethel-college-ks": {
+      "file": "/uni-logos/bulk/bethel-college-ks.png",
+      "source": "https://bethelks.edu/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "bethel-university": {
+      "file": "/uni-logos/bulk/bethel-university.png",
+      "source": "https://bethel-university.imgix.net/cdn/images/favicon.ico?w=100",
+      "sourceSize": "100x100"
+    },
+    "bevill-state-community-college": {
+      "file": "/uni-logos/bulk/bevill-state-community-college.png",
+      "source": "https://bscc.edu/Content/Uploads/bscc.edu/favicons/android-chrome-36x36.png",
+      "sourceSize": "36x36"
+    },
+    "big-bend-community-college": {
+      "file": "/uni-logos/bulk/big-bend-community-college.png",
+      "source": "https://bigbend.edu/favicon.ico",
+      "sourceSize": "143x156"
+    },
+    "big-sandy-community-and-technical-college": {
+      "file": "/uni-logos/bulk/big-sandy-community-and-technical-college.png",
+      "source": "https://bigsandy.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
     },
     "birkbeck-college-university-of-london": {
       "file": "/uni-logos/bulk/birkbeck-college-university-of-london.png",
@@ -401,9 +566,99 @@
       "source": "https://bcucdn.azureedge.net/cdl/v1.5/favicons/apple-touch-icon-152x152.png",
       "sourceSize": "152x152"
     },
+    "bismark-state-college": {
+      "file": "/uni-logos/bulk/bismark-state-college.png",
+      "source": "https://bismarckstate.edu/includes/favicon/android-icon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "black-hawk-college": {
+      "file": "/uni-logos/bulk/black-hawk-college.png",
+      "source": "https://www.bhc.edu/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "black-hills-state-university": {
+      "file": "/uni-logos/bulk/black-hills-state-university.png",
+      "source": "https://bhsu.edu/_images/images/favicon.png",
+      "sourceSize": "314x320"
+    },
+    "blackburn-college": {
+      "file": "/uni-logos/bulk/blackburn-college.png",
+      "source": "https://blackburn.edu/wp-content/uploads/2022/04/blackburn-colloege-favicon-32x32-1.png",
+      "sourceSize": "32x32"
+    },
+    "blackfeet-community-college": {
+      "file": "/uni-logos/bulk/blackfeet-community-college.png",
+      "source": "https://bfcc.edu/images/favicon.png",
+      "sourceSize": "64x64"
+    },
+    "bladen-community-college": {
+      "file": "/uni-logos/bulk/bladen-community-college.png",
+      "source": "https://bladencc.edu/wp-content/uploads/2023/11/Bladen_CC_Logo_Favicon-206x206.png",
+      "sourceSize": "206x206"
+    },
+    "bloomfield-college": {
+      "file": "/uni-logos/bulk/bloomfield-college.png",
+      "source": "https://www.montclair.edu/themes/custom/montclair/assets/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "bloomsburg-university-of-pennsylvania": {
+      "file": "/uni-logos/bulk/bloomsburg-university-of-pennsylvania.png",
+      "source": "https://www.commonwealthu.edu/themes/custom/commonwealthu/assets/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "blue-mountain-college": {
+      "file": "/uni-logos/bulk/blue-mountain-college.png",
+      "source": "https://irp.cdn-website.com/c5f03851/dms3rep/multi/Untitled+design+%285%29.png",
+      "sourceSize": "57x57"
+    },
+    "blue-ridge-community-college": {
+      "file": "/uni-logos/bulk/blue-ridge-community-college.png",
+      "source": "https://cdn.shortpixel.ai/spai/q_lossy+ret_img+to_auto/www.brcc.edu/wp-content/uploads/2023/10/brcc-favicon.png",
+      "sourceSize": "176x176"
+    },
     "bluefield-college": {
       "file": "/uni-logos/bulk/bluefield-college.png",
       "source": "https://www.bluefield.edu/wp-content/uploads/2020/03/cropped-BC-Logo-White-Thumbnail-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "bluefield-state-college": {
+      "file": "/uni-logos/bulk/bluefield-state-college.png",
+      "source": "https://bluefieldstate.edu/wp-content/uploads/2023/08/cropped-BStateLogo-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "bluegrass-community-and-technical-college": {
+      "file": "/uni-logos/bulk/bluegrass-community-and-technical-college.png",
+      "source": "https://bluegrass.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
+    "bob-jones-university": {
+      "file": "/uni-logos/bulk/bob-jones-university.png",
+      "source": "https://library.bju.edu/wp-content/uploads/2022/06/cropped-bju_logo_512-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "boise-bible-college": {
+      "file": "/uni-logos/bulk/boise-bible-college.png",
+      "source": "https://irp.cdn-website.com/c30fe05e/dms3rep/multi/Untitled-4-6ae5b4cd.png",
+      "sourceSize": "1667x1667"
+    },
+    "boise-state-university": {
+      "file": "/uni-logos/bulk/boise-state-university.png",
+      "source": "https://www.boisestate.edu/wp-content/themes/core/img/theme/branding-assets/android-icon.png",
+      "sourceSize": "192x192"
+    },
+    "boricua-college": {
+      "file": "/uni-logos/bulk/boricua-college.png",
+      "source": "https://www.boricuacollege.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
+    "boston-college": {
+      "file": "/uni-logos/bulk/boston-college.png",
+      "source": "https://www.bc.edu/etc/designs/bc-web/favicon-apple-touch.ico",
+      "sourceSize": "152x152"
+    },
+    "boston-graduate-school-of-psychoanalysis": {
+      "file": "/uni-logos/bulk/boston-graduate-school-of-psychoanalysis.png",
+      "source": "https://bgsp.edu/app/uploads/2024/08/cropped-BGSP_Diamond-192x192.png",
       "sourceSize": "192x192"
     },
     "boston-university": {
@@ -416,14 +671,44 @@
       "source": "https://www.bournemouth.ac.uk/sites/all/themes/bournemouth/assets/images/favicons/favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "bowdoin-college": {
+      "file": "/uni-logos/bulk/bowdoin-college.png",
+      "source": "https://library.bowdoin.edu/images/apple-touch-icon-precomposed.png",
+      "sourceSize": "57x57"
+    },
+    "bowling-green-state-university": {
+      "file": "/uni-logos/bulk/bowling-green-state-university.png",
+      "source": "https://www.bgsu.edu/etc.clientlibs/bgsu-support/themes/bootstrap-5.0.0/publish/resources/ico/apple-touch-icon-57-precomposed.png",
+      "sourceSize": "57x57"
+    },
     "bradley-university": {
       "file": "/uni-logos/bulk/bradley-university.png",
       "source": "https://www.bradley.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "brandeis-university": {
+      "file": "/uni-logos/bulk/brandeis-university.png",
+      "source": "https://www.brandeis.edu/_files/favicons/favicon-196x196.png",
+      "sourceSize": "196x196"
+    },
+    "brenau-university": {
+      "file": "/uni-logos/bulk/brenau-university.png",
+      "source": "https://www.brenau.edu/nitropack_static/mfJjemglITBdoqAQcJBqcCidixPOCOnK/assets/images/optimized/rev-28c00b2/www.brenau.edu/wp-content/uploads/2022/11/cropped-UpUpBusinessCard_brenau-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "brevard-college": {
       "file": "/uni-logos/bulk/brevard-college.png",
       "source": "https://cdn.shortpixel.ai/spai/q_lossless+ret_img+to_auto/brevard.edu/wp-content/uploads/2017/06/cropped-BC-Favicon-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "brewton-parker-college": {
+      "file": "/uni-logos/bulk/brewton-parker-college.png",
+      "source": "https://bpc.edu/wp-content/uploads/2024/10/cropped-bpcu-2025-alternate-arch-full-color-rgb-900px-w-300ppi-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "bridgewater-college": {
+      "file": "/uni-logos/bulk/bridgewater-college.png",
+      "source": "https://bridgewater.edu/wp-content/uploads/2024/09/cropped-favicon-Bridgewater-college-192x192.jpg",
       "sourceSize": "192x192"
     },
     "bridgwater-taunton-college": {
@@ -446,9 +731,34 @@
       "source": "https://byui.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "bristol-community-college": {
+      "file": "/uni-logos/bulk/bristol-community-college.png",
+      "source": "https://bristolcc.edu/media/favicon-96x96.png",
+      "sourceSize": "96x96"
+    },
+    "brookdale-community-college": {
+      "file": "/uni-logos/bulk/brookdale-community-college.png",
+      "source": "https://www.brookdalecc.edu/wp-content/uploads/2025/02/logo_brookdale1.png",
+      "sourceSize": "200x233"
+    },
+    "brookings-institution": {
+      "file": "/uni-logos/bulk/brookings-institution.png",
+      "source": "https://www.brookings.edu/wp-content/themes/brookings/assets/images/favicons/android-chrome-512x512.png",
+      "sourceSize": "512x512"
+    },
     "brooklyn-law-school": {
       "file": "/uni-logos/bulk/brooklyn-law-school.png",
       "source": "https://www.brooklaw.edu/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "broward-college": {
+      "file": "/uni-logos/bulk/broward-college.png",
+      "source": "https://www.broward.edu/_global/images/bc-favicon.png",
+      "sourceSize": "120x120"
+    },
+    "brown-university": {
+      "file": "/uni-logos/bulk/brown-university.png",
+      "source": "https://www.brown.edu/themes/custom/brown/static/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
     "brunel-university-uxbridge": {
@@ -456,9 +766,19 @@
       "source": "https://www.brunel.ac.uk/_MB34Eg_3bc0f13d-d1d2-44ab-8fc2-e745531e1a42/static-main/img/icons/favicons/safari-pinned-tab.svg",
       "sourceSize": "13125x13125"
     },
+    "brunswick-community-college": {
+      "file": "/uni-logos/bulk/brunswick-community-college.png",
+      "source": "https://brunswickcc.edu/wp-content/uploads/2019/07/cropped-BRCC_Favicon_512x512-192x192.png",
+      "sourceSize": "192x192"
+    },
     "bryan-college": {
       "file": "/uni-logos/bulk/bryan-college.png",
       "source": "https://www.bryan.edu/wp-content/uploads/cropped-cropped-cropped-bc-icon-red-white-1-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "bryant-and-stratton-college": {
+      "file": "/uni-logos/bulk/bryant-and-stratton-college.png",
+      "source": "https://www.bryantstratton.edu/wp-content/uploads/2024/05/cropped-favBSC-favicon_512x512-192x192.png",
       "sourceSize": "192x192"
     },
     "bryn-mawr-college": {
@@ -516,6 +836,11 @@
       "source": "https://www.caldwell.edu/wp-content/uploads/2024/11/cropped-CU-Shield-square-192x192.png",
       "sourceSize": "192x192"
     },
+    "calhoun-community-college": {
+      "file": "/uni-logos/bulk/calhoun-community-college.png",
+      "source": "https://calhoun.edu/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "california-baptist-university": {
       "file": "/uni-logos/bulk/california-baptist-university.png",
       "source": "https://calbaptist.edu/_resources/images/CBU-apple-touch-icon.png",
@@ -556,6 +881,11 @@
       "source": "https://www.cpp.edu/common/green-and-gold/assets/icons/gg-favicon.svg",
       "sourceSize": "728x1140"
     },
+    "california-polytechnic-state-university-san-luis-obispo": {
+      "file": "/uni-logos/bulk/california-polytechnic-state-university-san-luis-obispo.png",
+      "source": "https://library.calpoly.edu/themes/custom/calpoly_distribution/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "california-state-university": {
       "file": "/uni-logos/bulk/california-state-university.png",
       "source": "https://www.csueastbay.edu/apple-touch-icon.png",
@@ -571,20 +901,50 @@
       "source": "https://assets.csuchico.edu/global/fav/apple-touch-icon.png?v=h4jd93jf",
       "sourceSize": "180x180"
     },
+    "california-state-university-dominguez-hills": {
+      "file": "/uni-logos/bulk/california-state-university-dominguez-hills.png",
+      "source": "https://csudh.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "california-state-university-fresno": {
       "file": "/uni-logos/bulk/california-state-university-fresno.png",
       "source": "https://www.fresnostate.edu/apple-touch-icon.png",
       "sourceSize": "57x57"
+    },
+    "california-state-university-fullerton": {
+      "file": "/uni-logos/bulk/california-state-university-fullerton.png",
+      "source": "https://www.fullerton.edu/web/core/images/v5/favicon-32.png",
+      "sourceSize": "32x32"
     },
     "california-state-university-monterey-bay": {
       "file": "/uni-logos/bulk/california-state-university-monterey-bay.png",
       "source": "https://csumb.edu/media/csumb/site-assets-2024/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "california-state-university-northridge": {
+      "file": "/uni-logos/bulk/california-state-university-northridge.png",
+      "source": "https://live-csu-northridge.pantheonsite.io/sites/default/files/csun-n-fav.ico",
+      "sourceSize": "180x180"
+    },
+    "california-state-university-sacramento": {
+      "file": "/uni-logos/bulk/california-state-university-sacramento.png",
+      "source": "https://csus.edu/favicon.png",
+      "sourceSize": "64x64"
+    },
+    "california-state-university-san-bernardino": {
+      "file": "/uni-logos/bulk/california-state-university-san-bernardino.png",
+      "source": "https://www.csusb.edu/themes/csusb/favicon.ico",
+      "sourceSize": "64x64"
+    },
     "california-state-university-san-marcos": {
       "file": "/uni-logos/bulk/california-state-university-san-marcos.png",
       "source": "https://www.csusm.edu/apple-touch-icon.png",
       "sourceSize": "57x57"
+    },
+    "california-state-university-stanislaus": {
+      "file": "/uni-logos/bulk/california-state-university-stanislaus.png",
+      "source": "https://libapps.s3.amazonaws.com/accounts/216879/images/stan-state-shield-full-color-01.ico.png",
+      "sourceSize": "451x450"
     },
     "california-university-of-management-science": {
       "file": "/uni-logos/bulk/california-university-of-management-science.png",
@@ -596,10 +956,25 @@
       "source": "https://cwsl.edu/_resources/assets/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "calumet-college-of-st-joseph": {
+      "file": "/uni-logos/bulk/calumet-college-of-st-joseph.png",
+      "source": "https://www.ccsj.edu/wp-content/uploads/2021/02/favicon-emblem.png",
+      "sourceSize": "100x100"
+    },
     "calvary-bible-college": {
       "file": "/uni-logos/bulk/calvary-bible-college.png",
       "source": "https://www.calvary.edu/wp-content/themes/yscores/assets/img/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "calvin-college": {
+      "file": "/uni-logos/bulk/calvin-college.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/customers/726/images/wayfinder-book-favicon3.png",
+      "sourceSize": "315x315"
+    },
+    "camden-county-college": {
+      "file": "/uni-logos/bulk/camden-county-college.png",
+      "source": "https://www.camdencc.edu/wp-content/uploads/cropped-CCC-stroke-retina-favicon-1-192x192.gif",
+      "sourceSize": "192x192"
     },
     "cameron-university": {
       "file": "/uni-logos/bulk/cameron-university.png",
@@ -620,6 +995,11 @@
       "file": "/uni-logos/bulk/canada-college.png",
       "source": "https://canadacollege.edu/images/favicon.png",
       "sourceSize": "32x32"
+    },
+    "cankdeska-cikana-community-college": {
+      "file": "/uni-logos/bulk/cankdeska-cikana-community-college.png",
+      "source": "https://www.littlehoop.edu/wp-content/uploads/2021/11/favicon-300x300.png",
+      "sourceSize": "300x300"
     },
     "canterbury-christ-church-university": {
       "file": "/uni-logos/bulk/canterbury-christ-church-university.png",
@@ -671,6 +1051,11 @@
       "source": "https://albizu.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "carlow-college": {
+      "file": "/uni-logos/bulk/carlow-college.png",
+      "source": "https://www.carlow.edu/wp-content/uploads/2024/03/cropped-shamrock-favicon-1-192x192.png",
+      "sourceSize": "192x192"
+    },
     "carolina-university": {
       "file": "/uni-logos/bulk/carolina-university.png",
       "source": "https://carolinau.edu/themes/custom/piu/apple-touch-icon.png?v=M4KGOrBOEp",
@@ -685,6 +1070,11 @@
       "file": "/uni-logos/bulk/carroll-community-college.png",
       "source": "https://www.carrollcc.edu/wp-content/themes/carroll/favicons/favicon-196x196.png",
       "sourceSize": "196x196"
+    },
+    "carson-newman-college": {
+      "file": "/uni-logos/bulk/carson-newman-college.png",
+      "source": "https://www.cn.edu/wp-content/uploads/2022/08/cropped-Flavicon-192x192.jpg",
+      "sourceSize": "192x192"
     },
     "carteret-community-college": {
       "file": "/uni-logos/bulk/carteret-community-college.png",
@@ -791,6 +1181,11 @@
       "source": "https://cccneb.edu/wp-content/uploads/2026/06/cropped-Favicon_32x32-192x192.jpg",
       "sourceSize": "192x192"
     },
+    "central-connecticut-state-university": {
+      "file": "/uni-logos/bulk/central-connecticut-state-university.png",
+      "source": "https://library.ccsu.edu/wp-content/uploads/2021/03/cropped-library-logo-side-300x300.png",
+      "sourceSize": "300x300"
+    },
     "central-maine-community-college": {
       "file": "/uni-logos/bulk/central-maine-community-college.png",
       "source": "https://www.cmcc.edu/wp-content/uploads/2023/01/cropped-cmcc-logo-transparent-512px-192x192.png",
@@ -815,6 +1210,11 @@
       "file": "/uni-logos/bulk/central-ohio-technical-college.png",
       "source": "https://www.cotc.edu/sites/default/themes/dtheme/icons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "central-penn-college": {
+      "file": "/uni-logos/bulk/central-penn-college.png",
+      "source": "https://www.centralpenn.edu/wp-content/uploads/2023/02/cropped-Favicon-192x192.png",
+      "sourceSize": "192x192"
     },
     "central-piedmont-community-college": {
       "file": "/uni-logos/bulk/central-piedmont-community-college.png",
@@ -856,6 +1256,11 @@
       "source": "https://www.century.edu/_ingredients/assets/files/apple-touch-icon-precomposed.png",
       "sourceSize": "57x57"
     },
+    "chadron-state-college": {
+      "file": "/uni-logos/bulk/chadron-state-college.png",
+      "source": "https://csc.edu/favicon.ico",
+      "sourceSize": "64x64"
+    },
     "chaminade-university-of-honolulu": {
       "file": "/uni-logos/bulk/chaminade-university-of-honolulu.png",
       "source": "https://ucm.sfo3.digitaloceanspaces.com/wp-content/uploads/2018/07/08074028/cropped-UCM_logo_mark-blue-192x192.png",
@@ -865,6 +1270,21 @@
       "file": "/uni-logos/bulk/champlain-college.png",
       "source": "https://cdn.champlain.edu/imgs/favicon/favicon-196x196.png",
       "sourceSize": "196x196"
+    },
+    "charles-r-drew-university-of-medicine-and-science": {
+      "file": "/uni-logos/bulk/charles-r-drew-university-of-medicine-and-science.png",
+      "source": "https://b3178742.assetcdn.net/3178742/wp-content/uploads/2023/11/cropped-CDU-Emblem-Only-small_favicon-1-192x192.png?lossy=2&strip=1&webp=1",
+      "sourceSize": "192x192"
+    },
+    "charleston-southern-university": {
+      "file": "/uni-logos/bulk/charleston-southern-university.png",
+      "source": "https://b4152644.assetcdn.net/2.0/4152644/wp-content/uploads/cropped-CSU-Favicon-Circle-1-scaled-1-192x192.png?lossy=1&strip=1&avif=1",
+      "sourceSize": "192x192"
+    },
+    "chatham-college": {
+      "file": "/uni-logos/bulk/chatham-college.png",
+      "source": "https://libapps.s3.amazonaws.com/accounts/7528/images/android-chrome-512x512.png",
+      "sourceSize": "512x512"
     },
     "chattahoochee-valley-community-college": {
       "file": "/uni-logos/bulk/chattahoochee-valley-community-college.png",
@@ -881,10 +1301,20 @@
       "source": "https://www.chc.edu/wp-content/uploads/2022/12/cropped-favicon-300x300.png",
       "sourceSize": "300x300"
     },
+    "cheyney-university": {
+      "file": "/uni-logos/bulk/cheyney-university.png",
+      "source": "https://cheyney1837.wpenginepowered.com/wp-content/uploads/2025/11/cropped-CU-shield-square-192x192.png",
+      "sourceSize": "192x192"
+    },
     "chief-dull-knife-college": {
       "file": "/uni-logos/bulk/chief-dull-knife-college.png",
       "source": "https://www.cdkc.edu/wp-content/uploads/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "chowan-college": {
+      "file": "/uni-logos/bulk/chowan-college.png",
+      "source": "https://b2348370.assetcdn.net/2.0/2348370/wp-content/uploads/2021/11/favicon.png?lossy=1&strip=1&webp=1",
+      "sourceSize": "32x32"
     },
     "christian-brothers-university": {
       "file": "/uni-logos/bulk/christian-brothers-university.png",
@@ -906,9 +1336,19 @@
       "source": "https://www.cisco.edu/apple-touch-icon.png",
       "sourceSize": "120x120"
     },
+    "city-college-of-san-francisco": {
+      "file": "/uni-logos/bulk/city-college-of-san-francisco.png",
+      "source": "https://libapps.s3.amazonaws.com/accounts/74562/images/CCSF-Logo.jpg",
+      "sourceSize": "125x104"
+    },
     "city-colleges-of-chicago": {
       "file": "/uni-logos/bulk/city-colleges-of-chicago.png",
       "source": "https://www.ccc.edu/wp-content/uploads/cropped-favicon180x180-1-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "city-st-george-s-university-of-london-school-of-health-and-medical-sciences": {
+      "file": "/uni-logos/bulk/city-st-george-s-university-of-london-school-of-health-and-medical-sciences.png",
+      "source": "https://library.sgul.ac.uk/site-elements/images/favicons/android-icon-192x192.png",
       "sourceSize": "192x192"
     },
     "city-university-2": {
@@ -941,6 +1381,11 @@
       "source": "https://www.pennwest.edu/_resources/images/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "clark-college": {
+      "file": "/uni-logos/bulk/clark-college.png",
+      "source": "https://library.clark.edu/themes/zircon/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "clarke-college": {
       "file": "/uni-logos/bulk/clarke-college.png",
       "source": "https://clarke.edu/wp-content/themes/clarke-timber/images/favicon/android-icon-192x192.png",
@@ -950,6 +1395,11 @@
       "file": "/uni-logos/bulk/clarkson-college.png",
       "source": "https://www.clarksoncollege.edu/assets/images/favicons/maltese-96x96.png",
       "sourceSize": "96x96"
+    },
+    "clatsop-community-college": {
+      "file": "/uni-logos/bulk/clatsop-community-college.png",
+      "source": "https://clatsopcc.edu/favicon.ico",
+      "sourceSize": "50x50"
     },
     "clayton-state-college": {
       "file": "/uni-logos/bulk/clayton-state-college.png",
@@ -975,6 +1425,11 @@
       "file": "/uni-logos/bulk/cleveland-institute-of-music.png",
       "source": "https://www.cim.edu/android-icon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "clinton-college": {
+      "file": "/uni-logos/bulk/clinton-college.png",
+      "source": "https://www.clintoncollege.edu/wp-content/uploads/2024/09/image011-500x500.png",
+      "sourceSize": "500x500"
     },
     "clovis-community-college": {
       "file": "/uni-logos/bulk/clovis-community-college.png",
@@ -1011,6 +1466,11 @@
       "source": "https://www.colby.edu/wp-content/uploads/2024/03/cropped-icon-512x512-1-192x192.png",
       "sourceSize": "192x192"
     },
+    "cold-spring-harbor-laboratory": {
+      "file": "/uni-logos/bulk/cold-spring-harbor-laboratory.png",
+      "source": "https://www.cshl.edu/nitropack_static/PIZqeXISbpCcnYALLoaLxzuciMmyBMGe/assets/images/optimized/rev-b83bcae/www.cshl.edu/wp-content/themes/cshl-coresite/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "colegio-salesianos": {
       "file": "/uni-logos/bulk/colegio-salesianos.png",
       "source": "https://www.salesianos.edu/wp-content/uploads/2020/05/cropped-icono_intranet-min-192x192.png",
@@ -1030,6 +1490,11 @@
       "file": "/uni-logos/bulk/college-of-alameda.png",
       "source": "https://www.peralta.edu/hubfs/2020%20Rebranding%20Assets/Seal%20Color.png",
       "sourceSize": "4167x4167"
+    },
+    "college-of-dupage": {
+      "file": "/uni-logos/bulk/college-of-dupage.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/3958/images/apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "college-of-engineering-chengannur": {
       "file": "/uni-logos/bulk/college-of-engineering-chengannur.png",
@@ -1060,6 +1525,21 @@
       "file": "/uni-logos/bulk/college-of-notre-dame-of-maryland.png",
       "source": "https://ndm.edu/wp-content/uploads/2026/06/cropped-NDMU_2026-192x192.png",
       "sourceSize": "192x192"
+    },
+    "college-of-saint-benedict": {
+      "file": "/uni-logos/bulk/college-of-saint-benedict.png",
+      "source": "https://www.csbsju.edu/wp-content/uploads/2024/11/cropped-csbsju-solid-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "college-of-san-mateo": {
+      "file": "/uni-logos/bulk/college-of-san-mateo.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/accounts/56363/images/csmlib_favicon.jpg",
+      "sourceSize": "500x500"
+    },
+    "college-of-southern-idaho": {
+      "file": "/uni-logos/bulk/college-of-southern-idaho.png",
+      "source": "https://stspydusdaprodeus.blob.core.windows.net/csiprod-csi-pub/favicon/favicon-32x32.png",
+      "sourceSize": "32x32"
     },
     "college-of-southern-maryland": {
       "file": "/uni-logos/bulk/college-of-southern-maryland.png",
@@ -1111,6 +1591,11 @@
       "source": "https://wooster.edu/hubfs/Logos/wooster-logo-w-mark-square.png",
       "sourceSize": "90x90"
     },
+    "colorado-christian-university": {
+      "file": "/uni-logos/bulk/colorado-christian-university.png",
+      "source": "https://www.ccu.edu/_files/images/favicons/2024/favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "colorado-college": {
       "file": "/uni-logos/bulk/colorado-college.png",
       "source": "https://www.coloradocollege.edu/home/favicon.png",
@@ -1130,6 +1615,11 @@
       "file": "/uni-logos/bulk/colorado-state-university-global-campus.png",
       "source": "https://csuglobal.edu/app/uploads/2026/06/cropped-csug-favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "columbia-basin-college": {
+      "file": "/uni-logos/bulk/columbia-basin-college.png",
+      "source": "https://www.columbiabasin.edu/_resources/images/favicon.ico",
+      "sourceSize": "32x32"
     },
     "columbia-college-ca": {
       "file": "/uni-logos/bulk/columbia-college-ca.png",
@@ -1155,6 +1645,16 @@
       "file": "/uni-logos/bulk/columbia-international-university.png",
       "source": "https://ciu.edu/wp-content/uploads/CIU-BrowserIcon-Final.png",
       "sourceSize": "500x500"
+    },
+    "columbia-state-community-college": {
+      "file": "/uni-logos/bulk/columbia-state-community-college.png",
+      "source": "https://columbiastate.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
+    "columbus-state-university": {
+      "file": "/uni-logos/bulk/columbus-state-university.png",
+      "source": "https://www.columbusstate.edu/_resources/assets/images/icons/csu-apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "columbus-technical-college": {
       "file": "/uni-logos/bulk/columbus-technical-college.png",
@@ -1196,6 +1696,11 @@
       "source": "https://ccv.edu/wp-content/uploads/2025/12/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "concord-college": {
+      "file": "/uni-logos/bulk/concord-college.png",
+      "source": "https://www.concord.edu/wp-content/uploads/Icons/CU_Favicon_2024_192x192.jpg",
+      "sourceSize": "192x192"
+    },
     "concordia-college-moorhead": {
       "file": "/uni-logos/bulk/concordia-college-moorhead.png",
       "source": "https://www.concordiacollege.edu/apple-touch-icon.png",
@@ -1221,10 +1726,20 @@
       "source": "https://connorsstate.edu/wp-content/uploads/2019/08/cropped-android-icon-192x192-192x192.png",
       "sourceSize": "192x192"
     },
+    "copper-mountain-community-college": {
+      "file": "/uni-logos/bulk/copper-mountain-community-college.png",
+      "source": "https://cdn-ilccdjf.nitrocdn.com/kASQIEUTGcycipkeWDUECmeUDkzbNymc/assets/images/optimized/rev-a201116/www.cmccd.edu/wp-content/uploads/2023/10/FightingCactiBlackFontFinalTransparentNoText-383x383.png",
+      "sourceSize": "383x383"
+    },
     "coppin-state-university": {
       "file": "/uni-logos/bulk/coppin-state-university.png",
       "source": "https://www.coppin.edu/themes/custom/coppin_theme/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "corning-community-college": {
+      "file": "/uni-logos/bulk/corning-community-college.png",
+      "source": "https://corning-cc.edu/favicon.ico",
+      "sourceSize": "738x749"
     },
     "cornish-college-of-the-arts": {
       "file": "/uni-logos/bulk/cornish-college-of-the-arts.png",
@@ -1235,6 +1750,11 @@
       "file": "/uni-logos/bulk/cossatot-community-college-of-the-university-of-arkansas.png",
       "source": "https://cccua.edu/_resources/images/favicon.png",
       "sourceSize": "4500x4350"
+    },
+    "cosumnes-river-college": {
+      "file": "/uni-logos/bulk/cosumnes-river-college.png",
+      "source": "https://crc.losrios.edu/crc/shared/img/admin/favicon/favicon-32x32.png",
+      "sourceSize": "32x32"
     },
     "courtauld-institute-of-art-university-of-london": {
       "file": "/uni-logos/bulk/courtauld-institute-of-art-university-of-london.png",
@@ -1261,6 +1781,11 @@
       "source": "https://cranbrookart.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "cranbrook-schools": {
+      "file": "/uni-logos/bulk/cranbrook-schools.png",
+      "source": "https://cranbrook.edu/sites/default/files/cec_0.png",
+      "sourceSize": "32x32"
+    },
     "cranfield-university": {
       "file": "/uni-logos/bulk/cranfield-university.png",
       "source": "https://www.cranfield.ac.uk/~/media/brand/androidicon192x192.png",
@@ -1275,6 +1800,11 @@
       "file": "/uni-logos/bulk/creighton-university.png",
       "source": "https://www.creighton.edu/sites/default/files/icon.png",
       "sourceSize": "114x114"
+    },
+    "crowder-college": {
+      "file": "/uni-logos/bulk/crowder-college.png",
+      "source": "https://crowder.wpenginepowered.com/wp-content/uploads/2025/03/cropped-Belltower-Full-Color-Transparent-1-300x300.png",
+      "sourceSize": "300x300"
     },
     "crown-college": {
       "file": "/uni-logos/bulk/crown-college.png",
@@ -1306,10 +1836,20 @@
       "source": "https://www.baruch.cuny.edu/wp-content/themes/BCTC-Baruch--bc2-qa/img/icons/touch.png",
       "sourceSize": "144x144"
     },
+    "cuny-borough-of-manhattan-community-college": {
+      "file": "/uni-logos/bulk/cuny-borough-of-manhattan-community-college.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/customers/2491/images/new_library_favicon.jpg",
+      "sourceSize": "48x48"
+    },
     "cuny-bronx-community-college": {
       "file": "/uni-logos/bulk/cuny-bronx-community-college.png",
       "source": "https://www.bcc.cuny.edu/wp-content/uploads/2018/04/bcc-57.jpg",
       "sourceSize": "57x57"
+    },
+    "cuny-kingsborough-community-college": {
+      "file": "/uni-logos/bulk/cuny-kingsborough-community-college.png",
+      "source": "https://libapps.s3.amazonaws.com/accounts/16298/images/KCC_Badge_4_-_CHOSEN.png",
+      "sourceSize": "1239x1260"
     },
     "cuny-medgar-evers-college": {
       "file": "/uni-logos/bulk/cuny-medgar-evers-college.png",
@@ -1361,6 +1901,11 @@
       "source": "https://www.dwu.edu/images/favicon.png",
       "sourceSize": "117x117"
     },
+    "dallas-baptist-university": {
+      "file": "/uni-logos/bulk/dallas-baptist-university.png",
+      "source": "https://dbu.edu/favicon.ico",
+      "sourceSize": "48x48"
+    },
     "dallas-christian-college": {
       "file": "/uni-logos/bulk/dallas-christian-college.png",
       "source": "https://www.dallas.edu/wp-content/uploads/2017/07/DCC-D-Red-Email2.png",
@@ -1376,10 +1921,20 @@
       "source": "https://www.dallascollege.edu/media/dallas-college/site-assets/favicons/android-icon-192x192.png",
       "sourceSize": "192x192"
     },
+    "dalton-state-college": {
+      "file": "/uni-logos/bulk/dalton-state-college.png",
+      "source": "https://www.daltonstate.edu/wp-content/uploads/2022/05/favicon-300x300.png",
+      "sourceSize": "300x300"
+    },
     "dartmouth-college": {
       "file": "/uni-logos/bulk/dartmouth-college.png",
       "source": "https://home.dartmouth.edu/themes/custom/darthome_2021/dist/images/touch-icons/apple-touch-icon-iphone-60x60.png",
       "sourceSize": "60x60"
+    },
+    "davenport-university": {
+      "file": "/uni-logos/bulk/davenport-university.png",
+      "source": "https://www.davenport.edu/themes/custom/davenport/favicon.ico",
+      "sourceSize": "64x64"
     },
     "davidson-college": {
       "file": "/uni-logos/bulk/davidson-college.png",
@@ -1390,6 +1945,21 @@
       "file": "/uni-logos/bulk/davidson-davie-community-college.png",
       "source": "https://www.davidsondavie.edu/wp-content/uploads/2021/01/cropped-Davidson-Davie-Logo-RGB-Shield-192x192.png",
       "sourceSize": "192x192"
+    },
+    "davis-elkins-college": {
+      "file": "/uni-logos/bulk/davis-elkins-college.png",
+      "source": "https://www.dewv.edu/web-app-manifest-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "de-anza-college": {
+      "file": "/uni-logos/bulk/de-anza-college.png",
+      "source": "https://deanza.edu/favicon.ico",
+      "sourceSize": "64x64"
+    },
+    "de-montfort-university-leicester": {
+      "file": "/uni-logos/bulk/de-montfort-university-leicester.png",
+      "source": "https://libapps-eu.s3.amazonaws.com/accounts/11749/images/LLS_New_transparent.png",
+      "sourceSize": "100x100"
     },
     "defense-language-institute-foreign-language-center": {
       "file": "/uni-logos/bulk/defense-language-institute-foreign-language-center.png",
@@ -1415,6 +1985,21 @@
       "file": "/uni-logos/bulk/delaware-county-community-college.png",
       "source": "https://www.dccc.edu/wp-content/themes/wp-dccc/img/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "delaware-state-university": {
+      "file": "/uni-logos/bulk/delaware-state-university.png",
+      "source": "https://www.desu.edu/sites/all/themes/custom/dsu2016/images/favicon/favicon-194x194.png",
+      "sourceSize": "194x194"
+    },
+    "delaware-valley-university": {
+      "file": "/uni-logos/bulk/delaware-valley-university.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/customers/894/images/Favicon.png",
+      "sourceSize": "48x48"
+    },
+    "delta-college": {
+      "file": "/uni-logos/bulk/delta-college.png",
+      "source": "https://delta.edu/favicon.png",
+      "sourceSize": "32x32"
     },
     "denison-university": {
       "file": "/uni-logos/bulk/denison-university.png",
@@ -1446,6 +2031,16 @@
       "source": "https://www.disd.edu/wp-content/uploads/2021/02/favicon.png",
       "sourceSize": "254x254"
     },
+    "detroit-school-of-technology": {
+      "file": "/uni-logos/bulk/detroit-school-of-technology.png",
+      "source": "https://dsdt.edu/favicon.ico",
+      "sourceSize": "150x150"
+    },
+    "devry-institute-of-technology": {
+      "file": "/uni-logos/bulk/devry-institute-of-technology.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/accounts/35237/images/favicon-48x48_1.png",
+      "sourceSize": "48x48"
+    },
     "dharma-realm-buddhist-university": {
       "file": "/uni-logos/bulk/dharma-realm-buddhist-university.png",
       "source": "https://www.drbu.edu/wp-content/themes/primary/frontend/static-html/favicons/apple-touch-icon.png",
@@ -1460,6 +2055,11 @@
       "file": "/uni-logos/bulk/dickinson-state-university.png",
       "source": "https://dickinsonstate.edu/_resources/images/favicon/favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "digipen-institute-of-technology": {
+      "file": "/uni-logos/bulk/digipen-institute-of-technology.png",
+      "source": "https://www.digipen.edu/themes/custom/digipen_future/favicon.ico",
+      "sourceSize": "542x542"
     },
     "dillard-university": {
       "file": "/uni-logos/bulk/dillard-university.png",
@@ -1476,10 +2076,20 @@
       "source": "https://dc3.edu/wp-content/themes/dc3-2024/assets/images/layout/favicon_2.png?2024",
       "sourceSize": "128x128"
     },
+    "dominican-college": {
+      "file": "/uni-logos/bulk/dominican-college.png",
+      "source": "https://www.duny.edu/wp-content/themes/dominican-university/assets/images/apple-touch-icon.png",
+      "sourceSize": "150x150"
+    },
     "dominican-school-of-philosophy-and-theology": {
       "file": "/uni-logos/bulk/dominican-school-of-philosophy-and-theology.png",
       "source": "https://dspt.edu/images/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "drake-university": {
+      "file": "/uni-logos/bulk/drake-university.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/customers/398/images/favicon-32x32.png",
+      "sourceSize": "32x32"
     },
     "drew-university": {
       "file": "/uni-logos/bulk/drew-university.png",
@@ -1490,6 +2100,11 @@
       "file": "/uni-logos/bulk/drury-college.png",
       "source": "https://www.drury.edu/wp-content/uploads/2021/09/cropped-DruryStackedColor-192x192.png",
       "sourceSize": "192x192"
+    },
+    "dubai-medical-college-for-girls": {
+      "file": "/uni-logos/bulk/dubai-medical-college-for-girls.png",
+      "source": "https://www.dmcg.edu/images/apple-touch-icon.png",
+      "sourceSize": "36x36"
     },
     "dunwoody-college-of-technology": {
       "file": "/uni-logos/bulk/dunwoody-college-of-technology.png",
@@ -1545,6 +2160,11 @@
       "file": "/uni-logos/bulk/east-coast-college.png",
       "source": "https://www.eastcoast.ac.uk/wp-content/uploads/2019/05/favicon.jpg",
       "sourceSize": "300x300"
+    },
+    "east-mississippi-community-college": {
+      "file": "/uni-logos/bulk/east-mississippi-community-college.png",
+      "source": "https://resources.finalsite.net/images/f_auto,q_auto/v1784139113/eastmsedu5/nlwutab1ou52qdozfmb1/favicon.ico",
+      "sourceSize": "48x48"
     },
     "east-stroudsburg-state-university-of-pennsylvania": {
       "file": "/uni-logos/bulk/east-stroudsburg-state-university-of-pennsylvania.png",
@@ -1611,6 +2231,11 @@
       "source": "https://www.eosc.edu/Content/Uploads/EOSC/images/apple-touch-icon.png",
       "sourceSize": "152x152"
     },
+    "eastern-shore-community-college": {
+      "file": "/uni-logos/bulk/eastern-shore-community-college.png",
+      "source": "https://es.vccs.edu/wp-content/uploads/2025/05/ESCC_Favicon.jpg",
+      "sourceSize": "150x150"
+    },
     "eastern-washington-university": {
       "file": "/uni-logos/bulk/eastern-washington-university.png",
       "source": "https://cdn.ewu.edu/wp-content/themes/ewu-2018/assets/ewuEagleBlackRed.png?1",
@@ -1635,6 +2260,11 @@
       "file": "/uni-logos/bulk/ecole-superieure-d-informatique-et-de-management.png",
       "source": "https://www.hightech.edu/wp-content/uploads/2025/08/cropped-3-192x192.png",
       "sourceSize": "192x192"
+    },
+    "ecole-superieure-d-infotronique-d-haiti-esih": {
+      "file": "/uni-logos/bulk/ecole-superieure-d-infotronique-d-haiti-esih.png",
+      "source": "https://esih.edu/favicon.ico",
+      "sourceSize": "100x100"
     },
     "edge-hill-university": {
       "file": "/uni-logos/bulk/edge-hill-university.png",
@@ -1681,10 +2311,25 @@
       "source": "https://ecsu.edu/wp-content/uploads/2025/02/cropped-ecsulogos_favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "elizabethtown-college": {
+      "file": "/uni-logos/bulk/elizabethtown-college.png",
+      "source": "https://etown.edu/apple-touch-icon.png",
+      "sourceSize": "57x57"
+    },
+    "elizabethtown-community-and-technical-college": {
+      "file": "/uni-logos/bulk/elizabethtown-community-and-technical-college.png",
+      "source": "https://elizabethtown.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "elmhurst-college": {
       "file": "/uni-logos/bulk/elmhurst-college.png",
       "source": "https://www.elmhurst.edu/wp-content/uploads/2017/11/ec-fabicon-240x240.png",
       "sourceSize": "240x240"
+    },
+    "elmira-college": {
+      "file": "/uni-logos/bulk/elmira-college.png",
+      "source": "https://www.elmira.edu/web-app-manifest-192x192.png",
+      "sourceSize": "192x192"
     },
     "elms-college": {
       "file": "/uni-logos/bulk/elms-college.png",
@@ -1700,6 +2345,11 @@
       "file": "/uni-logos/bulk/emerson-college.png",
       "source": "https://emerson.edu/wp-content/themes/emerson-college/public/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "emmanuel-college": {
+      "file": "/uni-logos/bulk/emmanuel-college.png",
+      "source": "https://www.emmanuel.edu/themes/custom/emmanuel_default/favicon.ico",
+      "sourceSize": "140x140"
     },
     "emmaus-bible-college": {
       "file": "/uni-logos/bulk/emmaus-bible-college.png",
@@ -1806,6 +2456,11 @@
       "source": "https://faytechcc.edu/wp-content/uploads/2025/08/android-chrome-512x512-1-200x200.png",
       "sourceSize": "200x200"
     },
+    "felician-college": {
+      "file": "/uni-logos/bulk/felician-college.png",
+      "source": "https://s30757.pcdn.co/wp-content/uploads/2019/06/0-200x200.png",
+      "sourceSize": "200x200"
+    },
     "ferris-state-university": {
       "file": "/uni-logos/bulk/ferris-state-university.png",
       "source": "https://www.ferris.edu/apple-touch-icon.png",
@@ -1826,10 +2481,20 @@
       "source": "https://www.fitchburgstate.edu/themes/custom/custom_theme/assets/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "flagler-college": {
+      "file": "/uni-logos/bulk/flagler-college.png",
+      "source": "https://www.flagler.edu/themes/custom/flagler/favicon.ico",
+      "sourceSize": "64x64"
+    },
     "flathead-valley-community-college": {
       "file": "/uni-logos/bulk/flathead-valley-community-college.png",
       "source": "https://www.fvcc.edu/wp-content/themes/fvcc/public/favicon/favicon-196x196.png",
       "sourceSize": "196x196"
+    },
+    "flint-hills-technical-college": {
+      "file": "/uni-logos/bulk/flint-hills-technical-college.png",
+      "source": "https://fhtc.edu/wp-content/uploads/2019/10/cropped-fhtc-favicon-squircle-192x192.png",
+      "sourceSize": "192x192"
     },
     "florence-darlington-technical-college": {
       "file": "/uni-logos/bulk/florence-darlington-technical-college.png",
@@ -1861,6 +2526,16 @@
       "source": "https://i0.wp.com/fmc.edu/wp-content/uploads/2022/06/cropped-Circle-Logo.png?fit=192%2C192&#038;ssl=1",
       "sourceSize": "192x192"
     },
+    "florida-memorial-university": {
+      "file": "/uni-logos/bulk/florida-memorial-university.png",
+      "source": "https://www.fmu.edu/wp-content/uploads/2022/08/cropped-fmu_site_icon-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "florida-metropolitan-university-fort-lauderdale-college": {
+      "file": "/uni-logos/bulk/florida-metropolitan-university-fort-lauderdale-college.png",
+      "source": "https://www.fmu.edu/wp-content/uploads/2022/08/cropped-fmu_site_icon-192x192.jpg",
+      "sourceSize": "192x192"
+    },
     "florida-polytechnic-university": {
       "file": "/uni-logos/bulk/florida-polytechnic-university.png",
       "source": "https://floridapoly.edu/wp-content/uploads/2025/05/cropped-cropped-FLPolyMarkLogo_Browser-192x192.png",
@@ -1870,6 +2545,16 @@
       "file": "/uni-logos/bulk/florida-southwestern-state-college.png",
       "source": "https://www.fsw.edu/assets/theme/buccaneer/assets/img/favicon-96x96.png",
       "sourceSize": "96x96"
+    },
+    "florida-state-college-at-jacksonville": {
+      "file": "/uni-logos/bulk/florida-state-college-at-jacksonville.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/accounts/375739/images/fscj-mantaray-withfscj.png",
+      "sourceSize": "468x489"
+    },
+    "folsom-lake-college": {
+      "file": "/uni-logos/bulk/folsom-lake-college.png",
+      "source": "https://flc.losrios.edu/flc/shared/img/admin/logos-icons/favicon/apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "fontbonne-college": {
       "file": "/uni-logos/bulk/fontbonne-college.png",
@@ -1926,10 +2611,20 @@
       "source": "https://www.fmarion.edu/wp-content/uploads/2016/07/cropped-Site-Icon-Full-Color-e1502396334483-192x192.png",
       "sourceSize": "192x192"
     },
+    "franciscan-school-of-theology": {
+      "file": "/uni-logos/bulk/franciscan-school-of-theology.png",
+      "source": "https://www.fst.edu/nitropack_static/ashDKNArgKhLuFmGVYnDObbIBBaxGGLZ/assets/images/optimized/rev-589f182/www.fst.edu/wp-content/uploads/2026/01/franciscan-school-of-theology-logo-circle-300x300.png",
+      "sourceSize": "300x300"
+    },
     "franciscan-university-of-steubenville": {
       "file": "/uni-logos/bulk/franciscan-university-of-steubenville.png",
       "source": "https://franciscan.edu/wp-content/uploads/2019/11/Favicon_152.jpg",
       "sourceSize": "152x152"
+    },
+    "frank-phillips-college": {
+      "file": "/uni-logos/bulk/frank-phillips-college.png",
+      "source": "https://fpctx.edu/wp-content/uploads/2019/10/cropped-plainsmenhead-192x192.png",
+      "sourceSize": "192x192"
     },
     "franklin-and-marshall-college": {
       "file": "/uni-logos/bulk/franklin-and-marshall-college.png",
@@ -1941,10 +2636,20 @@
       "source": "https://frederick.edu/_resources/favicon/favicon-512x512.png",
       "sourceSize": "512x512"
     },
+    "freed-hardeman-university": {
+      "file": "/uni-logos/bulk/freed-hardeman-university.png",
+      "source": "https://fhu.edu/wp-content/uploads/favicon-1-300x300.png",
+      "sourceSize": "300x300"
+    },
     "friends-university": {
       "file": "/uni-logos/bulk/friends-university.png",
       "source": "https://www.friends.edu/wp-content/uploads/2015/09/cropped-Favicon-200x200.jpg",
       "sourceSize": "200x200"
+    },
+    "frontier-institute-of-technology": {
+      "file": "/uni-logos/bulk/frontier-institute-of-technology.png",
+      "source": "https://frontiertech.edu/wp-content/uploads/2026/04/cropped-favicon-192x192.png",
+      "sourceSize": "192x192"
     },
     "frostburg-state-university": {
       "file": "/uni-logos/bulk/frostburg-state-university.png",
@@ -1996,6 +2701,11 @@
       "source": "https://galgotiacollege.edu//public/uploads/all/2/PSf8vV9pdHjUb5MhnGpG1hiiJ9Y0c8YYgSAk54Q3.png",
       "sourceSize": "201x200"
     },
+    "galveston-college": {
+      "file": "/uni-logos/bulk/galveston-college.png",
+      "source": "https://libapps.s3.amazonaws.com/accounts/211835/images/GC_Library_Logo_T.png",
+      "sourceSize": "965x1166"
+    },
     "gandhi-institute-of-engineering-and-technology": {
       "file": "/uni-logos/bulk/gandhi-institute-of-engineering-and-technology.png",
       "source": "https://www.giet.edu/wp-content/uploads/2019/10/apple-icon.png",
@@ -2011,10 +2721,20 @@
       "source": "https://gardner-webb.edu/wp-content/uploads/2022/04/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "gateway-community-and-technical-college": {
+      "file": "/uni-logos/bulk/gateway-community-and-technical-college.png",
+      "source": "https://gateway.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "gateway-community-college-2": {
       "file": "/uni-logos/bulk/gateway-community-college-2.png",
       "source": "https://ctstate.edu/images/Logos-and-graphics/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "gateway-technical-college": {
+      "file": "/uni-logos/bulk/gateway-technical-college.png",
+      "source": "https://www.gtc.edu/android-chrome-512x512.png",
+      "sourceSize": "512x512"
     },
     "gavilan-college": {
       "file": "/uni-logos/bulk/gavilan-college.png",
@@ -2136,10 +2856,25 @@
       "source": "https://www.gordonstate.edu/_files/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "goucher-college": {
+      "file": "/uni-logos/bulk/goucher-college.png",
+      "source": "https://www.goucher.edu/_resources/img/favicon.ico?v=2",
+      "sourceSize": "32x32"
+    },
     "governors-state-university": {
       "file": "/uni-logos/bulk/governors-state-university.png",
       "source": "https://www.govst.edu/sites/default/files/TriadQRCode.png",
       "sourceSize": "360x360"
+    },
+    "grace-college": {
+      "file": "/uni-logos/bulk/grace-college.png",
+      "source": "https://www.grace.edu/wp-content/uploads/2024/08/cropped-GC-Favicon-300x300.png",
+      "sourceSize": "300x300"
+    },
+    "grace-university": {
+      "file": "/uni-logos/bulk/grace-university.png",
+      "source": "https://graceu.edu/wp-content/uploads/2022/04/favicon.png",
+      "sourceSize": "64x64"
     },
     "graceland-college": {
       "file": "/uni-logos/bulk/graceland-college.png",
@@ -2166,6 +2901,11 @@
       "source": "https://www.uagrantham.edu/wp-content/uploads/2022/06/cropped-uag-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "gratz-college": {
+      "file": "/uni-logos/bulk/gratz-college.png",
+      "source": "https://digitalcollections.gratz.edu/wp-content/uploads/fbrfg/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "grayson-college": {
       "file": "/uni-logos/bulk/grayson-college.png",
       "source": "https://www.grayson.edu/_files/favicons/favicon-196.png",
@@ -2185,6 +2925,16 @@
       "file": "/uni-logos/bulk/greensboro-college.png",
       "source": "https://www.greensboro.edu/wp-content/uploads/2022/12/cropped-greensboro-college-favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "greenville-technical-college": {
+      "file": "/uni-logos/bulk/greenville-technical-college.png",
+      "source": "https://gvltec.edu/_files/images/apple-touch-icon.png?v=RymYjnK8QM",
+      "sourceSize": "180x180"
+    },
+    "greenville-university": {
+      "file": "/uni-logos/bulk/greenville-university.png",
+      "source": "https://greenville.b-cdn.net/images/favicon.png",
+      "sourceSize": "100x100"
     },
     "grinnell-college": {
       "file": "/uni-logos/bulk/grinnell-college.png",
@@ -2251,6 +3001,11 @@
       "source": "https://www.hsutx.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "harford-community-college": {
+      "file": "/uni-logos/bulk/harford-community-college.png",
+      "source": "https://harford.edu/favicon.png",
+      "sourceSize": "32x32"
+    },
     "harlaxton-college": {
       "file": "/uni-logos/bulk/harlaxton-college.png",
       "source": "https://college.harlaxton.co.uk/apple-touch-icon.png",
@@ -2291,6 +3046,11 @@
       "source": "https://www.hastings.edu/wp-content/uploads/2018/08/favicon.png",
       "sourceSize": "256x256"
     },
+    "hazard-community-and-technical-college": {
+      "file": "/uni-logos/bulk/hazard-community-and-technical-college.png",
+      "source": "https://hazard.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "heidelberg-college": {
       "file": "/uni-logos/bulk/heidelberg-college.png",
       "source": "https://www.heidelberg.edu/sites/default/files/favicons/apple-touch-icon.png",
@@ -2320,6 +3080,11 @@
       "file": "/uni-logos/bulk/heritage-college.png",
       "source": "https://heritage.edu/wp-content/uploads/2022/08/cropped-BenefitSummary_22-23_Page_1-scaled-1-192x192.jpg",
       "sourceSize": "192x192"
+    },
+    "herkimer-county-community-college": {
+      "file": "/uni-logos/bulk/herkimer-county-community-college.png",
+      "source": "https://www.herkimer.edu/resources/themes/herkimer/dist/favicons/favicon-194x194.png",
+      "sourceSize": "194x194"
     },
     "herzing-university": {
       "file": "/uni-logos/bulk/herzing-university.png",
@@ -2361,6 +3126,16 @@
       "source": "https://www.hindscc.edu/wp-content/uploads/2022/04/cropped-hcc_favicon_color-192x192.png",
       "sourceSize": "192x192"
     },
+    "hindu-university-of-america": {
+      "file": "/uni-logos/bulk/hindu-university-of-america.png",
+      "source": "https://www.hua.edu/wp-content/uploads/2019/05/Asset-1@2x.png",
+      "sourceSize": "147x147"
+    },
+    "hobart-and-william-smith-colleges": {
+      "file": "/uni-logos/bulk/hobart-and-william-smith-colleges.png",
+      "source": "https://hws.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "hobe-sound-bible-college": {
       "file": "/uni-logos/bulk/hobe-sound-bible-college.png",
       "source": "https://hsbc.edu/wp-content/uploads/2024/03/cropped-site-icon-1-192x192.png",
@@ -2401,10 +3176,20 @@
       "source": "https://www.hkapa.edu/img/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "hong-kong-shue-yan-university": {
+      "file": "/uni-logos/bulk/hong-kong-shue-yan-university.png",
+      "source": "https://www.hksyu.edu/favicon.ico",
+      "sourceSize": "50x47"
+    },
     "hood-college": {
       "file": "/uni-logos/bulk/hood-college.png",
       "source": "https://www.hood.edu/themes/hood/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "hood-theological": {
+      "file": "/uni-logos/bulk/hood-theological.png",
+      "source": "https://hoodseminary.edu/favicon.ico",
+      "sourceSize": "32x32"
     },
     "hope-college": {
       "file": "/uni-logos/bulk/hope-college.png",
@@ -2416,10 +3201,20 @@
       "source": "https://www.hiu.edu/skin/default/ico/apple-touch-icon-57-precomposed.png",
       "sourceSize": "57x57"
     },
+    "hopkinsville-community-college": {
+      "file": "/uni-logos/bulk/hopkinsville-community-college.png",
+      "source": "https://hopkinsville.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "horry-georgetown-technical-college": {
       "file": "/uni-logos/bulk/horry-georgetown-technical-college.png",
       "source": "https://www.hgtc.edu/images/icons/fav-icon.png",
       "sourceSize": "57x57"
+    },
+    "houghton-college": {
+      "file": "/uni-logos/bulk/houghton-college.png",
+      "source": "https://b2656060.assetcdn.net/2.0/2656060/wp-content/themes/houghton/inc/assets/icons/favicons/favicon-96x96.png?lossy=1&strip=1&webp=1",
+      "sourceSize": "96x96"
     },
     "houston-baptist-university": {
       "file": "/uni-logos/bulk/houston-baptist-university.png",
@@ -2431,15 +3226,35 @@
       "source": "https://www.hccs.edu/media/hccsedu/site-assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "howard-college": {
+      "file": "/uni-logos/bulk/howard-college.png",
+      "source": "https://howardcollege.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "howard-community-college": {
       "file": "/uni-logos/bulk/howard-community-college.png",
       "source": "https://howardcc.edu/media/howardcc/site-assets/images/icon64.png",
       "sourceSize": "64x64"
     },
+    "howard-payne-university": {
+      "file": "/uni-logos/bulk/howard-payne-university.png",
+      "source": "https://www.hputx.edu/wp-content/uploads/2021/05/HP-Monogram_Blue.svg",
+      "sourceSize": "838x698"
+    },
+    "howard-university": {
+      "file": "/uni-logos/bulk/howard-university.png",
+      "source": "https://howard.edu/sites/home.howard.edu/themes/custom/hu_home/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "hudson-county-community-college": {
       "file": "/uni-logos/bulk/hudson-county-community-college.png",
       "source": "https://hccc.edu/_resources/images/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "hudson-valley-community-college": {
+      "file": "/uni-logos/bulk/hudson-valley-community-college.png",
+      "source": "https://www.hvcc.edu/_files/images/favicon.png",
+      "sourceSize": "48x48"
     },
     "hult-business-school": {
       "file": "/uni-logos/bulk/hult-business-school.png",
@@ -2451,10 +3266,25 @@
       "source": "https://www.humboldt.edu/sites/default/files/favicon_0_0.png",
       "sourceSize": "1000x1000"
     },
+    "humphreys-college": {
+      "file": "/uni-logos/bulk/humphreys-college.png",
+      "source": "https://www.humphreys.edu/nitropack_static/cFmROKBkuJPHMiHlnsiUFYppyPluPnNs/assets/images/optimized/rev-800baa6/www.humphreys.edu/wp-content/uploads/2025/07/cropped-cropped-Humphreys-University-Icon-2-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "hunter-college-cuny": {
+      "file": "/uni-logos/bulk/hunter-college-cuny.png",
+      "source": "https://library.hunter.cuny.edu/sites/all/themes/HCL/apple-touch-icon.png",
+      "sourceSize": "152x152"
+    },
     "huntingdon-college": {
       "file": "/uni-logos/bulk/huntingdon-college.png",
       "source": "https://www.huntingdon.edu/wp-content/uploads/cropped-hlogo-1-192x192.png",
       "sourceSize": "192x192"
+    },
+    "huston-tillotson-college": {
+      "file": "/uni-logos/bulk/huston-tillotson-college.png",
+      "source": "https://www.htc.edu/media/schools-and-colleges/htc/images/favicon.ico",
+      "sourceSize": "32x32"
     },
     "huston-tillotson-university": {
       "file": "/uni-logos/bulk/huston-tillotson-university.png",
@@ -2476,6 +3306,16 @@
       "source": "https://www.ied.edu/favicon/androidIcon192x192.png",
       "sourceSize": "192x192"
     },
+    "iilm-university-greater-noida": {
+      "file": "/uni-logos/bulk/iilm-university-greater-noida.png",
+      "source": "https://iilm.edu/wp-content/uploads/2025/12/favicon.png",
+      "sourceSize": "70x78"
+    },
+    "ilisagvik-college": {
+      "file": "/uni-logos/bulk/ilisagvik-college.png",
+      "source": "https://ilisagvik.edu/favicon.ico",
+      "sourceSize": "2000x2000"
+    },
     "illinois-benedictine-college": {
       "file": "/uni-logos/bulk/illinois-benedictine-college.png",
       "source": "https://ibc.edu/wp-content/uploads/2024/03/cropped-icon-192x192.webp",
@@ -2496,6 +3336,11 @@
       "source": "https://www.iit.edu/themes/iit/assets/favicons/apple-touch-icon.png?v=2",
       "sourceSize": "180x180"
     },
+    "illinois-state-university": {
+      "file": "/uni-logos/bulk/illinois-state-university.png",
+      "source": "https://ilstu.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "illinois-wesleyan-university": {
       "file": "/uni-logos/bulk/illinois-wesleyan-university.png",
       "source": "https://www.iwu.edu/_resources/images/favicons/favicon-192x192.png",
@@ -2515,6 +3360,11 @@
       "file": "/uni-logos/bulk/indian-river-state-college.png",
       "source": "https://irsc.edu/wp-content/uploads/2025/05/cropped-irsc-icon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "indian-school-of-business": {
+      "file": "/uni-logos/bulk/indian-school-of-business.png",
+      "source": "https://isb.edu/android-chrome-512x512.png",
+      "sourceSize": "512x512"
     },
     "indiana-institute-of-technology": {
       "file": "/uni-logos/bulk/indiana-institute-of-technology.png",
@@ -2565,6 +3415,11 @@
       "file": "/uni-logos/bulk/iowa-central-community-college.png",
       "source": "https://www.iowacentral.edu/apple-touch-icon.png?v1",
       "sourceSize": "180x180"
+    },
+    "iowa-lakes-community-college": {
+      "file": "/uni-logos/bulk/iowa-lakes-community-college.png",
+      "source": "https://iowalakes.edu/favicon.ico",
+      "sourceSize": "150x150"
     },
     "iowa-state-university": {
       "file": "/uni-logos/bulk/iowa-state-university.png",
@@ -2621,10 +3476,35 @@
       "source": "https://www.ju.edu/_resources/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "jahangirnagar-university": {
+      "file": "/uni-logos/bulk/jahangirnagar-university.png",
+      "source": "https://library.juniv.edu/logo192.png",
+      "sourceSize": "192x192"
+    },
+    "james-a-rhodes-state-college": {
+      "file": "/uni-logos/bulk/james-a-rhodes-state-college.png",
+      "source": "https://www.rhodesstate.edu/wp-content/uploads/2026/06/rhodes-favicon.svg",
+      "sourceSize": "61x65"
+    },
+    "james-madison-university": {
+      "file": "/uni-logos/bulk/james-madison-university.png",
+      "source": "https://jmu.edu/favicon.ico",
+      "sourceSize": "96x96"
+    },
+    "james-sprunt-community-college": {
+      "file": "/uni-logos/bulk/james-sprunt-community-college.png",
+      "source": "https://jamessprunt.edu/wp-content/uploads/2023/11/Favicon-32x32-Blue.png",
+      "sourceSize": "134x134"
+    },
     "jarvis-christian-college": {
       "file": "/uni-logos/bulk/jarvis-christian-college.png",
       "source": "https://www.jarvis.edu/wp-content/uploads/2024/03/cropped-cropped-favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "jefferson-community-and-technical-college": {
+      "file": "/uni-logos/bulk/jefferson-community-and-technical-college.png",
+      "source": "https://jefferson.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
     },
     "jefferson-community-college": {
       "file": "/uni-logos/bulk/jefferson-community-college.png",
@@ -2676,6 +3556,11 @@
       "source": "https://www.jbc.edu/wp-content/uploads/2018/05/cropped-favicon-2-192x192.gif",
       "sourceSize": "192x192"
     },
+    "johnson-c-smith-university": {
+      "file": "/uni-logos/bulk/johnson-c-smith-university.png",
+      "source": "https://www.library.jcsu.edu/wp-content/uploads/2022/04/cropped-fav2-192x192.png",
+      "sourceSize": "192x192"
+    },
     "johnson-university": {
       "file": "/uni-logos/bulk/johnson-university.png",
       "source": "https://johnsonu.edu/favicon/apple-touch-icon.png",
@@ -2685,6 +3570,11 @@
       "file": "/uni-logos/bulk/johnston-community-college.png",
       "source": "https://www.johnstoncc.edu/_resources/images/favicon/favicon32x32.png",
       "sourceSize": "32x32"
+    },
+    "juniata-college": {
+      "file": "/uni-logos/bulk/juniata-college.png",
+      "source": "https://www.juniata.edu/_resources/images/juniata-college-192-192.png",
+      "sourceSize": "192x192"
     },
     "kalamazoo-college": {
       "file": "/uni-logos/bulk/kalamazoo-college.png",
@@ -2721,10 +3611,20 @@
       "source": "https://www.kapiolani.hawaii.edu/wp-content/uploads/cropped-KCCfavicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "kaplan-university": {
+      "file": "/uni-logos/bulk/kaplan-university.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/681/images/favicon-32x32.png",
+      "sourceSize": "32x32"
+    },
     "karlsruhe-institute-of-technology": {
       "file": "/uni-logos/bulk/karlsruhe-institute-of-technology.png",
       "source": "https://www.kit.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "keck-graduate-institute": {
+      "file": "/uni-logos/bulk/keck-graduate-institute.png",
+      "source": "https://www.kgi.edu/_resources/images/favicon.ico",
+      "sourceSize": "260x260"
     },
     "keele-university": {
       "file": "/uni-logos/bulk/keele-university.png",
@@ -2751,6 +3651,16 @@
       "source": "https://www.kennesaw.edu/webstatic/_omni/images/global/icons/favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "kent-state-university": {
+      "file": "/uni-logos/bulk/kent-state-university.png",
+      "source": "https://library.kent.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
+    "kentucky-community-technical-college-system": {
+      "file": "/uni-logos/bulk/kentucky-community-technical-college-system.png",
+      "source": "https://kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "kenyon-college": {
       "file": "/uni-logos/bulk/kenyon-college.png",
       "source": "https://www.kenyon.edu/favicons/apple-touch-icon.png",
@@ -2760,6 +3670,11 @@
       "file": "/uni-logos/bulk/keweenaw-bay-ojibwa-community-college.png",
       "source": "https://businessbrokerfinder.us.com/wp-content/uploads/2026/01/favicon.png",
       "sourceSize": "64x64"
+    },
+    "kiet-group-of-institutions": {
+      "file": "/uni-logos/bulk/kiet-group-of-institutions.png",
+      "source": "https://kiet.edu/favicon.ico",
+      "sourceSize": "250x229"
     },
     "kilgore-college": {
       "file": "/uni-logos/bulk/kilgore-college.png",
@@ -2786,6 +3701,11 @@
       "source": "https://www.kirtland.edu/wp-content/uploads/cropped-Kirtland-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "kishwaukee-college": {
+      "file": "/uni-logos/bulk/kishwaukee-college.png",
+      "source": "https://kish.edu/favicon.ico",
+      "sourceSize": "48x48"
+    },
     "klamath-community-college": {
       "file": "/uni-logos/bulk/klamath-community-college.png",
       "source": "https://www.klamathcc.edu/_images/favicon.png",
@@ -2811,6 +3731,11 @@
       "source": "https://laroche.edu/wp-content/uploads/2025/12/cropped-Laroche-favicon-2-192x192.jpg",
       "sourceSize": "192x192"
     },
+    "la-salle-campus-barcelona-universitat-ramon-llull": {
+      "file": "/uni-logos/bulk/la-salle-campus-barcelona-universitat-ramon-llull.png",
+      "source": "https://www.salleurl.edu/sites/all/themes/lasalle2016beta/favicons/android-icon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "la-sierra-university": {
       "file": "/uni-logos/bulk/la-sierra-university.png",
       "source": "https://lasierra.edu/apple-touch-icon.png",
@@ -2820,6 +3745,11 @@
       "file": "/uni-logos/bulk/labette-community-college.png",
       "source": "https://labette.edu/images/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "lac-courte-oreilles-ojibwa-community-college": {
+      "file": "/uni-logos/bulk/lac-courte-oreilles-ojibwa-community-college.png",
+      "source": "https://lco.edu/favicon.ico",
+      "sourceSize": "100x88"
     },
     "lackawanna-college": {
       "file": "/uni-logos/bulk/lackawanna-college.png",
@@ -2834,6 +3764,11 @@
     "laguna-college-of-art-and-design": {
       "file": "/uni-logos/bulk/laguna-college-of-art-and-design.png",
       "source": "https://www.lcad.edu/wp-content/uploads/2025/08/cropped-cropped-LCAD-Favicon-23-2-270x270-1-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "lake-area-technical-institute": {
+      "file": "/uni-logos/bulk/lake-area-technical-institute.png",
+      "source": "https://www.lakeareatech.edu/wp-content/themes/latc_2026/images/icons/icon-hires.png",
       "sourceSize": "192x192"
     },
     "lake-erie-college-of-osteopathic-medicine": {
@@ -2856,6 +3791,11 @@
       "source": "https://www.lakemichigancollege.edu/sites/default/files/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "lake-superior-state-university": {
+      "file": "/uni-logos/bulk/lake-superior-state-university.png",
+      "source": "https://www.lssu.edu/wp-content/uploads/2024/04/LSSU-Blue-Favicon.jpg",
+      "sourceSize": "73x81"
+    },
     "lakeland-college": {
       "file": "/uni-logos/bulk/lakeland-college.png",
       "source": "https://lakeland.edu/apple-touch-icon.png",
@@ -2870,6 +3810,11 @@
       "file": "/uni-logos/bulk/lakeshore-technical-college.png",
       "source": "https://lakeshore.edu/sites/default/files/favicon-96x96.jpg",
       "sourceSize": "96x96"
+    },
+    "lamar-community-college": {
+      "file": "/uni-logos/bulk/lamar-community-college.png",
+      "source": "https://lamarcc.edu/favicon.ico",
+      "sourceSize": "55x55"
     },
     "lamar-state-college-port-arthur": {
       "file": "/uni-logos/bulk/lamar-state-college-port-arthur.png",
@@ -2911,6 +3856,11 @@
       "source": "https://lauruscollege.edu/img/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "lawrence-technological-university": {
+      "file": "/uni-logos/bulk/lawrence-technological-university.png",
+      "source": "https://ltu.edu/nitropack_static/rwulXONSfMOwGZBowUdMqBzPnyZyoBCW/assets/images/optimized/rev-1cbf42d/ltu.edu/wp-content/uploads/2024/02/cropped-LTU_Favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "lawrence-university": {
       "file": "/uni-logos/bulk/lawrence-university.png",
       "source": "https://www.lawrence.edu/wp-content/uploads/2026/07/cropped-lawrence-favicon-192x192.jpg",
@@ -2945,6 +3895,11 @@
       "file": "/uni-logos/bulk/leech-lake-tribal-college.png",
       "source": "https://www.lltc.edu/wp-content/uploads/2019/05/logo_LLTC_57x57px.png",
       "sourceSize": "57x57"
+    },
+    "leeds-beckett-university": {
+      "file": "/uni-logos/bulk/leeds-beckett-university.png",
+      "source": "https://www.leedsbeckett.ac.uk/dist/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "leeds-trinity-university": {
       "file": "/uni-logos/bulk/leeds-trinity-university.png",
@@ -3021,10 +3976,25 @@
       "source": "https://www.life.edu/wp-content/themes/life/assets/img/favicon/favicon-228.png",
       "sourceSize": "228x228"
     },
+    "limestone-college": {
+      "file": "/uni-logos/bulk/limestone-college.png",
+      "source": "https://www.limestone.edu/themes/custom/lime_zurb/favicon.ico",
+      "sourceSize": "253x301"
+    },
     "lincoln-university-missouri": {
       "file": "/uni-logos/bulk/lincoln-university-missouri.png",
       "source": "https://www.lincolnu.edu/_files/favicon.png",
       "sourceSize": "32x32"
+    },
+    "lincoln-university-san-francisco": {
+      "file": "/uni-logos/bulk/lincoln-university-san-francisco.png",
+      "source": "https://lincolnuca.edu/wp-content/uploads/2021/01/cropped-Logo_LU-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "lindenwood-university": {
+      "file": "/uni-logos/bulk/lindenwood-university.png",
+      "source": "https://www.lindenwood.edu/favicon/web-app-manifest-192x192.png",
+      "sourceSize": "192x192"
     },
     "lindsey-wilson-college": {
       "file": "/uni-logos/bulk/lindsey-wilson-college.png",
@@ -3055,6 +4025,11 @@
       "file": "/uni-logos/bulk/lock-haven-university.png",
       "source": "https://www.commonwealthu.edu/themes/custom/commonwealthu/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "logan-college-of-chiropractic": {
+      "file": "/uni-logos/bulk/logan-college-of-chiropractic.png",
+      "source": "https://i0.wp.com/www.logan.edu/wp-content/uploads/2019/10/favicon.png?fit=192%2C192&#038;ssl=1",
+      "sourceSize": "192x192"
     },
     "loma-linda-university": {
       "file": "/uni-logos/bulk/loma-linda-university.png",
@@ -3096,6 +4071,11 @@
       "source": "https://lbcc.edu/sites/default/themes/dtheme/img/logo-app.png",
       "sourceSize": "180x180"
     },
+    "longwood-university": {
+      "file": "/uni-logos/bulk/longwood-university.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/1265/images/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "lorain-county-community-college": {
       "file": "/uni-logos/bulk/lorain-county-community-college.png",
       "source": "https://www.lorainccc.edu/wp-content/uploads/2019/11/cropped-Blue-Square-192x192.png",
@@ -3121,6 +4101,11 @@
       "source": "https://www.losmedanos.edu/_resources/favicon/favicon-194x194.png",
       "sourceSize": "194x194"
     },
+    "los-rios-community-college-district": {
+      "file": "/uni-logos/bulk/los-rios-community-college-district.png",
+      "source": "https://losrios.edu/lrccd/main/img/favicon/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "loughborough-university": {
       "file": "/uni-logos/bulk/loughborough-university.png",
       "source": "https://www.lboro.ac.uk/web-assets/shared/favicon/favicon-196x196.png",
@@ -3136,6 +4121,11 @@
       "source": "https://www.latech.edu/_resources/images/favicon.png",
       "sourceSize": "112x101"
     },
+    "lourdes-college": {
+      "file": "/uni-logos/bulk/lourdes-college.png",
+      "source": "https://lourdes.edu/wp-content/uploads/2023/10/cropped-Lourdes-FavIcon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "loyola-marymount-university": {
       "file": "/uni-logos/bulk/loyola-marymount-university.png",
       "source": "https://www.lmu.edu/media/lmu2015responsivesite/siteassets/favicon/apple-touch-icon-precomposed.png",
@@ -3145,6 +4135,11 @@
       "file": "/uni-logos/bulk/loyola-university-chicago.png",
       "source": "https://www.luc.edu/media/home/images/apple-touch-icon.png",
       "sourceSize": "57x57"
+    },
+    "loyola-university-new-orleans": {
+      "file": "/uni-logos/bulk/loyola-university-new-orleans.png",
+      "source": "https://loyno.edu/themes/custom/loyola/favicon.ico",
+      "sourceSize": "32x32"
     },
     "lubbock-christian-university": {
       "file": "/uni-logos/bulk/lubbock-christian-university.png",
@@ -3161,10 +4156,20 @@
       "source": "https://www.luthersem.edu/wp-content/uploads/2020/02/cropped-logo-maroon-192x192.png",
       "sourceSize": "192x192"
     },
+    "luzerne-county-community-college": {
+      "file": "/uni-logos/bulk/luzerne-county-community-college.png",
+      "source": "https://luzerne.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "lycoming-college": {
       "file": "/uni-logos/bulk/lycoming-college.png",
       "source": "https://www.lycoming.edu/_resources/v10/img/lycoming-apple-touch-icon-180x180.png",
       "sourceSize": "180x180"
+    },
+    "lynchburg-college": {
+      "file": "/uni-logos/bulk/lynchburg-college.png",
+      "source": "https://www.lynchburg.edu/wp-content/uploads/2025/01/UL_Icon_512x512-600x600.png",
+      "sourceSize": "600x600"
     },
     "lyon-college": {
       "file": "/uni-logos/bulk/lyon-college.png",
@@ -3174,6 +4179,11 @@
     "madison-area-technical-college": {
       "file": "/uni-logos/bulk/madison-area-technical-college.png",
       "source": "https://madisoncollege.edu/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "madisonville-community-college": {
+      "file": "/uni-logos/bulk/madisonville-community-college.png",
+      "source": "https://madisonville.kctcs.edu/favicon.ico",
       "sourceSize": "180x180"
     },
     "madonna-university": {
@@ -3189,6 +4199,21 @@
     "maine-maritime-academy": {
       "file": "/uni-logos/bulk/maine-maritime-academy.png",
       "source": "https://mainemaritime.edu/wp-content/images/favicons/favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "malone-college": {
+      "file": "/uni-logos/bulk/malone-college.png",
+      "source": "https://b3976592.assetcdn.net/2.0/3976592/wp-content/uploads/2025/03/cropped-Favicon2-1-192x192.jpg?lossy=1&strip=1&avif=1",
+      "sourceSize": "192x192"
+    },
+    "manchester-college": {
+      "file": "/uni-logos/bulk/manchester-college.png",
+      "source": "https://www.manchester.edu/wp-content/uploads/cropped-mu-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "manchester-community-college": {
+      "file": "/uni-logos/bulk/manchester-community-college.png",
+      "source": "https://mccnh.edu/wp-content/uploads/2023/09/cropped-MCCFavicon-1-192x192.gif",
       "sourceSize": "192x192"
     },
     "manhattan-christian-college": {
@@ -3311,6 +4336,11 @@
       "source": "https://www.mayo.edu/-/media/web/gbs/shared/images/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "maysville-community-and-technical-college": {
+      "file": "/uni-logos/bulk/maysville-community-and-technical-college.png",
+      "source": "https://maysville.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "mcdowell-technical-community-college": {
       "file": "/uni-logos/bulk/mcdowell-technical-community-college.png",
       "source": "https://mcdowelltech.edu/images/favicons/android-chrome-192x192.png",
@@ -3326,9 +4356,19 @@
       "source": "https://mcm.edu/app/themes/mcmurry-theme/dist/images/favicon/apple-touch-icon_0cf0cd9e.png",
       "sourceSize": "180x180"
     },
+    "medical-university-of-south-carolina": {
+      "file": "/uni-logos/bulk/medical-university-of-south-carolina.png",
+      "source": "https://d3crna64wemw02.cloudfront.net/asset/339713052848/image_mm92lu8uqd1pl64qa937agao1n/?content-disposition=inline",
+      "sourceSize": "180x180"
+    },
     "meharry-medical-college": {
       "file": "/uni-logos/bulk/meharry-medical-college.png",
       "source": "https://34b67b1c.delivery.rocketcdn.me/wp-content/uploads/2025/09/cropped-VectorLogo_512x512_centered-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "merced-college": {
+      "file": "/uni-logos/bulk/merced-college.png",
+      "source": "https://www.mccd.edu/wp-content/themes/primary/frontend/static-html/favicons/android-chrome-192x192.png",
       "sourceSize": "192x192"
     },
     "mercer-university": {
@@ -3345,6 +4385,11 @@
       "file": "/uni-logos/bulk/meredith-college.png",
       "source": "https://www.meredith.edu/wp-content/uploads/2021/01/favicon.png",
       "sourceSize": "57x57"
+    },
+    "merrimack-college": {
+      "file": "/uni-logos/bulk/merrimack-college.png",
+      "source": "https://www.merrimack.edu/wp-content/uploads/favicon.png",
+      "sourceSize": "64x64"
     },
     "merritt-college": {
       "file": "/uni-logos/bulk/merritt-college.png",
@@ -3385,6 +4430,11 @@
       "file": "/uni-logos/bulk/michigan-technological-university.png",
       "source": "https://www.mtu.edu/favicon-192.png",
       "sourceSize": "192x192"
+    },
+    "mid-michigan-community-college": {
+      "file": "/uni-logos/bulk/mid-michigan-community-college.png",
+      "source": "https://midmich.edu/_mid_images/_cms_images/favicon.ico",
+      "sourceSize": "96x96"
     },
     "middle-tennessee-state-university": {
       "file": "/uni-logos/bulk/middle-tennessee-state-university.png",
@@ -3431,6 +4481,11 @@
       "source": "https://www.miles.edu/themes/custom/miles/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "miles-school-of-law": {
+      "file": "/uni-logos/bulk/miles-school-of-law.png",
+      "source": "https://mlaw.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "millennia-atlantic-university": {
       "file": "/uni-logos/bulk/millennia-atlantic-university.png",
       "source": "https://maufl.edu/wp-content/uploads/2025/04/cropped-MAU-icon-192x192.png",
@@ -3441,6 +4496,11 @@
       "source": "https://www.millersville.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "milligan-college": {
+      "file": "/uni-logos/bulk/milligan-college.png",
+      "source": "https://library.milligan.edu/wp-content/uploads/2020/06/cropped-MU_shield-192x192.png",
+      "sourceSize": "192x192"
+    },
     "millikin-university": {
       "file": "/uni-logos/bulk/millikin-university.png",
       "source": "https://millikin.edu/sites/default/files/M-Favicon-32px_0.png",
@@ -3450,6 +4510,11 @@
       "file": "/uni-logos/bulk/mills-college.png",
       "source": "https://brand.northeastern.edu/global/assets/favicon/apple-touch-152x152.png?v=2",
       "sourceSize": "152x152"
+    },
+    "millsaps-college": {
+      "file": "/uni-logos/bulk/millsaps-college.png",
+      "source": "https://millsaps.edu/wp-content/uploads/2024/08/cropped-1500x1500crest-192x192.png",
+      "sourceSize": "192x192"
     },
     "milton-academy": {
       "file": "/uni-logos/bulk/milton-academy.png",
@@ -3521,6 +4586,11 @@
       "source": "https://msdelta.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "mississippi-gulf-coast-community-college": {
+      "file": "/uni-logos/bulk/mississippi-gulf-coast-community-college.png",
+      "source": "https://mgccc.edu/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "mississippi-university-for-women": {
       "file": "/uni-logos/bulk/mississippi-university-for-women.png",
       "source": "https://www.muw.edu/wp-content/uploads/2022/04/cropped-muw_site_logo-192x192.png",
@@ -3535,6 +4605,11 @@
       "file": "/uni-logos/bulk/missouri-baptist-college.png",
       "source": "https://s38598.pcdn.co/wp-content/themes/mobap/assets/images/icons/android-icon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "missouri-state-university": {
+      "file": "/uni-logos/bulk/missouri-state-university.png",
+      "source": "https://missouristate.edu/favicon.png",
+      "sourceSize": "512x512"
     },
     "missouri-university-of-science-and-technology": {
       "file": "/uni-logos/bulk/missouri-university-of-science-and-technology.png",
@@ -3611,6 +4686,11 @@
       "source": "https://www.montana.edu/_resources/msu/2/images/structure/logos/msu-icon.png",
       "sourceSize": "192x192"
     },
+    "montana-state-university-northern": {
+      "file": "/uni-logos/bulk/montana-state-university-northern.png",
+      "source": "https://msun.edu/favicon.png",
+      "sourceSize": "180x180"
+    },
     "montana-tech": {
       "file": "/uni-logos/bulk/montana-tech.png",
       "source": "https://mtech.edu/_files/favicon/apple-touch-icon.png",
@@ -3631,6 +4711,11 @@
       "source": "https://mpc.edu/_resources/assets/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "montgomery-college": {
+      "file": "/uni-logos/bulk/montgomery-college.png",
+      "source": "https://www.montgomerycollege.edu/_images/global/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "montgomery-county-community-college": {
       "file": "/uni-logos/bulk/montgomery-county-community-college.png",
       "source": "https://mc3.edu/_resources/images/favicons/android-chrome-192x192.png?v=1.0.0",
@@ -3650,6 +4735,11 @@
       "file": "/uni-logos/bulk/moore-college-of-art-and-design.png",
       "source": "https://moore.edu/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "moorpark-college": {
+      "file": "/uni-logos/bulk/moorpark-college.png",
+      "source": "https://www.moorparkcollege.edu/themes/custom/moorparkcollege/favicon.ico",
+      "sourceSize": "32x32"
     },
     "moraine-park-technical-college": {
       "file": "/uni-logos/bulk/moraine-park-technical-college.png",
@@ -3681,6 +4771,16 @@
       "source": "https://morrisbrown.edu/wp-content/uploads/2022/01/cropped-MORRIS_BROWN_SEAL_512-192x192.png",
       "sourceSize": "192x192"
     },
+    "morris-college": {
+      "file": "/uni-logos/bulk/morris-college.png",
+      "source": "https://www.morris.edu/wp-content/uploads/2025/04/fav.png",
+      "sourceSize": "64x81"
+    },
+    "morton-college": {
+      "file": "/uni-logos/bulk/morton-college.png",
+      "source": "https://morton.edu/favicon.ico",
+      "sourceSize": "100x100"
+    },
     "mount-holyoke-college": {
       "file": "/uni-logos/bulk/mount-holyoke-college.png",
       "source": "https://www.mtholyoke.edu/themes/custom/holyoke/assets/favicons/apple-touch-icon.png",
@@ -3689,6 +4789,11 @@
     "mount-mary-college": {
       "file": "/uni-logos/bulk/mount-mary-college.png",
       "source": "https://mtmary.edu/favicon.png",
+      "sourceSize": "32x32"
+    },
+    "mount-saint-joseph-college": {
+      "file": "/uni-logos/bulk/mount-saint-joseph-college.png",
+      "source": "https://d2jv02qf7xgjwx.cloudfront.net/accounts/25766/images/favicon_mymount_msj_edu_32x32.png",
       "sourceSize": "32x32"
     },
     "mount-saint-mary-college": {
@@ -3700,6 +4805,11 @@
       "file": "/uni-logos/bulk/mount-vernon-nazarene-university.png",
       "source": "https://mvnu.edu/wp-content/uploads/2023/09/cropped-android-chrome-512x512-1-192x192.png",
       "sourceSize": "192x192"
+    },
+    "mountainland-technical-college": {
+      "file": "/uni-logos/bulk/mountainland-technical-college.png",
+      "source": "https://mtec.edu/wp-content/uploads/2021/10/MTECH_favicon.png",
+      "sourceSize": "128x128"
     },
     "mountwest-community-and-technical-college": {
       "file": "/uni-logos/bulk/mountwest-community-and-technical-college.png",
@@ -3721,6 +4831,11 @@
       "source": "https://www.muhlenberg.edu/wp-content/uploads/cropped-Favicon-180x180-1-192x192.png",
       "sourceSize": "192x192"
     },
+    "multnomah-bible-college": {
+      "file": "/uni-logos/bulk/multnomah-bible-college.png",
+      "source": "https://s3.us-west-2.amazonaws.com/uploads.multnomah.edu/2024/06/04013116/favicon-mcoju-1.png",
+      "sourceSize": "126x126"
+    },
     "muskegon-community-college": {
       "file": "/uni-logos/bulk/muskegon-community-college.png",
       "source": "https://www.muskegoncc.edu/wp-content/uploads/2025/03/icon-small-1.svg",
@@ -3731,10 +4846,20 @@
       "source": "https://www.muskingum.edu/sites/default/files/media/fav.png",
       "sourceSize": "260x260"
     },
+    "napa-valley-college": {
+      "file": "/uni-logos/bulk/napa-valley-college.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/3636/images/NVC_Library_Logo_Square.jpg",
+      "sourceSize": "198x246"
+    },
     "nash-community-college": {
       "file": "/uni-logos/bulk/nash-community-college.png",
       "source": "https://www.nashcc.edu/wp-content/uploads/cropped-N-icn-192x192.png",
       "sourceSize": "192x192"
+    },
+    "nashua-community-college": {
+      "file": "/uni-logos/bulk/nashua-community-college.png",
+      "source": "https://cdn-ilehchb.nitrocdn.com/hsLFavBkXIMsSRrKomTXQInwisjqrJrD/assets/images/optimized/rev-33880af/nashuacc.edu/wp-content/uploads/2022/02/favicon.png",
+      "sourceSize": "60x60"
     },
     "nashville-state-community-college": {
       "file": "/uni-logos/bulk/nashville-state-community-college.png",
@@ -3781,6 +4906,11 @@
       "source": "https://www2.naz.edu/packages/www_naz_edu/themes/naz_main/images/touch_icon.png",
       "sourceSize": "180x180"
     },
+    "nebraska-christian-college": {
+      "file": "/uni-logos/bulk/nebraska-christian-college.png",
+      "source": "https://nechristian.edu/favicon.ico",
+      "sourceSize": "100x100"
+    },
     "nebraska-college-of-technical-agriculture": {
       "file": "/uni-logos/bulk/nebraska-college-of-technical-agriculture.png",
       "source": "https://wdn-cdn.unl.edu/wdn/templates_6.1/includes/global/favicon/apple-touch-icon.png",
@@ -3790,6 +4920,11 @@
       "file": "/uni-logos/bulk/nebraska-wesleyan-university.png",
       "source": "https://www.nebrwesleyan.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "neumont-college-of-computer-science": {
+      "file": "/uni-logos/bulk/neumont-college-of-computer-science.png",
+      "source": "https://neumont.edu/favicon.ico",
+      "sourceSize": "100x100"
     },
     "nevada-state-university": {
       "file": "/uni-logos/bulk/nevada-state-university.png",
@@ -3856,6 +4991,11 @@
       "source": "https://www.nyls.edu/wp-content/uploads/2023/06/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "new-york-school-of-interior-design": {
+      "file": "/uni-logos/bulk/new-york-school-of-interior-design.png",
+      "source": "https://nysid.edu/favicon.ico",
+      "sourceSize": "100x100"
+    },
     "newberry-college": {
       "file": "/uni-logos/bulk/newberry-college.png",
       "source": "https://www.newberry.edu/assets/images/favicon/apple-touch-icon.png",
@@ -3870,6 +5010,11 @@
       "file": "/uni-logos/bulk/newman-university.png",
       "source": "https://newmanu.edu/media/templates/site/cassiopeia_nu_child/images/joomla-favicon.svg",
       "sourceSize": "300x300"
+    },
+    "newschool-of-architecture-and-design": {
+      "file": "/uni-logos/bulk/newschool-of-architecture-and-design.png",
+      "source": "https://newschoolarch.edu/wp-content/uploads/2025/03/cropped-Logo-Square-192x192.png",
+      "sourceSize": "192x192"
     },
     "niagara-university": {
       "file": "/uni-logos/bulk/niagara-university.png",
@@ -3926,6 +5071,11 @@
       "source": "https://cdn.ncsu.edu/brand-assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "north-central-college": {
+      "file": "/uni-logos/bulk/north-central-college.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/1055/images/small_2_color_lock_up_square_logo_only.png",
+      "sourceSize": "503x500"
+    },
     "north-central-state-college": {
       "file": "/uni-logos/bulk/north-central-state-college.png",
       "source": "https://ncstatecollege.edu/apple-touch-icon.png",
@@ -3950,6 +5100,16 @@
       "file": "/uni-logos/bulk/north-orange-county-community-college-district.png",
       "source": "https://www.nocccd.edu/themes/custom/north_orange/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "north-park-university": {
+      "file": "/uni-logos/bulk/north-park-university.png",
+      "source": "https://www.northpark.edu/wp-content/uploads/2024/07/cropped-north-park-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "north-south-university": {
+      "file": "/uni-logos/bulk/north-south-university.png",
+      "source": "https://library.northsouth.edu/wp-content/uploads/2020/09/NSU-logo-library-logo.png",
+      "sourceSize": "49x60"
     },
     "northampton-community-college": {
       "file": "/uni-logos/bulk/northampton-community-college.png",
@@ -3986,6 +5146,16 @@
       "source": "https://www.northeaststate.edu/_assets/_images/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "northeast-wisconsin-technical-college": {
+      "file": "/uni-logos/bulk/northeast-wisconsin-technical-college.png",
+      "source": "https://www.nwtc.edu/img/pwa/icon-192.png",
+      "sourceSize": "192x192"
+    },
+    "northeastern-illinois-university": {
+      "file": "/uni-logos/bulk/northeastern-illinois-university.png",
+      "source": "https://www.neiu.edu/themes/custom/neiu/favicon.ico",
+      "sourceSize": "96x96"
+    },
     "northeastern-junior-college": {
       "file": "/uni-logos/bulk/northeastern-junior-college.png",
       "source": "https://www.njc.edu/apple-touch-icon.png",
@@ -4021,6 +5191,11 @@
       "source": "https://nmu.edu/themes/re_northern_v2/images/favicon-196.png",
       "sourceSize": "196x196"
     },
+    "northern-oklahoma-college": {
+      "file": "/uni-logos/bulk/northern-oklahoma-college.png",
+      "source": "https://www.noc.edu/wp-content/uploads/2025/08/nocfavicon-1.png",
+      "sourceSize": "64x64"
+    },
     "northern-virginia-community-college": {
       "file": "/uni-logos/bulk/northern-virginia-community-college.png",
       "source": "https://www.nvcc.edu/dist/images/global/icons/favicon-32x32.png",
@@ -4036,10 +5211,20 @@
       "source": "https://www.northlandcollege.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "northland-pioneer-college": {
+      "file": "/uni-logos/bulk/northland-pioneer-college.png",
+      "source": "https://www.npc.edu/sites/default/files/npc-favico-256.ico",
+      "sourceSize": "256x256"
+    },
     "northumbria-university": {
       "file": "/uni-logos/bulk/northumbria-university.png",
       "source": "https://www.northumbria.ac.uk/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "northwest-arkansas-community-college": {
+      "file": "/uni-logos/bulk/northwest-arkansas-community-college.png",
+      "source": "https://assets-us.libsites.com/sites/27601/websites/6f83bd32-d082-11f0-acd5-0e3a14b280ef/3ae48a7e-e8e2-4c47-ac2c-45d1388be148.png",
+      "sourceSize": "93x101"
     },
     "northwest-florida-state-college": {
       "file": "/uni-logos/bulk/northwest-florida-state-college.png",
@@ -4096,6 +5281,11 @@
       "source": "https://www.norwich.edu/themes/custom/norwich/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "notre-dame-de-namur-university": {
+      "file": "/uni-logos/bulk/notre-dame-de-namur-university.png",
+      "source": "https://ndnu.edu/favicon.ico",
+      "sourceSize": "69x69"
+    },
     "nottingham-trent-university": {
       "file": "/uni-logos/bulk/nottingham-trent-university.png",
       "source": "https://www.ntu.ac.uk/media/images/favicons/favicon-96x96.png",
@@ -4110,6 +5300,11 @@
       "file": "/uni-logos/bulk/nunez-community-college.png",
       "source": "https://campussuite-storage.s3.amazonaws.com/prod/1558536/e366533c-f169-11e7-9166-122f978d8488/1614891/66c2a844-14b9-11e8-b882-0ae2816609ae/favicon/144",
       "sourceSize": "144x144"
+    },
+    "oakland-city-university": {
+      "file": "/uni-logos/bulk/oakland-city-university.png",
+      "source": "https://www.oak.edu/wp-content/uploads/2021/01/favicon.png",
+      "sourceSize": "180x180"
     },
     "oakland-university": {
       "file": "/uni-logos/bulk/oakland-university.png",
@@ -4130,6 +5325,11 @@
       "file": "/uni-logos/bulk/oberlin-college.png",
       "source": "https://www.oberlin.edu/themes/custom/oberlin/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "ocean-county-college": {
+      "file": "/uni-logos/bulk/ocean-county-college.png",
+      "source": "https://www.ocean.edu/wp-content/uploads/2024/10/logo.svg",
+      "sourceSize": "796x342"
     },
     "odessa-college": {
       "file": "/uni-logos/bulk/odessa-college.png",
@@ -4196,6 +5396,11 @@
       "source": "https://www.ossm.edu/wp-content/uploads/2017/12/navy52.png",
       "sourceSize": "52x52"
     },
+    "oklahoma-state-university": {
+      "file": "/uni-logos/bulk/oklahoma-state-university.png",
+      "source": "https://library.okstate.edu/apple-touch-icon.png",
+      "sourceSize": "105x100"
+    },
     "oklahoma-wesleyan-university": {
       "file": "/uni-logos/bulk/oklahoma-wesleyan-university.png",
       "source": "https://www.okwu.edu/wp-content/uploads/2020/03/cropped-logo-okwu-site-icon-1-192x192.png",
@@ -4231,15 +5436,35 @@
       "source": "https://oregoncoast.edu/wp-content/uploads/2026/07/favicon.svg",
       "sourceSize": "2133x2133"
     },
+    "otterbein-college": {
+      "file": "/uni-logos/bulk/otterbein-college.png",
+      "source": "https://www.otterbein.edu/wp-content/themes/otterbein/assets/favicon/android-chrome-192x192.caeaad0.png",
+      "sourceSize": "192x192"
+    },
+    "ouachita-baptist-university": {
+      "file": "/uni-logos/bulk/ouachita-baptist-university.png",
+      "source": "https://obu.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "owens-community-college": {
       "file": "/uni-logos/bulk/owens-community-college.png",
       "source": "https://www.owens.edu/wp-content/uploads/2026/07/owenscolorlogo-favicon-512-300x300.png",
       "sourceSize": "300x300"
     },
+    "owensboro-community-and-technical-college": {
+      "file": "/uni-logos/bulk/owensboro-community-and-technical-college.png",
+      "source": "https://owensboro.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "oxford-brookes-university": {
       "file": "/uni-logos/bulk/oxford-brookes-university.png",
       "source": "https://www.brookes.ac.uk/getmedia/2ec2024f-4bc2-4c7b-9da4-57e39b4be5b4/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "oxnard-college": {
+      "file": "/uni-logos/bulk/oxnard-college.png",
+      "source": "https://www.oxnardcollege.edu/themes/custom/oxnardcollege/favicon.ico",
+      "sourceSize": "32x32"
     },
     "ozark-christian-college": {
       "file": "/uni-logos/bulk/ozark-christian-college.png",
@@ -4250,6 +5475,11 @@
       "file": "/uni-logos/bulk/ozarka-college.png",
       "source": "https://www.ozarka.edu/favicon.png",
       "sourceSize": "32x32"
+    },
+    "ozarks-technical-community-college": {
+      "file": "/uni-logos/bulk/ozarks-technical-community-college.png",
+      "source": "https://ozarkstech.edu/wp-content/uploads/2025/04/cropped-favicon-otc-150x150-1-192x192.webp",
+      "sourceSize": "192x192"
     },
     "pace-university": {
       "file": "/uni-logos/bulk/pace-university.png",
@@ -4266,6 +5496,11 @@
       "source": "https://bpb-us-e2.wpmucdn.com/www.pnwu.edu/dist/c/1/files/2023/10/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "pacific-oaks-college": {
+      "file": "/uni-logos/bulk/pacific-oaks-college.png",
+      "source": "https://www.pacificoaks.edu/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
     "pacific-university": {
       "file": "/uni-logos/bulk/pacific-university.png",
       "source": "https://www.pacificu.edu/sites/default/files/favicon.png",
@@ -4276,10 +5511,20 @@
       "source": "https://paine.edu/wp-content/uploads/2025/11/cropped-YTLOGO-192x192.jpg",
       "sourceSize": "192x192"
     },
+    "palm-beach-atlantic-university": {
+      "file": "/uni-logos/bulk/palm-beach-atlantic-university.png",
+      "source": "https://pba.edu/favicon.ico",
+      "sourceSize": "150x150"
+    },
     "palm-beach-state-college": {
       "file": "/uni-logos/bulk/palm-beach-state-college.png",
       "source": "https://www.pbsc.edu/_resources/images/fav.svg",
       "sourceSize": "238x238"
+    },
+    "palmer-college-of-chiropractic-west": {
+      "file": "/uni-logos/bulk/palmer-college-of-chiropractic-west.png",
+      "source": "https://palmer.edu/favicon.ico",
+      "sourceSize": "32x32"
     },
     "pamlico-community-college": {
       "file": "/uni-logos/bulk/pamlico-community-college.png",
@@ -4311,6 +5556,11 @@
       "source": "https://www.patrickhenry.edu/wp-content/uploads/2024/02/PHCCLOGOCOMPASS.png",
       "sourceSize": "150x150"
     },
+    "paul-quinn-college": {
+      "file": "/uni-logos/bulk/paul-quinn-college.png",
+      "source": "https://paulquinn.edu/wp-content/uploads/2022/04/pqc-favicon-300x300.png",
+      "sourceSize": "300x300"
+    },
     "pearl-river-community-college": {
       "file": "/uni-logos/bulk/pearl-river-community-college.png",
       "source": "https://prcc.edu/wp-content/uploads/2022/04/cropped-PRCC-favicon-192x192.png",
@@ -4320,6 +5570,16 @@
       "file": "/uni-logos/bulk/pellissippi-state-community-college.png",
       "source": "https://www.pstcc.edu/media/pstccedu/site-assets/images/favicon/cropped-PSCC-Sheild-192x192.png",
       "sourceSize": "192x192"
+    },
+    "pennsylvania-state-university": {
+      "file": "/uni-logos/bulk/pennsylvania-state-university.png",
+      "source": "https://www.psu.edu/favicon.ico?favicon.17szk1izblhmq.ico",
+      "sourceSize": "347x347"
+    },
+    "pennsylvania-western-university": {
+      "file": "/uni-logos/bulk/pennsylvania-western-university.png",
+      "source": "https://www.pennwest.edu/_resources/images/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "pensacola-christian-college": {
       "file": "/uni-logos/bulk/pensacola-christian-college.png",
@@ -4331,6 +5591,21 @@
       "source": "https://pensacolastate.edu/wp-content/uploads/2017/01/PSC_mobile-logo_whccoa.png",
       "sourceSize": "75x60"
     },
+    "pepperdine-university": {
+      "file": "/uni-logos/bulk/pepperdine-university.png",
+      "source": "https://pepperdine.edu/favicon.ico",
+      "sourceSize": "48x48"
+    },
+    "periyar-maniammai-institute-of-science-technology": {
+      "file": "/uni-logos/bulk/periyar-maniammai-institute-of-science-technology.png",
+      "source": "https://pmu.edu/assets-v2/img/fav-icon.png",
+      "sourceSize": "32x32"
+    },
+    "pfeiffer-university": {
+      "file": "/uni-logos/bulk/pfeiffer-university.png",
+      "source": "https://www.pfeiffer.edu/wp-content/uploads/2021/11/favicon2-pfeiffer-200x200.png",
+      "sourceSize": "200x200"
+    },
     "philadelphia-college-of-osteopathic-medicine": {
       "file": "/uni-logos/bulk/philadelphia-college-of-osteopathic-medicine.png",
       "source": "https://www.pcom.edu/_resources/images/favicon.png?v=2",
@@ -4341,15 +5616,35 @@
       "source": "https://www.philander.edu/wp-content/uploads/2023/11/favicon-300x300.png",
       "sourceSize": "300x300"
     },
+    "phillips-academy-andover": {
+      "file": "/uni-logos/bulk/phillips-academy-andover.png",
+      "source": "https://www.andover.edu/dist/assets/favicons/apple-touch-icon-1024x1024.png",
+      "sourceSize": "1024x1024"
+    },
     "phillips-community-college-of-the-university-of-arkansas": {
       "file": "/uni-logos/bulk/phillips-community-college-of-the-university-of-arkansas.png",
       "source": "https://www.pccua.edu/images/favicon.png",
       "sourceSize": "50x50"
     },
+    "phillips-exeter-academy": {
+      "file": "/uni-logos/bulk/phillips-exeter-academy.png",
+      "source": "https://exeter.edu/app/uploads/2024/10/cropped-PEA_E_Red-2-192x192.png",
+      "sourceSize": "192x192"
+    },
     "phillips-university": {
       "file": "/uni-logos/bulk/phillips-university.png",
       "source": "https://www.pulf.org/wp-content/uploads/2024/05/favicon.jpg",
       "sourceSize": "71x71"
+    },
+    "piedmont-college": {
+      "file": "/uni-logos/bulk/piedmont-college.png",
+      "source": "https://www.piedmont.edu/wp-content/uploads/2025/10/cropped-web-app-manifest-512x512-1-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "piedmont-community-college": {
+      "file": "/uni-logos/bulk/piedmont-community-college.png",
+      "source": "https://piedmontcc.edu/wp-content/uploads/2021/12/cropped-Pacer-Head-01-01-scaled-1-192x192.jpg",
+      "sourceSize": "192x192"
     },
     "piedmont-technical-college": {
       "file": "/uni-logos/bulk/piedmont-technical-college.png",
@@ -4366,15 +5661,30 @@
       "source": "https://pima.edu/_files/images/apple-touch-icon.png",
       "sourceSize": "57x57"
     },
+    "pine-crest-school": {
+      "file": "/uni-logos/bulk/pine-crest-school.png",
+      "source": "https://www.pinecrest.edu/bookmark-icon.png",
+      "sourceSize": "76x76"
+    },
     "pitzer-college": {
       "file": "/uni-logos/bulk/pitzer-college.png",
       "source": "https://www.pitzer.edu/themes/custom/pitzer/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "platt-college": {
+      "file": "/uni-logos/bulk/platt-college.png",
+      "source": "https://platt.edu/wp-content/uploads/2020/04/cropped-Platt-College-San-Diego-Favicon-192x192.jpg",
+      "sourceSize": "192x192"
+    },
     "plymouth-state-university": {
       "file": "/uni-logos/bulk/plymouth-state-university.png",
       "source": "https://www.plymouth.edu/themes/custom/psu/images/favicons/android-chrome-192x192.png?v=xQO8xdw9eN",
       "sourceSize": "192x192"
+    },
+    "point-loma-nazarene-university": {
+      "file": "/uni-logos/bulk/point-loma-nazarene-university.png",
+      "source": "https://www.pointloma.edu/themes/custom/plnu/apple-touch-icon.png",
+      "sourceSize": "180x180"
     },
     "polk-state-college": {
       "file": "/uni-logos/bulk/polk-state-college.png",
@@ -4386,6 +5696,26 @@
       "source": "https://www.pomona.edu/themes/custom/pomona/images/favicon-152.png",
       "sourceSize": "152x152"
     },
+    "pontifcia-universita-urbaniana": {
+      "file": "/uni-logos/bulk/pontifcia-universita-urbaniana.png",
+      "source": "https://www.urbaniana.va/etc/designs/urbaniana/release/library/main/images/favicons/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "pontificia-universidad-catolica-de-puerto-rico": {
+      "file": "/uni-logos/bulk/pontificia-universidad-catolica-de-puerto-rico.png",
+      "source": "https://www.pucpr.edu/wp-content/uploads/2025/10/android-chrome-192x192-1.png",
+      "sourceSize": "192x192"
+    },
+    "portland-community-college": {
+      "file": "/uni-logos/bulk/portland-community-college.png",
+      "source": "https://pcc.edu/apple-touch-icon.png",
+      "sourceSize": "144x144"
+    },
+    "portland-state-university": {
+      "file": "/uni-logos/bulk/portland-state-university.png",
+      "source": "https://library.pdx.edu/apple-touch-icon.png",
+      "sourceSize": "114x114"
+    },
     "prairie-view-a-m-university": {
       "file": "/uni-logos/bulk/prairie-view-a-m-university.png",
       "source": "https://www.pvamu.edu/wp-content/uploads/2018/11/pvam-logo-.png",
@@ -4395,6 +5725,11 @@
       "file": "/uni-logos/bulk/pratt-institute.png",
       "source": "https://www.pratt.edu/wp-content/themes/pratt/static/img/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "presbyterian-college": {
+      "file": "/uni-logos/bulk/presbyterian-college.png",
+      "source": "https://www.presby.edu/wp-content/uploads/2025/06/cropped-Block-PC-Logo-1-192x192.png",
+      "sourceSize": "192x192"
     },
     "prescott-college": {
       "file": "/uni-logos/bulk/prescott-college.png",
@@ -4436,6 +5771,16 @@
       "source": "https://static.wixstatic.com/media/e68fc8_22ea4e5825714e7098481ca9c5f6d7c3%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/e68fc8_22ea4e5825714e7098481ca9c5f6d7c3%7Emv2.png",
       "sourceSize": "192x192"
     },
+    "quantum-veritas-international-university": {
+      "file": "/uni-logos/bulk/quantum-veritas-international-university.png",
+      "source": "https://qvius.edu/images/fav.png",
+      "sourceSize": "622x622"
+    },
+    "quincy-college": {
+      "file": "/uni-logos/bulk/quincy-college.png",
+      "source": "https://cdn-ildnggh.nitrocdn.com/BonpjiwqugWSrhwsKBlsvKMtxjcTNdFh/assets/images/optimized/rev-0c171e6/quincycollege.edu/wp-content/uploads/cropped-QC_FaviconMaster_-192x192.png",
+      "sourceSize": "192x192"
+    },
     "quinnipiac-college": {
       "file": "/uni-logos/bulk/quinnipiac-college.png",
       "source": "https://www.qu.edu/assets/images/favicon.png",
@@ -4446,10 +5791,20 @@
       "source": "https://www.qcc.edu/sites/default/files/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "rai-university": {
+      "file": "/uni-logos/bulk/rai-university.png",
+      "source": "https://raiuniversity.edu/assets/img/favicons/android-icon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "ramapo-college": {
       "file": "/uni-logos/bulk/ramapo-college.png",
       "source": "https://www.ramapo.edu/wp-content/themes/rcnjrd/images/favicons/favicon-160x160.png",
       "sourceSize": "160x160"
+    },
+    "ramdeobaba-university-nagpur-maharashtra-india": {
+      "file": "/uni-logos/bulk/ramdeobaba-university-nagpur-maharashtra-india.png",
+      "source": "https://www.rknec.edu/wp-content/uploads/2023/06/cropped-fav-ram-192x192.png",
+      "sourceSize": "192x192"
     },
     "randolph-community-college": {
       "file": "/uni-logos/bulk/randolph-community-college.png",
@@ -4471,10 +5826,25 @@
       "source": "https://www.raritanval.edu/wp-content/themes/edesign/webroot/images/favicon.png",
       "sourceSize": "180x180"
     },
+    "rasmussen-college-florida-campuses": {
+      "file": "/uni-logos/bulk/rasmussen-college-florida-campuses.png",
+      "source": "https://rasmussen.edu/apple-touch-icon-precomposed.png",
+      "sourceSize": "225x225"
+    },
     "red-rocks-community-college": {
       "file": "/uni-logos/bulk/red-rocks-community-college.png",
       "source": "https://www.rrcc.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "reed-college": {
+      "file": "/uni-logos/bulk/reed-college.png",
+      "source": "https://reed.edu/favicon.ico",
+      "sourceSize": "64x64"
+    },
+    "regent-college": {
+      "file": "/uni-logos/bulk/regent-college.png",
+      "source": "https://www.regent-college.edu/media/regent/site-assets/icons-amp-logos/Regent-Logo-Motif-180.png",
+      "sourceSize": "32x32"
     },
     "regent-university": {
       "file": "/uni-logos/bulk/regent-university.png",
@@ -4496,6 +5866,16 @@
       "source": "https://www.ric.edu/themes/custom/ric/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "rhode-island-school-of-design": {
+      "file": "/uni-logos/bulk/rhode-island-school-of-design.png",
+      "source": "https://www.risd.edu/themes/custom/risd_base_theme/favicon_io/android-chrome-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "rice-university": {
+      "file": "/uni-logos/bulk/rice-university.png",
+      "source": "https://library.rice.edu/themes/custom/fondren_barrio/favicon.ico",
+      "sourceSize": "256x256"
+    },
     "richard-bland-college-of-the-college-of-william-and-mary": {
       "file": "/uni-logos/bulk/richard-bland-college-of-the-college-of-william-and-mary.png",
       "source": "https://www.rbc.edu/wp-content/themes/RBC%202020/images/android-icon-192x192.png",
@@ -4510,6 +5890,11 @@
       "file": "/uni-logos/bulk/richland-community-college.png",
       "source": "https://www.richland.edu/wp-content/uploads/2024/01/cropped-favicon-1-192x192.png",
       "sourceSize": "192x192"
+    },
+    "richmond-university-the-american-international-university-in-london": {
+      "file": "/uni-logos/bulk/richmond-university-the-american-international-university-in-london.png",
+      "source": "https://cdn-ildfkdn.nitrocdn.com/cEqpdrbLQONVwFJixHPvOIVHpOCoXdWn/assets/images/optimized/rev-f82946b/www.richmond.ac.uk/wp-content/uploads/2020/10/union-stripes-favicon-80x80.png",
+      "sourceSize": "80x80"
     },
     "ridgewater-college": {
       "file": "/uni-logos/bulk/ridgewater-college.png",
@@ -4546,6 +5931,11 @@
       "source": "https://www.rmu.edu/sites/default/files/favicon_0.png",
       "sourceSize": "32x32"
     },
+    "roberts-wesleyan-university": {
+      "file": "/uni-logos/bulk/roberts-wesleyan-university.png",
+      "source": "https://library.roberts.edu/android-chrome-512x512.png",
+      "sourceSize": "512x512"
+    },
     "rochester-community-and-technical-college": {
       "file": "/uni-logos/bulk/rochester-community-and-technical-college.png",
       "source": "https://www.rctc.edu/wp-content/uploads/2026/01/R-Site-Icon-270x270.png",
@@ -4555,6 +5945,11 @@
       "file": "/uni-logos/bulk/rochester-institute-of-technology.png",
       "source": "https://www.rit.edu/sites/all/themes/uwbase/rit_bootstrap_2019/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "rock-valley-college": {
+      "file": "/uni-logos/bulk/rock-valley-college.png",
+      "source": "https://rockvalleycollege.edu/favicon.ico",
+      "sourceSize": "32x32"
     },
     "rockefeller-university": {
       "file": "/uni-logos/bulk/rockefeller-university.png",
@@ -4566,10 +5961,25 @@
       "source": "https://rockinghamcc.edu/wp-content/uploads/2020/07/FC-Accent3.png",
       "sourceSize": "250x250"
     },
+    "rockland-community-college": {
+      "file": "/uni-logos/bulk/rockland-community-college.png",
+      "source": "https://sunyrockland.edu/wp-content/uploads/2021/11/cropped-rccseal-192x192.png",
+      "sourceSize": "192x192"
+    },
     "rocky-mountain-college": {
       "file": "/uni-logos/bulk/rocky-mountain-college.png",
       "source": "https://i0.wp.com/rocky.edu/wp-content/uploads/2021/08/favicon.png?fit=192%2C192&#038;ssl=1",
       "sourceSize": "192x192"
+    },
+    "rocky-mountain-college-of-art-and-design": {
+      "file": "/uni-logos/bulk/rocky-mountain-college-of-art-and-design.png",
+      "source": "https://www.rmcad.edu/wp-content/uploads/2022/08/cropped-favicon-idea-1-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "rocky-vista-university": {
+      "file": "/uni-logos/bulk/rocky-vista-university.png",
+      "source": "https://www.rvu.edu/wp-content/uploads/rvu-favion-circle.png",
+      "sourceSize": "500x500"
     },
     "roger-williams-university": {
       "file": "/uni-logos/bulk/roger-williams-university.png",
@@ -4586,10 +5996,20 @@
       "source": "https://rollins.edu/apple-touch-icon.png",
       "sourceSize": "152x152"
     },
+    "rosalind-franklin-university-of-medicine-and-science": {
+      "file": "/uni-logos/bulk/rosalind-franklin-university-of-medicine-and-science.png",
+      "source": "https://www.rosalindfranklin.edu/images/favicons/favicon-194x194.png",
+      "sourceSize": "194x194"
+    },
     "rose-hulman-institute-of-technology": {
       "file": "/uni-logos/bulk/rose-hulman-institute-of-technology.png",
       "source": "https://www.rose-hulman.edu/apple-icon-144x144.png",
       "sourceSize": "144x144"
+    },
+    "rose-state-college": {
+      "file": "/uni-logos/bulk/rose-state-college.png",
+      "source": "https://cdn-ilehcha.nitrocdn.com/fDIqBiygoEiOdDCwrJWWOsxIOOlFRcbD/assets/images/optimized/rev-71540df/rose.edu/wp-content/uploads/2024/11/RSC-logo.png",
+      "sourceSize": "147x191"
     },
     "rowan-cabarrus-community-college": {
       "file": "/uni-logos/bulk/rowan-cabarrus-community-college.png",
@@ -4626,6 +6046,16 @@
       "source": "https://runshaw.ac.uk/wp-content/themes/runshaw-23/assets/icons/android-icon-192x192.png",
       "sourceSize": "192x192"
     },
+    "rush-university": {
+      "file": "/uni-logos/bulk/rush-university.png",
+      "source": "https://www.rush.edu/sites/default/files/favicon-96x96.png",
+      "sourceSize": "96x96"
+    },
+    "sacramento-city-college": {
+      "file": "/uni-logos/bulk/sacramento-city-college.png",
+      "source": "https://scc.losrios.edu/scc/main/img/icons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "sacred-heart-university": {
       "file": "/uni-logos/bulk/sacred-heart-university.png",
       "source": "https://www.sacredheart.edu/media/shu-media/site-assets/images/apple-touch-icon.png",
@@ -4635,6 +6065,11 @@
       "file": "/uni-logos/bulk/saddleback-college.png",
       "source": "https://www.saddleback.edu/themes/custom/saddleback_theme/assets/favicon/favicon.png",
       "sourceSize": "97x97"
+    },
+    "sae-creative-media-institute": {
+      "file": "/uni-logos/bulk/sae-creative-media-institute.png",
+      "source": "https://s3-eu-central-1.amazonaws.com/sae-edu-gsa-wp-2022/wp-media-folder-sae-germany/wp-content/uploads/sites/2/2021/09/cropped-SAE_favicon-1-192x192.png",
+      "sourceSize": "192x192"
     },
     "saginaw-chippewa-tribal-college": {
       "file": "/uni-logos/bulk/saginaw-chippewa-tribal-college.png",
@@ -4651,10 +6086,20 @@
       "source": "https://www.anselm.edu/themes/custom/saint_anselm/images/favicon/apple-touch-icon-60x60.png",
       "sourceSize": "60x60"
     },
+    "saint-edward-s-university": {
+      "file": "/uni-logos/bulk/saint-edward-s-university.png",
+      "source": "https://library.stedwards.edu/favicon.png",
+      "sourceSize": "192x192"
+    },
     "saint-elizabeth-college-of-nursing": {
       "file": "/uni-logos/bulk/saint-elizabeth-college-of-nursing.png",
       "source": "https://www.secon.edu/wp-content/uploads/2021/02/cropped-SECON-LOGO-green-192x192.png",
       "sourceSize": "192x192"
+    },
+    "saint-francis-university": {
+      "file": "/uni-logos/bulk/saint-francis-university.png",
+      "source": "https://francis.edu/favicon.ico",
+      "sourceSize": "32x32"
     },
     "saint-john-s-university-ny": {
       "file": "/uni-logos/bulk/saint-john-s-university-ny.png",
@@ -4721,6 +6166,16 @@
       "source": "https://www.sxu.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "salem-college": {
+      "file": "/uni-logos/bulk/salem-college.png",
+      "source": "https://www.salem.edu/wp-content/uploads/2025/01/cropped-Salem-College-Seal-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "salisbury-state-university": {
+      "file": "/uni-logos/bulk/salisbury-state-university.png",
+      "source": "https://ssu.edu/wp-content/uploads/cropped-mstile-150x150-e1522862086119-255x255.png",
+      "sourceSize": "255x255"
+    },
     "salisbury-university": {
       "file": "/uni-logos/bulk/salisbury-university.png",
       "source": "https://www.salisbury.edu/_files/img/su-favicon.png",
@@ -4735,6 +6190,11 @@
       "file": "/uni-logos/bulk/salt-lake-community-college.png",
       "source": "https://www.slcc.edu/_redesign/_files/images/apple-touch-icon-precomposed.png",
       "sourceSize": "180x180"
+    },
+    "salve-regina-university": {
+      "file": "/uni-logos/bulk/salve-regina-university.png",
+      "source": "https://salve.edu/themes/custom/salve/assets/favicons/web-app-manifest-192x192.png",
+      "sourceSize": "192x192"
     },
     "sam-houston-state-university": {
       "file": "/uni-logos/bulk/sam-houston-state-university.png",
@@ -4751,6 +6211,16 @@
       "source": "https://sampsoncc.b-cdn.net/app/themes/sampsoncc/dist/img/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "samuel-merritt-college": {
+      "file": "/uni-logos/bulk/samuel-merritt-college.png",
+      "source": "https://www.samuelmerritt.edu/themes/custom/samu/apple-touch-icon.png",
+      "sourceSize": "144x144"
+    },
+    "san-bernardino-community-college-district": {
+      "file": "/uni-logos/bulk/san-bernardino-community-college-district.png",
+      "source": "https://sbccd.edu/_resources/favicons/android-icon-192x192.png?v=2023.10.06.11.53.37",
+      "sourceSize": "192x192"
+    },
     "san-bernardino-valley-college": {
       "file": "/uni-logos/bulk/san-bernardino-valley-college.png",
       "source": "https://www.valleycollege.edu/_resources/icons/2022/favicon-2022-194x194.png?v=20250128",
@@ -4760,6 +6230,11 @@
       "file": "/uni-logos/bulk/san-diego-christian-college.png",
       "source": "https://sdcc.edu/wp-content/themes/divi-mmm/fav/android-icon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "san-diego-city-college": {
+      "file": "/uni-logos/bulk/san-diego-city-college.png",
+      "source": "https://sdcity.edu/favicon.ico",
+      "sourceSize": "64x64"
     },
     "san-diego-mesa-college": {
       "file": "/uni-logos/bulk/san-diego-mesa-college.png",
@@ -4785,6 +6260,11 @@
       "file": "/uni-logos/bulk/san-joaquin-valley-college-visalia.png",
       "source": "https://www.sjvc.edu/wp-content/uploads/2025/03/SJVC-Logo-Icon.png",
       "sourceSize": "152x150"
+    },
+    "san-juan-bautista-school-of-medicine": {
+      "file": "/uni-logos/bulk/san-juan-bautista-school-of-medicine.png",
+      "source": "https://sanjuanbautista.edu/user/themes/bootstrap4/favicon.png",
+      "sourceSize": "48x48"
     },
     "sans-technology-institute": {
       "file": "/uni-logos/bulk/sans-technology-institute.png",
@@ -4841,6 +6321,11 @@
       "source": "https://savannahstate.edu/wp-content/uploads/2024/06/favicon-350x350.png",
       "sourceSize": "350x350"
     },
+    "savannah-technical-college": {
+      "file": "/uni-logos/bulk/savannah-technical-college.png",
+      "source": "https://www.savannahtech.edu/wp-content/uploads/2026/08/savannah-tech-favicon.png",
+      "sourceSize": "144x144"
+    },
     "saxion-universities": {
       "file": "/uni-logos/bulk/saxion-universities.png",
       "source": "https://www.saxion.edu/webfiles/1788341337993/static/default/images/favicons/apple-touch-icon.png",
@@ -4881,6 +6366,11 @@
       "source": "https://www.sruc.ac.uk/assets/images/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "seattle-central-college": {
+      "file": "/uni-logos/bulk/seattle-central-college.png",
+      "source": "https://seattlecentral.edu/sites/default/files/seattlecentralcollege_0.ico",
+      "sourceSize": "32x32"
+    },
     "seattle-university": {
       "file": "/uni-logos/bulk/seattle-university.png",
       "source": "https://www.seattleu.edu/media/seattle-university/site-assets/favicons/apple-touch-icon.png",
@@ -4896,6 +6386,11 @@
       "source": "https://www.seminolestate.edu/ssap/assets/source/website/branding/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "sepr-l-ecole-des-metiers": {
+      "file": "/uni-logos/bulk/sepr-l-ecole-des-metiers.png",
+      "source": "https://www.sepr.edu/wp-content/uploads/favicon.svg",
+      "sourceSize": "2133x2133"
+    },
     "seton-hill-college": {
       "file": "/uni-logos/bulk/seton-hill-college.png",
       "source": "https://www.setonhill.edu/_favicon/apple-touch-icon.png",
@@ -4905,6 +6400,11 @@
       "file": "/uni-logos/bulk/sewanee-university-of-the-south.png",
       "source": "https://new.sewanee.edu/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "shahjalal-university-of-science-and-technology": {
+      "file": "/uni-logos/bulk/shahjalal-university-of-science-and-technology.png",
+      "source": "https://library.sust.edu/frontend/images/logo/sust2.png",
+      "sourceSize": "160x138"
     },
     "shasta-college": {
       "file": "/uni-logos/bulk/shasta-college.png",
@@ -4920,6 +6420,11 @@
       "file": "/uni-logos/bulk/shawnee-community-college.png",
       "source": "https://shawneecc.edu/wp-content/uploads/2018/08/SCC-logo-image-only.png",
       "sourceSize": "125x123"
+    },
+    "sheffield-hallam-university": {
+      "file": "/uni-logos/bulk/sheffield-hallam-university.png",
+      "source": "https://library.shu.ac.uk/apple-touch-icon-precomposed.png",
+      "sourceSize": "144x144"
     },
     "shenandoah-university": {
       "file": "/uni-logos/bulk/shenandoah-university.png",
@@ -4950,6 +6455,11 @@
       "file": "/uni-logos/bulk/siam-university.png",
       "source": "https://siam.edu/wp-content/uploads/2025/05/emoticon512x512_big-512x402.png",
       "sourceSize": "512x402"
+    },
+    "siena-college": {
+      "file": "/uni-logos/bulk/siena-college.png",
+      "source": "https://siena.edu/favicon.png",
+      "sourceSize": "32x32"
     },
     "sierra-college": {
       "file": "/uni-logos/bulk/sierra-college.png",
@@ -5006,6 +6516,11 @@
       "source": "https://www.sofia.edu/wp-content/uploads/2021/09/Sofia-Favicon.png",
       "sourceSize": "100x100"
     },
+    "somerset-community-college": {
+      "file": "/uni-logos/bulk/somerset-community-college.png",
+      "source": "https://somerset.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "south-carolina-state-university": {
       "file": "/uni-logos/bulk/south-carolina-state-university.png",
       "source": "https://scsu.edu/_resources/images/favicon.png",
@@ -5036,10 +6551,20 @@
       "source": "https://www.southhills.edu/wp-content/uploads/cropped-South-Hills-SH-Logo-512x512-1-192x192.jpg",
       "sourceSize": "192x192"
     },
+    "south-piedmont-community-college": {
+      "file": "/uni-logos/bulk/south-piedmont-community-college.png",
+      "source": "https://spcc.edu/wp-content/uploads/2025/05/SP-Web-Icon-300x300.png",
+      "sourceSize": "300x300"
+    },
     "south-plains-college": {
       "file": "/uni-logos/bulk/south-plains-college.png",
       "source": "https://www.southplainscollege.edu/_resources/images/structure/logos/spc192.png",
       "sourceSize": "192x192"
+    },
+    "south-seattle-college": {
+      "file": "/uni-logos/bulk/south-seattle-college.png",
+      "source": "https://southseattle.edu/sites/default/files/south-seattle-college-icon_0.ico",
+      "sourceSize": "32x32"
     },
     "south-suburban-college": {
       "file": "/uni-logos/bulk/south-suburban-college.png",
@@ -5060,6 +6585,11 @@
       "file": "/uni-logos/bulk/southeast-community-college-area.png",
       "source": "https://southeast.edu/_resources/images/SCC_Logo.svg",
       "sourceSize": "1233x1179"
+    },
+    "southeast-kentucky-community-and-technical-college": {
+      "file": "/uni-logos/bulk/southeast-kentucky-community-and-technical-college.png",
+      "source": "https://southeast.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
     },
     "southeast-missouri-state-university": {
       "file": "/uni-logos/bulk/southeast-missouri-state-university.png",
@@ -5091,6 +6621,11 @@
       "source": "https://prod.speakcdn.com/sitefiles/2330/css/images/favicon/apple-touch-icon.png?033023-1",
       "sourceSize": "180x180"
     },
+    "southern-connecticut-state-university": {
+      "file": "/uni-logos/bulk/southern-connecticut-state-university.png",
+      "source": "https://www.southernct.edu/themes/custom/custom_theme/favicon.ico",
+      "sourceSize": "52x52"
+    },
     "southern-crescent-technical-college": {
       "file": "/uni-logos/bulk/southern-crescent-technical-college.png",
       "source": "https://www.sctech.edu/wp-content/uploads/cropped-favicon-192x192.png",
@@ -5100,6 +6635,11 @@
       "file": "/uni-logos/bulk/southern-illinois-university-carbondale.png",
       "source": "https://siu.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "southern-maine-community-college": {
+      "file": "/uni-logos/bulk/southern-maine-community-college.png",
+      "source": "https://www.smccme.edu/wp-content/themes/smcc/library/images/apple-icon-touch.png",
+      "sourceSize": "129x129"
     },
     "southern-nazarene-university": {
       "file": "/uni-logos/bulk/southern-nazarene-university.png",
@@ -5130,6 +6670,11 @@
       "file": "/uni-logos/bulk/southern-virginia-university.png",
       "source": "https://svu.edu/wp-content/uploads/2023/05/cropped-svu-emblem_crimson_512x512-192x192.png",
       "sourceSize": "192x192"
+    },
+    "southern-wesleyan-university": {
+      "file": "/uni-logos/bulk/southern-wesleyan-university.png",
+      "source": "https://www.swu.edu/_assets/_logos/favicon.ico",
+      "sourceSize": "144x144"
     },
     "southern-west-virginia-community-and-technical-college": {
       "file": "/uni-logos/bulk/southern-west-virginia-community-and-technical-college.png",
@@ -5211,6 +6756,11 @@
       "source": "https://spalding.edu/wp-content/uploads/2016/05/favicon-32x32.png",
       "sourceSize": "32x32"
     },
+    "spartanburg-methodist-college": {
+      "file": "/uni-logos/bulk/spartanburg-methodist-college.png",
+      "source": "https://www.smcsc.edu/wp-content/uploads/cropped-SMC_site_icon-300x300.png",
+      "sourceSize": "300x300"
+    },
     "spokane-colleges": {
       "file": "/uni-logos/bulk/spokane-colleges.png",
       "source": "https://spokane.edu/MarketingLanding/SpokaneColleges_Favicon_500x500.png",
@@ -5241,6 +6791,11 @@
       "source": "https://sau.edu/media/content-assets/images/logos/favicon.png",
       "sourceSize": "801x801"
     },
+    "st-anthony-college-of-nursing": {
+      "file": "/uni-logos/bulk/st-anthony-college-of-nursing.png",
+      "source": "https://www.osfhealthcare.org/favicon.png",
+      "sourceSize": "180x180"
+    },
     "st-augustine-s-university": {
       "file": "/uni-logos/bulk/st-augustine-s-university.png",
       "source": "https://st-aug.edu/wp-content/uploads/2018/06/cropped-SAU-vertical-01-2-192x192.png",
@@ -5261,6 +6816,11 @@
       "source": "https://www.sjc.edu/application/files/4415/5924/4468/favicon.png",
       "sourceSize": "500x500"
     },
+    "st-joseph-s-college-me": {
+      "file": "/uni-logos/bulk/st-joseph-s-college-me.png",
+      "source": "https://59f84262.delivery.rocketcdn.me/wp-content/uploads/2025/08/SJC_Favicon.png",
+      "sourceSize": "260x260"
+    },
     "st-lawrence-university": {
       "file": "/uni-logos/bulk/st-lawrence-university.png",
       "source": "https://www.stlawu.edu/themes/custom/stlawu/assets/favicons/apple-touch-icon.png",
@@ -5275,6 +6835,11 @@
       "file": "/uni-logos/bulk/st-mary-of-the-woods-college.png",
       "source": "https://www.smwc.edu/wp-content/uploads/2019/11/cropped-smwc-circle-navy-300x300.png",
       "sourceSize": "300x300"
+    },
+    "st-mary-s-college-of-maryland": {
+      "file": "/uni-logos/bulk/st-mary-s-college-of-maryland.png",
+      "source": "https://library.smcm.edu/wp-content/uploads/2020/03/cropped-SMCM_NauticalFlag_Favicon_512px-192x192.png",
+      "sourceSize": "192x192"
     },
     "st-mary-s-university": {
       "file": "/uni-logos/bulk/st-mary-s-university.png",
@@ -5296,10 +6861,20 @@
       "source": "https://snc.edu/themes/custom/snc/src/images/logo-snc-athletics.svg",
       "sourceSize": "2500x1617"
     },
+    "st-thomas-aquinas-college": {
+      "file": "/uni-logos/bulk/st-thomas-aquinas-college.png",
+      "source": "https://b2857029.assetcdn.net/2.0/2857029/wp-content/uploads/2023/05/STACfavicon.gif?lossy=1&strip=1&webp=0",
+      "sourceSize": "32x32"
+    },
     "st-thomas-university-fl": {
       "file": "/uni-logos/bulk/st-thomas-university-fl.png",
       "source": "https://www.stu.edu/wp-content/uploads/2025/04/favicon.png",
       "sourceSize": "300x300"
+    },
+    "staffordshire-university": {
+      "file": "/uni-logos/bulk/staffordshire-university.png",
+      "source": "https://staffs.ac.uk/favicon.ico",
+      "sourceSize": "32x32"
     },
     "stamford-international-university": {
       "file": "/uni-logos/bulk/stamford-international-university.png",
@@ -5331,6 +6906,11 @@
       "source": "https://www.stonybrook.edu/commcms/_resources/favicon/apple-touch-icon.png",
       "sourceSize": "144x144"
     },
+    "state-university-of-new-york-college-at-brockport": {
+      "file": "/uni-logos/bulk/state-university-of-new-york-college-at-brockport.png",
+      "source": "https://brockport.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "state-university-of-new-york-college-at-cortland": {
       "file": "/uni-logos/bulk/state-university-of-new-york-college-at-cortland.png",
       "source": "https://www2.cortland.edu/apple-touch-icon.png",
@@ -5340,6 +6920,11 @@
       "file": "/uni-logos/bulk/state-university-of-new-york-college-at-geneseo.png",
       "source": "https://www.geneseo.edu/wp-content/uploads/2025/11/cropped-334_COMMARK_2025_Logo-materials_UPDATE-favicon-192x192.png",
       "sourceSize": "192x192"
+    },
+    "state-university-of-new-york-college-at-new-paltz": {
+      "file": "/uni-logos/bulk/state-university-of-new-york-college-at-new-paltz.png",
+      "source": "https://library.newpaltz.edu/apple-touch-icon.png",
+      "sourceSize": "114x114"
     },
     "state-university-of-new-york-college-at-old-westbury": {
       "file": "/uni-logos/bulk/state-university-of-new-york-college-at-old-westbury.png",
@@ -5386,6 +6971,11 @@
       "source": "https://www.sterling.edu/sites/all/themes/omega/omega/apple-touch-icon-precomposed.png",
       "sourceSize": "57x57"
     },
+    "stetson-university": {
+      "file": "/uni-logos/bulk/stetson-university.png",
+      "source": "https://stetson.edu/favicon.ico",
+      "sourceSize": "192x192"
+    },
     "stevens-institute-of-technology": {
       "file": "/uni-logos/bulk/stevens-institute-of-technology.png",
       "source": "https://www.stevens.edu/favicon/apple-touch-icon.png",
@@ -5431,10 +7021,20 @@
       "source": "https://www.sulross.edu/wp-content/uploads/2020/08/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "sullivan-county-community-college": {
+      "file": "/uni-logos/bulk/sullivan-county-community-college.png",
+      "source": "https://sunysullivan.edu/wp-content/uploads/2020/12/cropped-SUNY-sullivan-logo-1-192x192.png",
+      "sourceSize": "192x192"
+    },
     "sullivan-university": {
       "file": "/uni-logos/bulk/sullivan-university.png",
       "source": "https://www.sullivan.edu/images/favicon.png",
       "sourceSize": "180x180"
+    },
+    "suny-adirondack-adirondack-community-college": {
+      "file": "/uni-logos/bulk/suny-adirondack-adirondack-community-college.png",
+      "source": "https://sunyacc.edu/themes/custom/suny/assets/favicons/android-chrome-192x192.png",
+      "sourceSize": "192x192"
     },
     "suny-broome-community-college": {
       "file": "/uni-logos/bulk/suny-broome-community-college.png",
@@ -5444,6 +7044,11 @@
     "suny-downstate-health-sciences-university": {
       "file": "/uni-logos/bulk/suny-downstate-health-sciences-university.png",
       "source": "https://www.downstate.edu/_resources/images/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
+    "suny-empire-state-university": {
+      "file": "/uni-logos/bulk/suny-empire-state-university.png",
+      "source": "https://sunyempire.edu/_resources/assets/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
     "suny-westchester-community-college": {
@@ -5505,6 +7110,11 @@
       "file": "/uni-logos/bulk/taylor-university.png",
       "source": "https://www.taylor.edu/_files/images/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "tbilisi-state-medical-university": {
+      "file": "/uni-logos/bulk/tbilisi-state-medical-university.png",
+      "source": "https://tsmu.edu/ts/images/favicon.ico",
+      "sourceSize": "146x146"
     },
     "technische-universitat-dortmund": {
       "file": "/uni-logos/bulk/technische-universitat-dortmund.png",
@@ -5571,6 +7181,16 @@
       "source": "https://www.ttu.edu/apple-touch-icon.png",
       "sourceSize": "57x57"
     },
+    "texas-wesleyan-university": {
+      "file": "/uni-logos/bulk/texas-wesleyan-university.png",
+      "source": "https://txwes.edu/media/communications-office/brand-toolbox/txwes-logos/TxWesShieldIcon.png",
+      "sourceSize": "1200x1200"
+    },
+    "texas-woman-s-university": {
+      "file": "/uni-logos/bulk/texas-woman-s-university.png",
+      "source": "https://twu.edu/favicon.ico",
+      "sourceSize": "33x33"
+    },
     "thaddeus-stevens-college-of-technology": {
       "file": "/uni-logos/bulk/thaddeus-stevens-college-of-technology.png",
       "source": "https://i0.wp.com/www.stevenscollege.edu/wp-content/uploads/2024/04/cropped-favicon.png?fit=192%2C192&#038;quality=80&#038;ssl=1",
@@ -5580,6 +7200,11 @@
       "file": "/uni-logos/bulk/the-american-college-of-greece.png",
       "source": "https://www.acg.edu/wp-content/plugins/phpsword-favicon-manager/favicons/ACG_logo_800.png",
       "sourceSize": "800x730"
+    },
+    "the-american-university-of-paris": {
+      "file": "/uni-logos/bulk/the-american-university-of-paris.png",
+      "source": "https://www.aup.edu/themes/custom/aup/favicon.ico",
+      "sourceSize": "64x64"
     },
     "the-bush-school": {
       "file": "/uni-logos/bulk/the-bush-school.png",
@@ -5681,6 +7306,11 @@
       "source": "https://www.utrgv.edu/_files/images-2022/spirit-v-orange.png",
       "sourceSize": "32x32"
     },
+    "the-university-of-texas-at-san-antonio": {
+      "file": "/uni-logos/bulk/the-university-of-texas-at-san-antonio.png",
+      "source": "https://www.utsa.edu/_files/images/favicon/android-icon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "the-winsor-school": {
       "file": "/uni-logos/bulk/the-winsor-school.png",
       "source": "https://www.winsor.edu/wp-content/uploads/2024/01/cropped-favicon-1-192x192.png",
@@ -5696,6 +7326,11 @@
       "source": "https://www.thomasaquinas.edu/sites/default/files/Shield_Grey.png",
       "sourceSize": "284x314"
     },
+    "thomas-college": {
+      "file": "/uni-logos/bulk/thomas-college.png",
+      "source": "https://www.thomas.edu/wp-content/uploads/2024/02/cropped-favicon-300x300.png",
+      "sourceSize": "300x300"
+    },
     "thomas-jefferson-high-school-for-science-and-technology": {
       "file": "/uni-logos/bulk/thomas-jefferson-high-school-for-science-and-technology.png",
       "source": "https://ion.tjhsst.edu/static/img/favicon/favicon-32x32.png",
@@ -5705,6 +7340,11 @@
       "file": "/uni-logos/bulk/three-rivers-community-college.png",
       "source": "https://trcc.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "tiffin-university": {
+      "file": "/uni-logos/bulk/tiffin-university.png",
+      "source": "https://www.tiffin.edu/nitropack_static/rfNCIaqqEsrXKRRLbfCAeWQAhlVTQUEz/assets/images/optimized/rev-98b076d/www.tiffin.edu/wp-content/uploads/2022/03/cropped-tiffin-favicon-1-192x192.png",
+      "sourceSize": "192x192"
     },
     "tilburg-university": {
       "file": "/uni-logos/bulk/tilburg-university.png",
@@ -5746,6 +7386,11 @@
       "source": "https://www.transy.edu/wp-content/uploads/2020/01/cropped-site-icon-192x192.png?x50376",
       "sourceSize": "192x192"
     },
+    "treasure-valley-community-college": {
+      "file": "/uni-logos/bulk/treasure-valley-community-college.png",
+      "source": "https://tvcc.cc/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "trevecca-nazarene-university": {
       "file": "/uni-logos/bulk/trevecca-nazarene-university.png",
       "source": "https://www.trevecca.edu/hubfs/Shield_square.png",
@@ -5766,15 +7411,35 @@
       "source": "https://www.trincoll.edu/wp-content/themes/trinity/primary/android-chrome-192x192.png",
       "sourceSize": "192x192"
     },
+    "trinity-college-dc": {
+      "file": "/uni-logos/bulk/trinity-college-dc.png",
+      "source": "https://i0.wp.com/www2.trinitydc.edu/wp-content/uploads/2025/10/site-icon.png?fit=192%2C192&#038;ssl=1",
+      "sourceSize": "192x192"
+    },
     "trinity-college-of-florida": {
       "file": "/uni-logos/bulk/trinity-college-of-florida.png",
       "source": "https://www.trinitycollege.edu/wp-content/uploads/2026/07/cropped-Trinity-Logo_Brandmark_Gradiant@3x-1-192x192.png",
       "sourceSize": "192x192"
     },
+    "truckee-meadows-community-college": {
+      "file": "/uni-logos/bulk/truckee-meadows-community-college.png",
+      "source": "https://tmcc.edu/favicon.ico",
+      "sourceSize": "666x666"
+    },
+    "truman-state-university": {
+      "file": "/uni-logos/bulk/truman-state-university.png",
+      "source": "https://library.truman.edu/wp-content/uploads/2022/06/favicon.png",
+      "sourceSize": "48x48"
+    },
     "tufts-university": {
       "file": "/uni-logos/bulk/tufts-university.png",
       "source": "https://www.tufts.edu/themes/custom/tuftsedu_theme/favicon.png",
       "sourceSize": "512x512"
+    },
+    "tulane-university": {
+      "file": "/uni-logos/bulk/tulane-university.png",
+      "source": "https://library.tulane.edu/sites/default/files/tulaneshield_green.svg",
+      "sourceSize": "576x811"
     },
     "tulsa-community-college": {
       "file": "/uni-logos/bulk/tulsa-community-college.png",
@@ -5785,6 +7450,11 @@
       "file": "/uni-logos/bulk/turing-school-of-software-and-design.png",
       "source": "https://cdn.prod.website-files.com/6181549f60a2245732e2f91b/61a6c4128130ee7c7f1c9ac2_turing-school-mark-256.png",
       "sourceSize": "256x256"
+    },
+    "tusculum-college": {
+      "file": "/uni-logos/bulk/tusculum-college.png",
+      "source": "https://site.tusculum.edu/wp-content/uploads/2022/06/favicon.png",
+      "sourceSize": "128x128"
     },
     "tuskegee-university": {
       "file": "/uni-logos/bulk/tuskegee-university.png",
@@ -5816,6 +7486,11 @@
       "source": "https://www.usuhs.edu/sites/default/files/favicons/android-chrome-192x192.png",
       "sourceSize": "192x192"
     },
+    "union-college-kentucky": {
+      "file": "/uni-logos/bulk/union-college-kentucky.png",
+      "source": "https://irp.cdn-website.com/62fe7d2a/dms3rep/multi/union+college+favicon.png",
+      "sourceSize": "57x57"
+    },
     "union-college-nebraska": {
       "file": "/uni-logos/bulk/union-college-nebraska.png",
       "source": "https://uau.edu/apple-touch-icon.png?v=2",
@@ -5824,6 +7499,11 @@
     "union-county-college": {
       "file": "/uni-logos/bulk/union-county-college.png",
       "source": "https://www.ucc.edu/wp-content/uploads/2025/10/cropped-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "union-university": {
+      "file": "/uni-logos/bulk/union-university.png",
+      "source": "https://www.uu.edu/wp-content/uploads/2026/06/cropped-badge-192x192.jpg",
       "sourceSize": "192x192"
     },
     "united-business-institute": {
@@ -5835,6 +7515,11 @@
       "file": "/uni-logos/bulk/united-states-air-force-academy.png",
       "source": "https://www.usafa.edu/app/uploads/af-logo-web-blue-150x150.png",
       "sourceSize": "150x150"
+    },
+    "united-states-military-academy": {
+      "file": "/uni-logos/bulk/united-states-military-academy.png",
+      "source": "https://s3.amazonaws.com/usma-media/logo_crest_only_best_0.gif",
+      "sourceSize": "335x294"
     },
     "united-states-military-academy-west-point": {
       "file": "/uni-logos/bulk/united-states-military-academy-west-point.png",
@@ -5849,6 +7534,16 @@
     "united-states-sports-academy": {
       "file": "/uni-logos/bulk/united-states-sports-academy.png",
       "source": "https://ussu.edu/wp-content/uploads/2025/08/cropped-2025-Academic-Emblem-Navy-scaled-1-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "united-states-university": {
+      "file": "/uni-logos/bulk/united-states-university.png",
+      "source": "https://usuniversity.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
+    "unity-environmental-college": {
+      "file": "/uni-logos/bulk/unity-environmental-college.png",
+      "source": "https://unity.edu/wp-content/uploads/2025/01/cropped-Favicon-2-192x192.png",
       "sourceSize": "192x192"
     },
     "universidad-catolica-san-antonio": {
@@ -5991,10 +7686,20 @@
       "source": "https://www.uakron.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-alabama-at-birmingham": {
+      "file": "/uni-logos/bulk/university-of-alabama-at-birmingham.png",
+      "source": "https://www.uab.edu/joomla4/media/templates/site/sleepyDragon/favicon/favicon-196x196.png",
+      "sourceSize": "196x196"
+    },
     "university-of-alabama-at-huntsville": {
       "file": "/uni-logos/bulk/university-of-alabama-at-huntsville.png",
       "source": "https://uah.edu/apple-touch-icon-precomposed.png",
       "sourceSize": "144x144"
+    },
+    "university-of-alaska-anchorage": {
+      "file": "/uni-logos/bulk/university-of-alaska-anchorage.png",
+      "source": "https://www.uaa.alaska.edu/_template/assets/img/touch-icons/android-icon-192x192.png",
+      "sourceSize": "192x192"
     },
     "university-of-alaska-southeast": {
       "file": "/uni-logos/bulk/university-of-alaska-southeast.png",
@@ -6006,9 +7711,44 @@
       "source": "https://arizona.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-arkansas-community-college-batesville": {
+      "file": "/uni-logos/bulk/university-of-arkansas-community-college-batesville.png",
+      "source": "https://uaccb.edu/favicon.ico",
+      "sourceSize": "50x50"
+    },
+    "university-of-arkansas-fayetteville": {
+      "file": "/uni-logos/bulk/university-of-arkansas-fayetteville.png",
+      "source": "https://www.uark.edu/_resources/includes-22/assets/icons/apple-touch-icon-1024x1024.png",
+      "sourceSize": "1024x1024"
+    },
+    "university-of-arkansas-for-medical-sciences": {
+      "file": "/uni-logos/bulk/university-of-arkansas-for-medical-sciences.png",
+      "source": "https://library.uams.edu/wp-content/themes/uams-2020/assets/favicon/favicon-192x192.png?v=1",
+      "sourceSize": "192x192"
+    },
     "university-of-arkansas-grantham": {
       "file": "/uni-logos/bulk/university-of-arkansas-grantham.png",
       "source": "https://www.uagrantham.edu/wp-content/uploads/2022/06/cropped-uag-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "university-of-arkansas-little-rock": {
+      "file": "/uni-logos/bulk/university-of-arkansas-little-rock.png",
+      "source": "https://ualr.edu/favicon.ico",
+      "sourceSize": "150x150"
+    },
+    "university-of-arkansas-monticello": {
+      "file": "/uni-logos/bulk/university-of-arkansas-monticello.png",
+      "source": "https://uamont.edu/_resources/images/favicon.ico",
+      "sourceSize": "1667x1667"
+    },
+    "university-of-arkansas-system-eversity": {
+      "file": "/uni-logos/bulk/university-of-arkansas-system-eversity.png",
+      "source": "https://uasys.edu/wp-content/uploads/sites/16/2017/08/cropped-uofa-192x192.jpg",
+      "sourceSize": "192x192"
+    },
+    "university-of-asia-pacific-dhanmondi": {
+      "file": "/uni-logos/bulk/university-of-asia-pacific-dhanmondi.png",
+      "source": "https://uap-bd.edu/img/favicon.png",
       "sourceSize": "192x192"
     },
     "university-of-baguio": {
@@ -6026,10 +7766,25 @@
       "source": "https://www.bradford.ac.uk/media-v8/t4-bank/assets/icons/logo_black200x200.png",
       "sourceSize": "200x200"
     },
+    "university-of-bridgeport": {
+      "file": "/uni-logos/bulk/university-of-bridgeport.png",
+      "source": "https://library.bridgeport.edu/wp-content/uploads/2025/05/cropped-ub-logo-rgb-horizontal-192x192.png",
+      "sourceSize": "192x192"
+    },
     "university-of-california-davis": {
       "file": "/uni-logos/bulk/university-of-california-davis.png",
       "source": "https://www.ucdavis.edu/sites/default/files/ucd-favicon5_0.png",
       "sourceSize": "32x32"
+    },
+    "university-of-california-san-francisco": {
+      "file": "/uni-logos/bulk/university-of-california-san-francisco.png",
+      "source": "https://www.library.ucsf.edu/wp-content/uploads/2018/02/site-icon-orange-512-480x480.png",
+      "sourceSize": "480x480"
+    },
+    "university-of-california-santa-barbara": {
+      "file": "/uni-logos/bulk/university-of-california-santa-barbara.png",
+      "source": "https://library.ucsb.edu/android-chrome-512x512.png",
+      "sourceSize": "512x512"
     },
     "university-of-california-santa-cruz": {
       "file": "/uni-logos/bulk/university-of-california-santa-cruz.png",
@@ -6101,6 +7856,11 @@
       "source": "https://www.derby.ac.uk/media/global/system/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-dubuque": {
+      "file": "/uni-logos/bulk/university-of-dubuque.png",
+      "source": "https://dbq.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "university-of-dundee": {
       "file": "/uni-logos/bulk/university-of-dundee.png",
       "source": "https://www.dundee.ac.uk/themes/custom/uod/assets/favicons/apple-icon-180x180.png",
@@ -6121,6 +7881,11 @@
       "source": "https://www.evansville.edu/images/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-fairfax": {
+      "file": "/uni-logos/bulk/university-of-fairfax.png",
+      "source": "https://library.ufairfax.edu/wp-content/uploads/2025/10/uof-logo-150x150.png",
+      "sourceSize": "150x150"
+    },
     "university-of-findlay": {
       "file": "/uni-logos/bulk/university-of-findlay.png",
       "source": "https://www.findlay.edu/wp-content/uploads/2026/04/cropped-favicon-32x32-1-192x192.png",
@@ -6130,6 +7895,11 @@
       "file": "/uni-logos/bulk/university-of-florida.png",
       "source": "https://www.ufl.edu/wp-content/uploads/sites/5/2022/02/favicon-blue_1.png",
       "sourceSize": "64x64"
+    },
+    "university-of-georgia": {
+      "file": "/uni-logos/bulk/university-of-georgia.png",
+      "source": "https://library.uga.edu/sites/default/files/favicon-144x144_0_2.png",
+      "sourceSize": "144x144"
     },
     "university-of-greenwich": {
       "file": "/uni-logos/bulk/university-of-greenwich.png",
@@ -6186,6 +7956,16 @@
       "source": "https://www.uidaho.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-illinois-chicago": {
+      "file": "/uni-logos/bulk/university-of-illinois-chicago.png",
+      "source": "https://library.uic.edu/favicon-196x196.png",
+      "sourceSize": "196x196"
+    },
+    "university-of-illinois-springfield": {
+      "file": "/uni-logos/bulk/university-of-illinois-springfield.png",
+      "source": "https://www.uis.edu/themes/uismain/favicon.ico",
+      "sourceSize": "64x64"
+    },
     "university-of-indianapolis": {
       "file": "/uni-logos/bulk/university-of-indianapolis.png",
       "source": "https://uindy.edu/images/favicon/android-icon-192x192.png",
@@ -6200,6 +7980,11 @@
       "file": "/uni-logos/bulk/university-of-jamestown.png",
       "source": "https://www.uj.edu/wp-content/themes/jamestown/assets/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "university-of-la-verne": {
+      "file": "/uni-logos/bulk/university-of-la-verne.png",
+      "source": "https://library.laverne.edu/wp-content/themes/laverne2017/img/favicon-228.png",
+      "sourceSize": "228x228"
     },
     "university-of-lancaster": {
       "file": "/uni-logos/bulk/university-of-lancaster.png",
@@ -6241,6 +8026,16 @@
       "source": "https://www.maine.edu/wp-content/uploads/sites/1/2026/02/cropped-unnamed-192x192.png",
       "sourceSize": "192x192"
     },
+    "university-of-management-amp-technology": {
+      "file": "/uni-logos/bulk/university-of-management-amp-technology.png",
+      "source": "https://www.umtweb.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
+    "university-of-mary": {
+      "file": "/uni-logos/bulk/university-of-mary.png",
+      "source": "https://www.umary.edu/sites/default/files/favicon-32x32.png",
+      "sourceSize": "32x32"
+    },
     "university-of-mary-hardin-baylor": {
       "file": "/uni-logos/bulk/university-of-mary-hardin-baylor.png",
       "source": "https://www.umhb.edu/img/apple-57.png",
@@ -6260,6 +8055,11 @@
       "file": "/uni-logos/bulk/university-of-maryland-college-park.png",
       "source": "https://umd.edu/default/static/icons/apple-touch-icon.png",
       "sourceSize": "256x256"
+    },
+    "university-of-maryland-eastern-shore": {
+      "file": "/uni-logos/bulk/university-of-maryland-eastern-shore.png",
+      "source": "https://www.umes.edu/wp-content/uploads/2022/07/cropped-siteicon-2-192x192.png",
+      "sourceSize": "192x192"
     },
     "university-of-maryland-global-campus": {
       "file": "/uni-logos/bulk/university-of-maryland-global-campus.png",
@@ -6291,6 +8091,11 @@
       "source": "https://crk.umn.edu/apple-touch-icon-precomposed.png",
       "sourceSize": "157x157"
     },
+    "university-of-minnesota-duluth": {
+      "file": "/uni-logos/bulk/university-of-minnesota-duluth.png",
+      "source": "https://www.d.umn.edu/favicon.ico",
+      "sourceSize": "64x64"
+    },
     "university-of-mississippi": {
       "file": "/uni-logos/bulk/university-of-mississippi.png",
       "source": "https://olemiss.edu/assets/favicons/2026/red_crest_192x192.png",
@@ -6305,6 +8110,11 @@
       "file": "/uni-logos/bulk/university-of-missouri-saint-louis.png",
       "source": "https://www.umsl.edu/files/images/apple-touch-icon-180x180.png",
       "sourceSize": "180x180"
+    },
+    "university-of-mobile": {
+      "file": "/uni-logos/bulk/university-of-mobile.png",
+      "source": "https://umobile.edu/wp-content/uploads/2026/06/cropped-Favicon-192x192.png",
+      "sourceSize": "192x192"
     },
     "university-of-montevallo": {
       "file": "/uni-logos/bulk/university-of-montevallo.png",
@@ -6381,9 +8191,29 @@
       "source": "https://und.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-north-florida": {
+      "file": "/uni-logos/bulk/university-of-north-florida.png",
+      "source": "https://www.unf.edu/images/logos/favicon.ico",
+      "sourceSize": "192x192"
+    },
     "university-of-north-georgia": {
       "file": "/uni-logos/bulk/university-of-north-georgia.png",
       "source": "https://ung.edu/_uploads/images/2021/favicons/android-icon-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "university-of-north-texas": {
+      "file": "/uni-logos/bulk/university-of-north-texas.png",
+      "source": "https://library.unt.edu/assets/omni/images/icons/192x192.png?v=omni",
+      "sourceSize": "192x192"
+    },
+    "university-of-north-texas-health-science-center": {
+      "file": "/uni-logos/bulk/university-of-north-texas-health-science-center.png",
+      "source": "https://unthsc.edu/favicon.png",
+      "sourceSize": "32x32"
+    },
+    "university-of-northampton": {
+      "file": "/uni-logos/bulk/university-of-northampton.png",
+      "source": "https://www.northampton.ac.uk/wp-content/themes/uon-2020/assets/images/favicon/android-chrome-192x192.png",
       "sourceSize": "192x192"
     },
     "university-of-northern-colorado": {
@@ -6411,6 +8241,11 @@
       "source": "https://www.uoregon.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-pikeville": {
+      "file": "/uni-logos/bulk/university-of-pikeville.png",
+      "source": "https://b1243347.assetcdn.net/2.0/1243347/wp-content/uploads/2020/08/favicon-32x32-1.png?lossy=2&strip=1&webp=1",
+      "sourceSize": "32x32"
+    },
     "university-of-pittsburgh-medical-center": {
       "file": "/uni-logos/bulk/university-of-pittsburgh-medical-center.png",
       "source": "https://www.upmc.com/apple-touch-icon.png",
@@ -6430,6 +8265,11 @@
       "file": "/uni-logos/bulk/university-of-portsmouth.png",
       "source": "https://www.port.ac.uk/themes/custom/portsmouth/images/favicons/main/favicon-384x384.png",
       "sourceSize": "384x384"
+    },
+    "university-of-prishtina": {
+      "file": "/uni-logos/bulk/university-of-prishtina.png",
+      "source": "https://library.uni-pr.edu/favicon.ico",
+      "sourceSize": "90x90"
     },
     "university-of-puerto-rico": {
       "file": "/uni-logos/bulk/university-of-puerto-rico.png",
@@ -6586,6 +8426,11 @@
       "source": "https://www.utep.edu/_assets/images-template/webclip.png",
       "sourceSize": "256x256"
     },
+    "university-of-texas-health-science-center-at-san-antonio": {
+      "file": "/uni-logos/bulk/university-of-texas-health-science-center-at-san-antonio.png",
+      "source": "https://library.uthscsa.edu/wp-content/uploads/2018/05/cropped-android-chrome-512x512-192x192.png",
+      "sourceSize": "192x192"
+    },
     "university-of-texas-medical-branch": {
       "file": "/uni-logos/bulk/university-of-texas-medical-branch.png",
       "source": "https://utmb-cdn.azureedge.net/web/favicon/apple-touch-icon.png",
@@ -6611,6 +8456,11 @@
       "source": "https://ozarks.edu/wp-content/themes/ozarks/assets/images/favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-the-people": {
+      "file": "/uni-logos/bulk/university-of-the-people.png",
+      "source": "https://www.uopeople.edu/wp-content/uploads/2024/05/Favicon.webp",
+      "sourceSize": "300x300"
+    },
     "university-of-the-southwest": {
       "file": "/uni-logos/bulk/university-of-the-southwest.png",
       "source": "https://usw.edu/favicon.png",
@@ -6630,6 +8480,11 @@
       "file": "/uni-logos/bulk/university-of-toledo.png",
       "source": "https://www.utoledo.edu/favicon.png",
       "sourceSize": "32x32"
+    },
+    "university-of-toronto-computer-science-department": {
+      "file": "/uni-logos/bulk/university-of-toronto-computer-science-department.png",
+      "source": "https://images.squarespace-cdn.com/content/v1/5c8e9a223560c34f9070706f/9875af32-17f8-484c-8b30-6e04058eb13d/favicon.ico?format=100w",
+      "sourceSize": "100x103"
     },
     "university-of-utah": {
       "file": "/uni-logos/bulk/university-of-utah.png",
@@ -6671,6 +8526,11 @@
       "source": "https://www.westga.edu/_resources/images/icons/android-chrome-192x192.png",
       "sourceSize": "192x192"
     },
+    "university-of-wisconsin-colleges": {
+      "file": "/uni-logos/bulk/university-of-wisconsin-colleges.png",
+      "source": "https://www.wisconsin.edu/uwc/wp-content/themes/_tk-uwsa-theme/favicon.svg?",
+      "sourceSize": "680x708"
+    },
     "university-of-wisconsin-eau-claire": {
       "file": "/uni-logos/bulk/university-of-wisconsin-eau-claire.png",
       "source": "https://www.uwec.edu/themes/custom/citizen_dart/favicons/apple-touch-icon.png",
@@ -6686,6 +8546,11 @@
       "source": "https://www.uwlax.edu/images/icons/UWL/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "university-of-wisconsin-madison": {
+      "file": "/uni-logos/bulk/university-of-wisconsin-madison.png",
+      "source": "https://web.library.wisc.edu/a/favicon/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "university-of-wisconsin-milwaukee": {
       "file": "/uni-logos/bulk/university-of-wisconsin-milwaukee.png",
       "source": "https://uwm.edu/wp-content/themes/uwmwebid2/assets/images/apple-touch-icon.png",
@@ -6695,6 +8560,11 @@
       "file": "/uni-logos/bulk/university-of-wisconsin-oshkosh.png",
       "source": "https://www.uwosh.edu/wp-content/themes/uw-oshkosh-divi/assets/images/favicons/apple-touch-icon.png?v=3",
       "sourceSize": "180x180"
+    },
+    "university-of-wisconsin-parkside": {
+      "file": "/uni-logos/bulk/university-of-wisconsin-parkside.png",
+      "source": "https://www.uwp.edu/wp-content/uploads/2026/03/parkside-favicon.png",
+      "sourceSize": "192x192"
     },
     "university-of-wisconsin-platteville": {
       "file": "/uni-logos/bulk/university-of-wisconsin-platteville.png",
@@ -6736,6 +8606,16 @@
       "source": "https://www.york.ac.uk/static/2/images/favicons/favicon_180.png",
       "sourceSize": "180x180"
     },
+    "univsersity-of-chicago-booth-school-of-business": {
+      "file": "/uni-logos/bulk/univsersity-of-chicago-booth-school-of-business.png",
+      "source": "https://www.chicagobooth.edu/favicon.svg",
+      "sourceSize": "308x308"
+    },
+    "unu-world-institute-for-development-economics-research-helsinki-finland": {
+      "file": "/uni-logos/bulk/unu-world-institute-for-development-economics-research-helsinki-finland.png",
+      "source": "https://www.wider.unu.edu/favicons/apple-touch-icon.png",
+      "sourceSize": "180x180"
+    },
     "utah-tech-university": {
       "file": "/uni-logos/bulk/utah-tech-university.png",
       "source": "https://utahtech.edu/wp-content/themes/dixie-state-university/assets/media/favicons/android-icon-192x192.png",
@@ -6745,6 +8625,11 @@
       "file": "/uni-logos/bulk/utica-college.png",
       "source": "https://www.utica.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
+    },
+    "uwi-school-of-business-and-applied-studies-limited-uwi-roytec": {
+      "file": "/uni-logos/bulk/uwi-school-of-business-and-applied-studies-limited-uwi-roytec.png",
+      "source": "https://roytec.edu/images/favicon.ico",
+      "sourceSize": "130x142"
     },
     "valencia-college": {
       "file": "/uni-logos/bulk/valencia-college.png",
@@ -6766,6 +8651,11 @@
       "source": "https://www.vandercook.edu/wp-content/uploads/favicon.jpg",
       "sourceSize": "90x90"
     },
+    "ventura-college": {
+      "file": "/uni-logos/bulk/ventura-college.png",
+      "source": "https://www.venturacollege.edu/themes/custom/venturacollege/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "verde-valley-school": {
       "file": "/uni-logos/bulk/verde-valley-school.png",
       "source": "https://bbk12e1-cdn.myschoolcdn.com/1483/site/1390/homescreen/VVSLogo.png?w=192",
@@ -6786,15 +8676,40 @@
       "source": "https://vermontstate.edu/wp-content/uploads/2022/08/cropped-vsu_logo_color_square_3-192x192.png",
       "sourceSize": "192x192"
     },
+    "vermont-technical-college": {
+      "file": "/uni-logos/bulk/vermont-technical-college.png",
+      "source": "https://vermontstate.edu/wp-content/uploads/2022/08/cropped-vsu_logo_color_square_3-192x192.png",
+      "sourceSize": "192x192"
+    },
+    "vernon-college": {
+      "file": "/uni-logos/bulk/vernon-college.png",
+      "source": "https://library.vernoncollege.edu/images/mobileIcons/icon_57.png",
+      "sourceSize": "57x57"
+    },
     "vesalius-college": {
       "file": "/uni-logos/bulk/vesalius-college.png",
       "source": "https://www.brussels-school.be/themes/custom/ocelot_bsog/icons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "victor-valley-college": {
+      "file": "/uni-logos/bulk/victor-valley-college.png",
+      "source": "https://libapps.s3.amazonaws.com/customers/3825/images/vvcspringsharefavicon.png",
+      "sourceSize": "49x49"
+    },
+    "virginia-community-college-system": {
+      "file": "/uni-logos/bulk/virginia-community-college-system.png",
+      "source": "https://www.vccs.edu/wp-content/uploads/2019/02/cropped-favicon-192x192.png",
+      "sourceSize": "192x192"
+    },
     "virginia-military-institute": {
       "file": "/uni-logos/bulk/virginia-military-institute.png",
       "source": "https://www.vmi.edu/wp-content/uploads/2026/05/cropped-LogoICO-192x192.png",
       "sourceSize": "192x192"
+    },
+    "virginia-state-university": {
+      "file": "/uni-logos/bulk/virginia-state-university.png",
+      "source": "https://library.vsu.edu/wp-content/uploads/2021/01/vsulogosm-1.png",
+      "sourceSize": "125x125"
     },
     "virginia-tech": {
       "file": "/uni-logos/bulk/virginia-tech.png",
@@ -6816,6 +8731,11 @@
       "source": "https://www.batten.edu/assets/img/global/apple-touch-icon.png",
       "sourceSize": "152x152"
     },
+    "virginia-western-community-college": {
+      "file": "/uni-logos/bulk/virginia-western-community-college.png",
+      "source": "https://www.virginiawestern.edu/wp-content/uploads/2021/05/cropped-vwcc-stacked-blue-192x192.png",
+      "sourceSize": "192x192"
+    },
     "vivekananda-institute-of-professional-studies": {
       "file": "/uni-logos/bulk/vivekananda-institute-of-professional-studies.png",
       "source": "https://vips.edu/logo.png",
@@ -6836,6 +8756,11 @@
       "source": "https://wagner.edu/apple-touch-icon.png",
       "sourceSize": "114x114"
     },
+    "wake-forest-baptist-health": {
+      "file": "/uni-logos/bulk/wake-forest-baptist-health.png",
+      "source": "https://wakehealth.edu/favicon.png",
+      "sourceSize": "32x32"
+    },
     "wake-forest-university": {
       "file": "/uni-logos/bulk/wake-forest-university.png",
       "source": "https://prod.wp.cdn.aws.wfu.edu/wfu-gutenberg-quarantheme/assets/images/icon-512.png",
@@ -6846,6 +8771,11 @@
       "source": "https://www.waketech.edu/apple-touch-icon.png",
       "sourceSize": "60x60"
     },
+    "wakefield-college": {
+      "file": "/uni-logos/bulk/wakefield-college.png",
+      "source": "https://wakefield.ac.uk/android-chrome-512x512.png",
+      "sourceSize": "512x512"
+    },
     "walla-walla-community-college": {
       "file": "/uni-logos/bulk/walla-walla-community-college.png",
       "source": "https://www.wwcc.edu/apple-touch-icon.png",
@@ -6855,6 +8785,11 @@
       "file": "/uni-logos/bulk/walla-walla-university.png",
       "source": "https://www.wallawalla.edu/_assets/259983c1692d985796ad63cb89fc164e/Favicons/favicon-196x196.1723046421.png",
       "sourceSize": "196x196"
+    },
+    "walsh-college": {
+      "file": "/uni-logos/bulk/walsh-college.png",
+      "source": "https://walshcollege.edu/favicon.ico",
+      "sourceSize": "32x32"
     },
     "walters-state-community-college": {
       "file": "/uni-logos/bulk/walters-state-community-college.png",
@@ -6936,6 +8871,11 @@
       "source": "https://www.waynecc.edu/wp-content/uploads/cropped-siteicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "wayne-county-community-college-district": {
+      "file": "/uni-logos/bulk/wayne-county-community-college-district.png",
+      "source": "https://www.wcccd.edu/Images/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "wayne-state-college": {
       "file": "/uni-logos/bulk/wayne-state-college.png",
       "source": "https://www.wsc.edu/site/dist/images/favicons/apple-touch-icon.png?1.24.5",
@@ -6976,6 +8916,11 @@
       "source": "https://www.wells.edu/wp-content/uploads/cropped-favicon-192x192.png",
       "sourceSize": "192x192"
     },
+    "wenatchee-valley-college": {
+      "file": "/uni-logos/bulk/wenatchee-valley-college.png",
+      "source": "https://wvc.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "west-chester-university-of-pennsylvania": {
       "file": "/uni-logos/bulk/west-chester-university-of-pennsylvania.png",
       "source": "https://www.wcupa.edu/_resources/favicon/apple-touch-icon.png",
@@ -7001,6 +8946,11 @@
       "source": "https://westhillscollege.com/_favicon/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "west-kentucky-community-and-technical-college": {
+      "file": "/uni-logos/bulk/west-kentucky-community-and-technical-college.png",
+      "source": "https://westkentucky.kctcs.edu/favicon.ico",
+      "sourceSize": "180x180"
+    },
     "west-valley-college": {
       "file": "/uni-logos/bulk/west-valley-college.png",
       "source": "https://www.westvalley.edu/favicon.png",
@@ -7016,6 +8966,11 @@
       "source": "https://www.wvncc.edu/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "west-virginia-school-of-osteopathic-medicine": {
+      "file": "/uni-logos/bulk/west-virginia-school-of-osteopathic-medicine.png",
+      "source": "https://wvsom.edu/favicon.ico",
+      "sourceSize": "32x32"
+    },
     "west-virginia-university-at-parkersburg": {
       "file": "/uni-logos/bulk/west-virginia-university-at-parkersburg.png",
       "source": "https://www.wvup.edu/wp-content/uploads/2026/07/cropped-bell-w-stars-favicon-192x192.png",
@@ -7025,6 +8980,16 @@
       "file": "/uni-logos/bulk/west-virginia-wesleyan-college.png",
       "source": "https://www.wvwc.edu/wp-content/uploads/2021/09/cropped-wes-fav-192x192.png",
       "sourceSize": "192x192"
+    },
+    "westcliff-university": {
+      "file": "/uni-logos/bulk/westcliff-university.png",
+      "source": "https://www.westcliff.edu/wp-content/themes/WU-theme/assets/images/icon-32.png",
+      "sourceSize": "32x32"
+    },
+    "western-carolina-university": {
+      "file": "/uni-logos/bulk/western-carolina-university.png",
+      "source": "https://www.wcu.edu/WebGraphicsNew/icons/WC-192x192.png",
+      "sourceSize": "193x193"
     },
     "western-governors-university": {
       "file": "/uni-logos/bulk/western-governors-university.png",
@@ -7071,6 +9036,11 @@
       "source": "https://cdn.wou.edu/wp-content/blogs.dir/613/files/2022/05/cropped-wou-favicon-1-192x192.png",
       "sourceSize": "192x192"
     },
+    "western-piedmont-community-college": {
+      "file": "/uni-logos/bulk/western-piedmont-community-college.png",
+      "source": "https://www.wpcc.edu/favicon.ico",
+      "sourceSize": "150x150"
+    },
     "western-state-colorado-university": {
       "file": "/uni-logos/bulk/western-state-colorado-university.png",
       "source": "https://western.edu/wp-content/uploads/w-western-favicon.svg",
@@ -7111,6 +9081,11 @@
       "source": "https://westminsteru.edu/_resources/images/favicons/apple-touch-icon.png",
       "sourceSize": "180x180"
     },
+    "westmont-college": {
+      "file": "/uni-logos/bulk/westmont-college.png",
+      "source": "https://www.westmont.edu/sites/default/files/favicon_1.ico",
+      "sourceSize": "64x64"
+    },
     "wharton-county-junior-college": {
       "file": "/uni-logos/bulk/wharton-county-junior-college.png",
       "source": "https://wcjc.edu/_resources/assets/favicon/apple-touch-icon.png",
@@ -7120,6 +9095,11 @@
       "file": "/uni-logos/bulk/whatcom-community-college.png",
       "source": "https://www.whatcom.edu/apple-touch-icon.png",
       "sourceSize": "57x57"
+    },
+    "wheaton-college-norton-ma-usa": {
+      "file": "/uni-logos/bulk/wheaton-college-norton-ma-usa.png",
+      "source": "https://library.wheatoncollege.edu/wp-content/uploads/2024/06/cropped-favicon-1-192x192.png",
+      "sourceSize": "192x192"
     },
     "wheelock-college": {
       "file": "/uni-logos/bulk/wheelock-college.png",
@@ -7180,6 +9160,11 @@
       "file": "/uni-logos/bulk/william-paterson-university.png",
       "source": "https://www.wpunj.edu/template/wp17/images/wp-button.png",
       "sourceSize": "150x150"
+    },
+    "williamsburg-technical-college": {
+      "file": "/uni-logos/bulk/williamsburg-technical-college.png",
+      "source": "https://www.wiltech.edu/wp-content/uploads/2025/10/wtc-logo.svg",
+      "sourceSize": "1000x996"
     },
     "williston-state-college": {
       "file": "/uni-logos/bulk/williston-state-college.png",
@@ -7245,6 +9230,16 @@
       "file": "/uni-logos/bulk/worldquant-university.png",
       "source": "https://www.wqu.edu/sites/default/files/favicon-128x128.png",
       "sourceSize": "128x128"
+    },
+    "wright-state-university": {
+      "file": "/uni-logos/bulk/wright-state-university.png",
+      "source": "https://wright.edu/favicon.ico",
+      "sourceSize": "36x36"
+    },
+    "wsu-tech": {
+      "file": "/uni-logos/bulk/wsu-tech.png",
+      "source": "https://wsutech.edu/wp-content/uploads/2022/11/Favicon-Graphic_AndroidDevices_192x192.png",
+      "sourceSize": "192x192"
     },
     "xavier-university": {
       "file": "/uni-logos/bulk/xavier-university.png",
