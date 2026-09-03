@@ -9,6 +9,15 @@
  * is the single sanctioned home for non-palette hexes.
  */
 
+// Bulk-collected self-served icons: each university's own published
+// favicon/touch icon, fetched from its own domain by
+// `scripts/collect-uni-icons.mjs` (per-file source URL in the manifest — the
+// same provenance class as the hand-collected marks, applied at scale).
+// Consulted only for slugs with NO curated entry of either kind, so a
+// deliberate curation decision (e.g. keeping a school on its monogram chip)
+// is never overridden by collection.
+import BULK_LOGOS from './uni-logos-bulk.json';
+
 export interface UniBrand {
   /** Chip background — the university's primary brand colour. */
   readonly bg: string;
@@ -200,20 +209,33 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
 };
 
 /**
- * Paper-compatible duotones for everything without a curated entry: dark,
- * bookish inks with cream monograms, all AA-safe by construction (tested).
- * Hand-tuned; order is stable — changing it changes fallback assignments.
+ * Kill-switch for bulk-collected marks: add a slug here (takedown request or
+ * an illegible icon) and it instantly reverts to its monogram chip without
+ * touching the generated manifest.
  */
-export const FALLBACK_DUOTONES: readonly { readonly bg: string; readonly fg: string }[] = [
-  { bg: '#1f3a5f', fg: '#fdf0d5' }, // ink blue
-  { bg: '#4a1d3f', fg: '#fdf0d5' }, // mulberry
-  { bg: '#1e4d3b', fg: '#fdf0d5' }, // college green
-  { bg: '#5c3317', fg: '#fdf0d5' }, // oak
-  { bg: '#3d2b56', fg: '#fdf0d5' }, // violet ink
-  { bg: '#284b63', fg: '#fdf0d5' }, // slate
-  { bg: '#6b2737', fg: '#fdf0d5' }, // claret
-  { bg: '#37423d', fg: '#fdf0d5' }, // blackboard green
-];
+export const BULK_LOGO_DENYLIST: ReadonlySet<string> = new Set([]);
+
+/** Convert HSL (deg, %, %) to #rrggbb. */
+function hslToHex(h: number, s: number, l: number): string {
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (n: number): string => {
+    const k = (n + h / 30) % 12;
+    const c = l / 100 - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)));
+    return Math.round(255 * c)
+      .toString(16)
+      .padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+/**
+ * A university-specific duotone for everything without a curated brand: the
+ * slug hashes to its own hue, rendered as a dark bookish ink (27% lightness
+ * keeps every hue AA-safe against the cream monogram — swept in tests).
+ */
+export function fallbackColours(slug: string): { readonly bg: string; readonly fg: string } {
+  return { bg: hslToHex(hashSlug(slug) % 360, 46, 27), fg: '#fdf0d5' };
+}
 
 /** Words that never carry a university's identity. */
 const FILLER = new Set(['the', 'university', 'of', 'college', 'school', 'institute', 'and']);
@@ -238,18 +260,30 @@ function hashSlug(slug: string): number {
   return hash;
 }
 
+const BULK_ICONS: Readonly<Record<string, { readonly file: string } | undefined>> =
+  BULK_LOGOS.icons;
+
 /**
- * The badge for a university: curated brand colours (or a deterministic
- * duotone), plus the official logo when `CURATED_LOGOS` carries one.
+ * The university's own mark: hand-curated first; otherwise its bulk-collected
+ * self-served icon — but only for slugs untouched by curation, so a curated
+ * "monogram chip, no logo" decision stands.
+ */
+function logoFor(slug: string): string | undefined {
+  const curated = CURATED_LOGOS[slug];
+  if (curated !== undefined) return curated;
+  if (CURATED_BRANDS[slug] !== undefined || BULK_LOGO_DENYLIST.has(slug)) return undefined;
+  return BULK_ICONS[slug]?.file;
+}
+
+/**
+ * The badge for a university: curated brand colours (or the university's own
+ * hash-hued duotone), plus its own mark when curation or collection holds one.
  */
 export function badgeFor(slug: string, name: string): UniBrand {
-  const curated = CURATED_BRANDS[slug];
-  const duotone = FALLBACK_DUOTONES[hashSlug(slug) % FALLBACK_DUOTONES.length];
-  const base: UniBrand = curated ?? {
-    bg: duotone?.bg ?? '#1f3a5f',
-    fg: duotone?.fg ?? '#fdf0d5',
+  const base: UniBrand = CURATED_BRANDS[slug] ?? {
+    ...fallbackColours(slug),
     monogram: monogramFor(name),
   };
-  const logo = CURATED_LOGOS[slug];
+  const logo = logoFor(slug);
   return logo === undefined ? base : { ...base, logo };
 }
