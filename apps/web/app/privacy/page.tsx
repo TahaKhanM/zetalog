@@ -70,18 +70,20 @@ export default function PrivacyPage(): React.JSX.Element {
         <li>Why: to compute and show the leaderboards and your per-account history.</li>
         <li>
           Link authentication: after one explicit Link click, the extension uses Chrome Identity and
-          PKCE to open a browser-owned sign-in redirect. The extension keeps the PKCE verifier,
-          validates the exact callback, and exchanges its one-time code directly for a revocable
-          credential. No credential, website session token, authorization code, or PKCE verifier is
-          exposed to page scripts or the content script. Chrome 116 or later is required for this
-          Manifest V3 flow. A valid legacy installation migrates silently. Only an already-broken
-          legacy session needs this one action, and the server rejects legacy credentials from 4
-          November 2026 UTC.
+          PKCE to open a browser-owned sign-in redirect. Completing that sign-in also creates the
+          normal first-party ZetaLog website session for this browser profile. The extension keeps
+          the PKCE verifier, validates the exact callback, and exchanges its one-time code directly
+          for a separate revocable credential. No credential, website session token, authorization
+          code, or PKCE verifier is exposed to page scripts or the content script. Chrome 116 or
+          later is required for this Manifest V3 flow. A valid legacy installation migrates
+          silently. Only an already-broken legacy session needs this one action, and the server
+          rejects legacy credentials from 4 November 2026 UTC.
         </li>
         <li>
           What is not uploaded: no general browsing data, and nothing at all while the extension is
           unlinked. Signing out of the website does not itself unlink an already-linked extension;
-          use Unlink in the popup to revoke it.
+          use Unlink in the popup to revoke it. Unlinking the extension does not sign the website
+          out; use the website&apos;s sign-out action separately.
         </li>
         <li>
           Processors: Supabase provides authentication and database services; Vercel hosts the

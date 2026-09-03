@@ -61,8 +61,8 @@ export function LinkHandoff(): React.JSX.Element {
         <p className="auth-sent__title num">Linked</p>
         <p className="meta">
           {syncPending
-            ? 'Extension connected. Saved scores are queued and will retry automatically.'
-            : 'Extension connected. New games sync automatically. You can close this tab.'}
+            ? 'Extension and website signed in. Saved scores are queued and will retry automatically.'
+            : 'Extension and website signed in. New games sync automatically. You can close this tab.'}
         </p>
         <p style={{ marginTop: '1.25rem' }}>
           <Link href="/me" className="btn btn--ghost btn--sm">
@@ -77,8 +77,9 @@ export function LinkHandoff(): React.JSX.Element {
     <div className="auth-sent">
       <p className="auth-sent__title num">Connect ZetaLog</p>
       <p className="meta">
-        One secure Chrome window will sign you in if needed, then connect this extension to the
-        leaderboard.
+        Syncing needs a free ZetaLog account. The secure Chrome window will ask you to sign in or
+        create one, then connect this extension to the leaderboard. That also signs you in to the
+        ZetaLog website in this browser.
       </p>
       <p style={{ marginTop: '1.25rem' }}>
         <button
