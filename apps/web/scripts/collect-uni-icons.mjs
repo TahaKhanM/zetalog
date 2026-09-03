@@ -32,7 +32,7 @@ const BRAND_PATH = resolve(HERE, '../lib/uni-brand.ts');
 const OUT_DIR = resolve(HERE, '../public/uni-logos/bulk');
 const MANIFEST_PATH = resolve(HERE, '../lib/uni-logos-bulk.json');
 
-const CONCURRENCY = 40;
+const CONCURRENCY = 8;
 const FETCH_TIMEOUT_MS = 10000;
 const MAX_BODY_BYTES = 3 * 1024 * 1024;
 const TILE_PX = 64;
