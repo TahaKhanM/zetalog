@@ -17,7 +17,7 @@ import { safeNext } from '@/app/signin/safe-next';
  * server-side); sign-up and recovery keep the code-only emails — a code is
  * asked for ONLY at account creation and password reset, never for sign-in.
  * OAuth (Google, GitHub) sits above the email flow and round-trips through
- * `/auth/callback`. Shared by `/signin` and `/link`.
+ * `/auth/callback`.
  */
 
 type RecoveryIntent = 'reset' | 'setup';
@@ -93,7 +93,13 @@ function StrengthMeter({ password }: { password: string }): React.JSX.Element | 
   );
 }
 
-export function SignInForm({ next }: { next: string }): React.JSX.Element {
+export function SignInForm({
+  next,
+  extensionLink = false,
+}: {
+  next: string;
+  extensionLink?: boolean;
+}): React.JSX.Element {
   // Defence in depth: this component may be reused by a future page which has
   // not already parsed its query string through the server-page validator.
   const safeDestination = safeNext(next);
@@ -645,7 +651,11 @@ export function SignInForm({ next }: { next: string }): React.JSX.Element {
             }}
           />
         </label>
-        <p className="auth-form__hint">Use your university email to get its badge on the boards.</p>
+        <p className="auth-form__hint">
+          {extensionLink
+            ? 'Enter your email. If you’re new to ZetaLog, we’ll help you create an account next.'
+            : 'Use your university email to get its badge on the boards.'}
+        </p>
         {/* Only busy gates the button: `required` already blocks an empty
             submit, and a value-dependent `disabled` flickers during hydration. */}
         <button type="submit" className="btn btn--primary" disabled={busy}>

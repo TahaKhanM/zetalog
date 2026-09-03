@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clientEnv } from './env';
 import { extensionOAuthRedirectUris, serverEnv } from './env.server';
+import { OFFICIAL_EXTENSION_REDIRECT_URI } from './chrome-store';
 
 const KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -9,6 +10,7 @@ const KEYS = [
   'SUPABASE_SERVICE_ROLE_KEY',
   'RESEND_API_KEY',
   'EMAIL_FROM',
+  'EXTENSION_OAUTH_REDIRECT_URIS',
 ] as const;
 
 const EXTENSION_REDIRECT_URI =
@@ -74,7 +76,19 @@ describe('env (lazy parsing)', () => {
 
   it('reads the extension allowlist without requiring unrelated server configuration', () => {
     vi.stubEnv('EXTENSION_OAUTH_REDIRECT_URIS', EXTENSION_REDIRECT_URI);
-    expect(extensionOAuthRedirectUris()).toEqual([EXTENSION_REDIRECT_URI]);
+    expect(extensionOAuthRedirectUris()).toEqual([
+      OFFICIAL_EXTENSION_REDIRECT_URI,
+      EXTENSION_REDIRECT_URI,
+    ]);
+  });
+
+  it('enables the published Store item when no additional callbacks are configured', () => {
+    expect(extensionOAuthRedirectUris()).toEqual([OFFICIAL_EXTENSION_REDIRECT_URI]);
+  });
+
+  it('always enables the published Store item without duplicating it', () => {
+    vi.stubEnv('EXTENSION_OAUTH_REDIRECT_URIS', OFFICIAL_EXTENSION_REDIRECT_URI);
+    expect(extensionOAuthRedirectUris()).toEqual([OFFICIAL_EXTENSION_REDIRECT_URI]);
   });
 
   it('reflects env changes between calls (no import-time snapshot)', () => {

@@ -6,6 +6,7 @@ import {
   oauthStateSchema,
   pkceChallengeSchema,
 } from '@/lib/extension-oauth';
+import { EXTENSION_LINK_INTENT } from '@/lib/extension-link-intent';
 import { apiError } from '@/lib/http';
 
 export const AUTHORIZE_LIMIT_PER_HOUR = 20;
@@ -53,6 +54,7 @@ export async function handleAuthorize(
   if (userId === null) {
     const signIn = new URL('/signin', requestUrl.origin);
     signIn.searchParams.set('next', `${requestUrl.pathname}${requestUrl.search}`);
+    signIn.searchParams.set('intent', EXTENSION_LINK_INTENT);
     return NextResponse.redirect(signIn, 303);
   }
 

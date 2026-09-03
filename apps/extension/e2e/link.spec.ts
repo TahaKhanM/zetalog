@@ -26,6 +26,12 @@ let extensionId: string;
 let observedChallenge: string | null = null;
 let observedRedirect: string | null = null;
 
+function hasWebsiteSession(req: import('node:http').IncomingMessage): boolean {
+  return (
+    req.headers.cookie?.split(';').some((cookie) => cookie.trim() === 'zl-test-session=1') ?? false
+  );
+}
+
 function cors(res: import('node:http').ServerResponse): void {
   res.setHeader('access-control-allow-origin', '*');
   res.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
@@ -48,10 +54,32 @@ async function startProtocolReplica(): Promise<{ server: Server; baseUrl: string
     if (requestUrl.pathname === '/api/extension/link/authorize') {
       observedChallenge = requestUrl.searchParams.get('code_challenge');
       observedRedirect = requestUrl.searchParams.get('redirect_uri');
+      if (!hasWebsiteSession(req)) {
+        const next = encodeURIComponent(`${requestUrl.pathname}${requestUrl.search}`);
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+        res.end(
+          `<!doctype html><html lang="en"><body><h1>Sign in to ZetaLog</h1><a href="/test-signin?next=${next}">Continue sign-in</a></body></html>`,
+        );
+        return;
+      }
       const callback = new URL(observedRedirect ?? 'https://invalid.example');
       callback.searchParams.set('code', `zla_${'b'.repeat(43)}`);
       callback.searchParams.set('state', requestUrl.searchParams.get('state') ?? 'missing');
       res.writeHead(303, { location: callback.toString() }).end();
+      return;
+    }
+    if (requestUrl.pathname === '/test-signin') {
+      const next = requestUrl.searchParams.get('next');
+      if (!next?.startsWith('/api/extension/link/authorize?')) {
+        res.writeHead(400).end();
+        return;
+      }
+      res
+        .writeHead(303, {
+          location: next,
+          'set-cookie': 'zl-test-session=1; Path=/; HttpOnly; SameSite=Lax',
+        })
+        .end();
       return;
     }
     if (requestUrl.pathname === '/api/extension/link/token' && req.method === 'POST') {
@@ -81,6 +109,17 @@ async function startProtocolReplica(): Promise<{ server: Server; baseUrl: string
     if (requestUrl.pathname === '/api/games' && req.method === 'GET') {
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ games: [] }));
+      return;
+    }
+    if (requestUrl.pathname === '/me') {
+      res.writeHead(hasWebsiteSession(req) ? 200 : 401, {
+        'content-type': 'text/html; charset=utf-8',
+      });
+      res.end(
+        hasWebsiteSession(req)
+          ? '<!doctype html><html lang="en"><body><h1>Website account signed in</h1></body></html>'
+          : '<!doctype html><html lang="en"><body><h1>Website account signed out</h1></body></html>',
+      );
       return;
     }
     res.writeHead(404, { 'content-type': 'application/json' });
@@ -125,10 +164,14 @@ test.afterAll(async () => {
   );
 });
 
-test('links once through Chrome Identity without exposing website tokens', async () => {
+test('signing in through Chrome Identity also signs in normal website tabs', async () => {
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  const authWindowPromise = context.waitForEvent('page');
   await popup.getByRole('button', { name: 'Sync to leaderboard' }).click();
+  const authWindow = await authWindowPromise;
+  await expect(authWindow.getByRole('heading', { name: 'Sign in to ZetaLog' })).toBeVisible();
+  await authWindow.getByRole('link', { name: 'Continue sign-in' }).click();
 
   await expect(popup.getByText('Linked to leaderboard')).toBeVisible({ timeout: 20_000 });
   expect(observedRedirect).toBe(`https://${extensionId}.chromiumapp.org/zetalog-link`);
@@ -142,5 +185,13 @@ test('links once through Chrome Identity without exposing website tokens', async
   });
   expect(JSON.stringify(stored)).toContain(CREDENTIAL);
   expect(JSON.stringify(stored)).not.toContain('refresh_token');
+
+  // The website login happened inside Chrome Identity. Its first-party cookie
+  // must remain available to an ordinary tab after the auth window closes.
+  const website = await context.newPage();
+  const websiteResponse = await website.goto(`${baseUrl}/me`);
+  expect(websiteResponse?.status()).toBe(200);
+  await expect(website.getByRole('heading', { name: 'Website account signed in' })).toBeVisible();
+  await website.close();
   await popup.close();
 });

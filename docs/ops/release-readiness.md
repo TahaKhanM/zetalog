@@ -89,11 +89,11 @@ available; it does not move local storage between extension IDs.
 
 ### 3. Upload the draft to the existing item
 
-- [ ] Open the existing item (`bhbpjdngipckdepgblhopdfijnpeefml`) and upload the
+- [ ] Open the existing item (`bjleafpcpockiiblhkoddgomhkloaiab`) and upload the
       CI ZIP as a **draft only**. Do not rebuild it and do not create a new
       item; a new item gets a new ID and breaks the configured link callback.
 - [ ] Confirm `EXTENSION_OAUTH_REDIRECT_URIS` in staging and production is
-      exactly `https://bhbpjdngipckdepgblhopdfijnpeefml.chromiumapp.org/zetalog-link`;
+      exactly `https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link`;
       wildcards and additional origins are forbidden.
 - [ ] In the fully populated staging environment run `pnpm release:check-env`.
       It validates presence and callback shape without printing secret values.

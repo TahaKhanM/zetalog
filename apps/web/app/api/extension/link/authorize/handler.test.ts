@@ -62,6 +62,7 @@ describe('extension authorize handler', () => {
     expect(next).toContain('/api/extension/link/authorize?');
     expect(next).toContain(`redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
     expect(next).toContain('code_challenge_method=S256');
+    expect(location.searchParams.get('intent')).toBe('link-extension');
   });
 
   it('binds the signed-in user, challenge, and exact redirect before returning code + state', async () => {

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { OFFICIAL_EXTENSION_REDIRECT_URI } from './chrome-store';
 import { clientSchema, parseEnv } from './env';
 import { parseExtensionRedirectUris } from './extension-oauth';
 
@@ -25,7 +26,12 @@ const serverSchema = z.object({
 const extensionOauthSchema = z.object({
   // Comma-separated exact Chrome Identity callback URLs. This is server-only
   // because it defines which installed extension release may receive a code.
-  EXTENSION_OAUTH_REDIRECT_URIS: z.string().min(1).transform(parseExtensionRedirectUris),
+  EXTENSION_OAUTH_REDIRECT_URIS: z
+    .string()
+    .optional()
+    .transform((value) =>
+      value === undefined || value.trim() === '' ? [] : parseExtensionRedirectUris(value),
+    ),
 });
 
 /** Client and server-only variables together — the shape server code receives. */
@@ -43,7 +49,12 @@ export function serverEnv(): ServerEnv {
   return parseEnv(fullServerSchema, process.env);
 }
 
-/** Exact Chrome Identity callback URLs for the extension OAuth flow. */
+/**
+ * Exact Chrome Identity callback URLs for the extension OAuth flow. The
+ * published Store item is always enabled in code; environment entries keep
+ * older official installations working during a controlled ID rotation.
+ */
 export function extensionOAuthRedirectUris(): string[] {
-  return parseEnv(extensionOauthSchema, process.env).EXTENSION_OAUTH_REDIRECT_URIS;
+  const configured = parseEnv(extensionOauthSchema, process.env).EXTENSION_OAUTH_REDIRECT_URIS;
+  return [...new Set([OFFICIAL_EXTENSION_REDIRECT_URI, ...configured])];
 }
