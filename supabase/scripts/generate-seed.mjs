@@ -94,7 +94,9 @@ export function mergeCountry(rows, country) {
  */
 export function assignSlugs(universities, slugCounts) {
   return universities.map((uni) => {
-    const base = slugify(uni.name) || 'university';
+    // Non-Latin names slugify to nothing; fall back to the primary domain so
+    // legacy international .edu holders get a meaningful, collision-free slug.
+    const base = slugify(uni.name) || slugify(uni.domains[0] ?? '') || 'university';
     const seen = slugCounts.get(base) ?? 0;
     const slug = seen === 0 ? base : `${base}-${seen + 1}`;
     slugCounts.set(base, seen + 1);
@@ -148,10 +150,17 @@ export function* tarFiles(tarBuffer) {
 }
 
 /**
+ * A swot line that is a URL, bare domain, or email address rather than an
+ * institution name (contributor artifacts in a hand-edited dataset).
+ */
+const isJunkName = (line) => /^https?:\/\//i.test(line) || (!/\s/.test(line) && /[.@]/.test(line));
+
+/**
  * The swot `.edu` registry: domain -> institution names. Paths under
  * `lib/domains/` encode the domain in reverse (`edu/harvard/college.txt` is
  * `college.harvard.edu`); each file lists one institution name per line
- * (system-wide domains list every campus).
+ * (system-wide domains list every campus). Files with no usable name are
+ * skipped.
  */
 export function swotEduDomains(tarBuffer) {
   const domains = new Map();
@@ -164,7 +173,7 @@ export function swotEduDomains(tarBuffer) {
       .toString('utf8')
       .split('\n')
       .map((line) => line.trim())
-      .filter((line) => line !== '');
+      .filter((line) => line !== '' && !isJunkName(line));
     if (names.length > 0) domains.set(domain, names);
   }
   return domains;

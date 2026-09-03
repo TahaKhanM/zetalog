@@ -79,6 +79,52 @@ describe('monogramFor', () => {
   it('falls back to the first character for single-word names', () => {
     expect(monogramFor('LSE')).toBe('L');
   });
+
+  it('skips leading punctuation and quotes from dataset quirks', () => {
+    expect(monogramFor('"Colegio Salesianos"')).toBe('C');
+    expect(monogramFor('(ESIH) École Supérieure')).toBe('E');
+  });
+
+  it('monograms non-Latin names in their own script', () => {
+    expect(monogramFor('成均館大学校')).toBe('成');
+    expect(monogramFor('Приазовський університет')).toBe('П');
+  });
+});
+
+describe('every seeded university renders a legible badge', () => {
+  const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+  const rows = [...seed.matchAll(/values \('((?:[^']|'')*)', '((?:[^']|'')*)', array\[/g)].map(
+    (match) => ({
+      name: (match[1] ?? '').replace(/''/g, "'"),
+      slug: (match[2] ?? '').replace(/''/g, "'"),
+    }),
+  );
+
+  it('covers the full seed', () => {
+    expect(rows.length).toBeGreaterThan(3000);
+  });
+
+  it('yields AA-contrast colours and a letter/digit monogram for all of them', () => {
+    for (const { slug, name } of rows) {
+      const badge = badgeFor(slug, name);
+      const ratio = contrastRatio(badge.bg, badge.fg);
+      expect(
+        ratio,
+        `${slug}: ${badge.bg}/${badge.fg} = ${ratio.toFixed(2)}`,
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        badge.monogram,
+        `${slug} (${name}): monogram ${JSON.stringify(badge.monogram)}`,
+      ).toMatch(/^[\p{L}\p{N}]$/u);
+      expect(badge.monogram).toBe(badge.monogram.toUpperCase());
+    }
+  });
+
+  it('never leaves a university with a placeholder slug', () => {
+    for (const { slug } of rows) {
+      expect(slug, `placeholder slug for a university`).not.toMatch(/^university(-\d+)?$/);
+    }
+  });
 });
 
 describe('curated map integrity', () => {
