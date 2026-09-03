@@ -155,6 +155,22 @@ test.beforeAll(async () => {
   extensionId = new URL(worker.url()).host;
 });
 
+test.beforeEach(async () => {
+  // One persistent context serves every run of this suite (CI repeats each
+  // test), and a successful link both sets the website session cookie and
+  // stores the extension credential. Start every run signed out and unlinked,
+  // or the replica skips the sign-in page this suite exists to exercise.
+  await context.clearCookies();
+  await context.serviceWorkers()[0]?.evaluate(async () => {
+    const extensionGlobal = globalThis as typeof globalThis & {
+      chrome: { storage: { local: { clear(): Promise<void> } } };
+    };
+    await extensionGlobal.chrome.storage.local.clear();
+  });
+  observedChallenge = null;
+  observedRedirect = null;
+});
+
 test.afterAll(async () => {
   await context.close();
   await new Promise<void>((resolve) =>
