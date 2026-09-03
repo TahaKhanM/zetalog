@@ -1,19 +1,19 @@
 # ZetaLog database (Supabase)
 
 The complete database layer: schema, default-deny RLS, the leaderboard view, the
-new-user badge trigger, UK-university seed data and pgTAP policy tests. This is
+new-user badge trigger, UK and US university seed data and pgTAP policy tests. This is
 the security boundary between the public internet and users' telemetry: treat
 every change here as security-critical.
 
 ## Layout
 
-| Path                        | Contents                                                      |
-| --------------------------- | ------------------------------------------------------------- |
-| `migrations/`               | Ordered SQL migrations (schema → RLS → views+trigger)         |
-| `seed.sql`                  | Generated UK-university reference data (committed artifact)   |
-| `scripts/generate-seed.mjs` | Dependency-free generator that (re)produces `seed.sql`        |
-| `tests/`                    | pgTAP policy/constraint/view tests, run by `supabase test db` |
-| `config.toml`               | Local stack configuration                                     |
+| Path                        | Contents                                                           |
+| --------------------------- | ------------------------------------------------------------------ |
+| `migrations/`               | Ordered SQL migrations (schema → RLS → views+trigger)              |
+| `seed.sql`                  | Generated UK and US university reference data (committed artifact) |
+| `scripts/generate-seed.mjs` | Dependency-free generator that (re)produces `seed.sql`             |
+| `tests/`                    | pgTAP policy/constraint/view tests, run by `supabase test db`      |
+| `config.toml`               | Local stack configuration                                          |
 
 Migrations, in order:
 
@@ -42,6 +42,8 @@ Migrations, in order:
     requires `pg_cron` to be available in the hosted project before it runs.
 11. `20260809164010_add_profile_leaderboard_badges.sql`: a constrained,
     service-managed badge slot for exceptional leaderboard identities.
+12. `20260903000000_universities_country.sql`: ISO country (GB/US) on the
+    university affiliation registry.
 
 ## Local development
 
@@ -60,15 +62,21 @@ to a fresh test database and runs every `tests/*.sql` file with `pg_prove`.
 
 ### Regenerating the seed
 
-`seed.sql` is a committed, deterministic artifact. Refresh it against upstream
-only intentionally:
+`seed.sql` is a committed, deterministic artifact built from two upstreams: the
+Hipo world-universities dataset (GB + US institutions) and JetBrains swot (the
+academic-domain registry education-discount programmes verify student emails
+against), whose `.edu` tree fills Hipo's gaps: system-wide mail domains like
+`umsystem.edu` and institutions Hipo omits. Refresh only intentionally:
 
 ```bash
 node supabase/scripts/generate-seed.mjs   # rewrites supabase/seed.sql
 ```
 
 Re-running with unchanged upstream data reproduces the file byte-for-byte, so a
-noisy diff means the source dataset changed. Review the diff before committing.
+noisy diff means a source dataset changed. Review the diff before committing.
+Rows upsert on slug, so re-applying the seed to a database refreshes existing
+universities' domains in place; the generator refuses to remap a committed slug
+to a different institution.
 
 ## Provisioning a hosted project
 
@@ -81,9 +89,10 @@ noisy diff means the source dataset changed. Review the diff before committing.
 4. **Push** the schema: `supabase db push` (applies `migrations/` to the remote
    database). Confirm the `zetalog-operational-data-retention` job exists and
    can run `public.purge_expired_operational_data()`.
-5. **Seed** the reference data: run `seed.sql` once against the remote database
-   (Dashboard → SQL Editor or `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`).
-   It is idempotent (`on conflict (slug) do nothing`), so re-running is safe.
+5. **Seed** the reference data: run `seed.sql` against the remote database
+   (`supabase db push --include-seed`, the Dashboard SQL Editor or
+   `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`). It is idempotent (upsert on
+   slug), so re-running is safe and refreshes domain data in place.
 6. **Auth providers** (Dashboard → Authentication → Providers): enable **Email**
    (passwords, confirm-email ON, minimum length 10), **Google** and **GitHub**
    OAuth. The full setup checklist, including the GitHub OAuth app and the email
@@ -97,11 +106,11 @@ noisy diff means the source dataset changed. Review the diff before committing.
 8. **URLs** (Dashboard → Authentication → URL Configuration): set the **Site URL**
    to the deployed web origin and add the website `/auth/callback` plus preview
    deployments to **Redirect URLs**. Do not add the Chrome Identity callback here.
-9. **Chrome Identity callback**: after the Chrome Web Store assigns the production
-   extension ID, set the web deployment's `EXTENSION_OAUTH_REDIRECT_URIS` to the
-   exact `https://<extension-id>.chromiumapp.org/zetalog-link` value. This is a
-   server-side allowlist, not a Supabase Auth Redirect URL. Deploy the database
-   migrations and web/API with that value before publishing the extension.
+9. **Chrome Identity callback**: set the web deployment's
+   `EXTENSION_OAUTH_REDIRECT_URIS` to the exact production value,
+   `https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link`. This is
+   a server-side allowlist, not a Supabase Auth Redirect URL. Deploy the database
+   migrations and web/API with that value before publishing an extension update.
 
 ## Environment variables
 

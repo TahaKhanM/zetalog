@@ -171,7 +171,7 @@ export default async function AccountPage(): Promise<React.JSX.Element> {
           ) : (
             <>
               <p className="meta" style={{ margin: 0 }}>
-                Verify a UK university email to get its badge and board.
+                Verify a UK or US university email to get its badge and board.
               </p>
               <span className="conn__chips">
                 <Link href="/verify" className="btn btn--primary btn--sm">

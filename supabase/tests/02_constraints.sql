@@ -8,7 +8,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path to public, extensions, pg_catalog;
 
-select plan(14);
+select plan(17);
 
 -- Fixtures: two users (profiles via trigger).
 insert into auth.users (instance_id, id, aud, role, email)
@@ -110,6 +110,25 @@ select throws_ok(
      values ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', gen_random_uuid(), now(),
              'fp', 10, -1, 'accepted', '{}', '{}') $$,
   '23514', null, 'rejects a negative server_score');
+
+-- universities.country: default GB, US allowed, anything else rejected ------
+insert into public.universities (name, slug, domains)
+values ('Constraint Country Default', 'constraint-country-default', array['constraint-default.test']);
+
+select is(
+  (select country from public.universities where slug = 'constraint-country-default'),
+  'GB',
+  'universities.country defaults to GB');
+
+select lives_ok(
+  $$ insert into public.universities (name, slug, domains, country)
+     values ('Constraint Country US', 'constraint-country-us', array['constraint-us.test'], 'US') $$,
+  'accepts country US');
+
+select throws_ok(
+  $$ insert into public.universities (name, slug, domains, country)
+     values ('Constraint Country FR', 'constraint-country-fr', array['constraint-fr.test'], 'FR') $$,
+  '23514', null, 'rejects a country other than GB or US');
 
 select * from finish();
 rollback;

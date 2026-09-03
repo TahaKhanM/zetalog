@@ -4,13 +4,15 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  BULK_LOGO_DENYLIST,
   CURATED_BRANDS,
   CURATED_LOGOS,
-  FALLBACK_DUOTONES,
   badgeFor,
   contrastRatio,
+  fallbackColours,
   monogramFor,
 } from './uni-brand';
+import BULK_LOGOS from './uni-logos-bulk.json';
 
 describe('contrastRatio', () => {
   it('reports 21:1 for black on white', () => {
@@ -37,9 +39,12 @@ describe('accessibility of the whole badge system', () => {
     }
   });
 
-  it('every fallback duotone meets WCAG AA for small text (4.5:1)', () => {
-    for (const duotone of FALLBACK_DUOTONES) {
-      expect(contrastRatio(duotone.bg, duotone.fg)).toBeGreaterThanOrEqual(4.5);
+  it('every fallback colour pair meets WCAG AA regardless of the slug-derived hue', () => {
+    // Sweep enough distinct slugs to cover the whole hue wheel.
+    for (let i = 0; i < 720; i += 1) {
+      const { bg, fg } = fallbackColours(`sweep-slug-${String(i)}`);
+      expect(contrastRatio(bg, fg), `${bg} on ${fg}`).toBeGreaterThanOrEqual(4.5);
+      expect(bg).toMatch(/^#[0-9a-f]{6}$/);
     }
   });
 });
@@ -56,13 +61,13 @@ describe('badgeFor', () => {
     const first = badgeFor('unknown-college', 'Unknown College');
     const second = badgeFor('unknown-college', 'Unknown College');
     expect(first).toEqual(second);
-    expect(FALLBACK_DUOTONES.map((d) => d.bg)).toContain(first.bg);
+    expect(first.bg).toBe(fallbackColours('unknown-college').bg);
   });
 
-  it('spreads distinct unknown slugs across more than one duotone', () => {
+  it('gives distinct universities their own fallback colours', () => {
     const slugs = ['aaa-college', 'bbb-college', 'ccc-institute', 'ddd-school', 'eee-academy'];
     const backgrounds = new Set(slugs.map((slug) => badgeFor(slug, slug).bg));
-    expect(backgrounds.size).toBeGreaterThan(1);
+    expect(backgrounds.size).toBe(slugs.length);
   });
 });
 
@@ -78,6 +83,52 @@ describe('monogramFor', () => {
 
   it('falls back to the first character for single-word names', () => {
     expect(monogramFor('LSE')).toBe('L');
+  });
+
+  it('skips leading punctuation and quotes from dataset quirks', () => {
+    expect(monogramFor('"Colegio Salesianos"')).toBe('C');
+    expect(monogramFor('(ESIH) École Supérieure')).toBe('E');
+  });
+
+  it('monograms non-Latin names in their own script', () => {
+    expect(monogramFor('成均館大学校')).toBe('成');
+    expect(monogramFor('Приазовський університет')).toBe('П');
+  });
+});
+
+describe('every seeded university renders a legible badge', () => {
+  const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+  const rows = [...seed.matchAll(/values \('((?:[^']|'')*)', '((?:[^']|'')*)', array\[/g)].map(
+    (match) => ({
+      name: (match[1] ?? '').replace(/''/g, "'"),
+      slug: (match[2] ?? '').replace(/''/g, "'"),
+    }),
+  );
+
+  it('covers the full seed', () => {
+    expect(rows.length).toBeGreaterThan(3000);
+  });
+
+  it('yields AA-contrast colours and a letter/digit monogram for all of them', () => {
+    for (const { slug, name } of rows) {
+      const badge = badgeFor(slug, name);
+      const ratio = contrastRatio(badge.bg, badge.fg);
+      expect(
+        ratio,
+        `${slug}: ${badge.bg}/${badge.fg} = ${ratio.toFixed(2)}`,
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        badge.monogram,
+        `${slug} (${name}): monogram ${JSON.stringify(badge.monogram)}`,
+      ).toMatch(/^[\p{L}\p{N}]{1,2}$/u);
+      expect(badge.monogram).toBe(badge.monogram.toUpperCase());
+    }
+  });
+
+  it('never leaves a university with a placeholder slug', () => {
+    for (const { slug } of rows) {
+      expect(slug, `placeholder slug for a university`).not.toMatch(/^university(-\d+)?$/);
+    }
   });
 });
 
@@ -139,11 +190,69 @@ describe('curated logos', () => {
     expect(CURATED_BRANDS[slug]).toBeUndefined();
     const badge = badgeFor(slug, 'University of Bath');
     expect(badge.logo).toBe(CURATED_LOGOS[slug]);
-    expect(FALLBACK_DUOTONES.map((duotone) => duotone.bg)).toContain(badge.bg);
+    expect(badge.bg).toBe(fallbackColours(slug).bg);
     expect(badge.monogram).toBe('B');
   });
 
   it('badgeFor returns no logo for unmapped slugs', () => {
     expect(badgeFor('unknown-college', 'Unknown College').logo).toBeUndefined();
+  });
+
+  it('gives UMKC its own official flame mark, not a hashed M chip', () => {
+    const badge = badgeFor(
+      'university-of-missouri-kansas-city',
+      'University of Missouri - Kansas City',
+    );
+    expect(badge.logo).toBe('/uni-logos/university-of-missouri-kansas-city.png');
+    expect(badge.bg).toBe('#04487f');
+    expect(badge.monogram).toBe('KC');
+  });
+
+  it('keeps the five US schools without a usable official square mark on monogram chips', () => {
+    for (const slug of [
+      'columbia-university',
+      'new-york-university',
+      'georgia-institute-of-technology',
+      'university-of-california-los-angeles',
+      'university-of-washington',
+    ]) {
+      expect(CURATED_LOGOS[slug], slug).toBeUndefined();
+      expect(CURATED_BRANDS[slug], slug).toBeDefined();
+      // Bulk collection must never override this curated decision.
+      expect(badgeFor(slug, slug).logo, slug).toBeUndefined();
+    }
+  });
+});
+
+describe('bulk-collected marks', () => {
+  const icons = Object.entries(BULK_LOGOS.icons) as [string, { file: string; source: string }][];
+
+  it('collected a substantial share of the seed', () => {
+    expect(icons.length).toBeGreaterThan(500);
+  });
+
+  it('every icon has a served file, a same-provenance source URL, and a seeded slug', () => {
+    const seed = readFileSync(join(import.meta.dirname, '../../../supabase/seed.sql'), 'utf8');
+    for (const [slug, icon] of icons) {
+      expect(icon.file, slug).toBe(`/uni-logos/bulk/${slug}.png`);
+      expect(existsSync(join(import.meta.dirname, '../public', icon.file)), slug).toBe(true);
+      expect(icon.source, slug).toMatch(/^https:\/\//);
+      expect(seed, `bulk slug not in seed: ${slug}`).toContain(`'${slug}'`);
+    }
+  });
+
+  it('never carries a slug that is hand-curated', () => {
+    for (const [slug] of icons) {
+      expect(CURATED_LOGOS[slug], slug).toBeUndefined();
+      expect(CURATED_BRANDS[slug], slug).toBeUndefined();
+    }
+  });
+
+  it('badgeFor serves the collected mark for an uncurated slug', () => {
+    const [slug, icon] = icons.find(([candidate]) => !BULK_LOGO_DENYLIST.has(candidate)) ?? [];
+    expect(slug).toBeDefined();
+    if (slug !== undefined && icon !== undefined) {
+      expect(badgeFor(slug, slug).logo).toBe(icon.file);
+    }
   });
 });

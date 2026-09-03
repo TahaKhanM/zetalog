@@ -197,8 +197,8 @@ export function VerifyFlow(): React.JSX.Element {
   return (
     <form onSubmit={(event) => void requestCode(event)} className="auth-form__stack">
       <p className="meta">
-        Enter your UK university email. We&apos;ll send a code; the address is used only to verify
-        and is never shown.
+        Enter your UK or US university email. We&apos;ll send a code; the address is used only to
+        verify and is never shown.
       </p>
       <label className="uni-filter">
         <span className="uni-filter__label">University email</span>
