@@ -62,15 +62,21 @@ to a fresh test database and runs every `tests/*.sql` file with `pg_prove`.
 
 ### Regenerating the seed
 
-`seed.sql` is a committed, deterministic artifact. Refresh it against upstream
-only intentionally:
+`seed.sql` is a committed, deterministic artifact built from two upstreams: the
+Hipo world-universities dataset (GB + US institutions) and JetBrains swot (the
+academic-domain registry education-discount programmes verify student emails
+against), whose `.edu` tree fills Hipo's gaps — system-wide mail domains like
+`umsystem.edu` and institutions Hipo omits. Refresh only intentionally:
 
 ```bash
 node supabase/scripts/generate-seed.mjs   # rewrites supabase/seed.sql
 ```
 
 Re-running with unchanged upstream data reproduces the file byte-for-byte, so a
-noisy diff means the source dataset changed. Review the diff before committing.
+noisy diff means a source dataset changed. Review the diff before committing.
+Rows upsert on slug, so re-applying the seed to a database refreshes existing
+universities' domains in place; the generator refuses to remap a committed slug
+to a different institution.
 
 ## Provisioning a hosted project
 
@@ -83,9 +89,10 @@ noisy diff means the source dataset changed. Review the diff before committing.
 4. **Push** the schema: `supabase db push` (applies `migrations/` to the remote
    database). Confirm the `zetalog-operational-data-retention` job exists and
    can run `public.purge_expired_operational_data()`.
-5. **Seed** the reference data — run `seed.sql` once against the remote database
-   (Dashboard → SQL Editor, or `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`).
-   It is idempotent (`on conflict (slug) do nothing`), so re-running is safe.
+5. **Seed** the reference data — run `seed.sql` against the remote database
+   (`supabase db push --include-seed`, the Dashboard SQL Editor, or
+   `psql "$SUPABASE_DB_URL" -f supabase/seed.sql`). It is idempotent (upsert on
+   slug), so re-running is safe and refreshes domain data in place.
 6. **Auth providers** (Dashboard → Authentication → Providers): enable **Email**
    (passwords, confirm-email ON, minimum length 10), **Google**, and **GitHub**
    OAuth. The full setup checklist, including the GitHub OAuth app and the email
