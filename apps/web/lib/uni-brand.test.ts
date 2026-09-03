@@ -120,7 +120,7 @@ describe('every seeded university renders a legible badge', () => {
       expect(
         badge.monogram,
         `${slug} (${name}): monogram ${JSON.stringify(badge.monogram)}`,
-      ).toMatch(/^[\p{L}\p{N}]$/u);
+      ).toMatch(/^[\p{L}\p{N}]{1,2}$/u);
       expect(badge.monogram).toBe(badge.monogram.toUpperCase());
     }
   });
@@ -196,6 +196,16 @@ describe('curated logos', () => {
 
   it('badgeFor returns no logo for unmapped slugs', () => {
     expect(badgeFor('unknown-college', 'Unknown College').logo).toBeUndefined();
+  });
+
+  it('gives UMKC its own official flame mark, not a hashed M chip', () => {
+    const badge = badgeFor(
+      'university-of-missouri-kansas-city',
+      'University of Missouri - Kansas City',
+    );
+    expect(badge.logo).toBe('/uni-logos/university-of-missouri-kansas-city.png');
+    expect(badge.bg).toBe('#04487f');
+    expect(badge.monogram).toBe('KC');
   });
 
   it('keeps the five US schools without a usable official square mark on monogram chips', () => {

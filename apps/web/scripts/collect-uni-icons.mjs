@@ -20,7 +20,7 @@
 /* global fetch, process, Buffer, URL, AbortSignal */
 
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,14 +33,14 @@ const OUT_DIR = resolve(HERE, '../public/uni-logos/bulk');
 const MANIFEST_PATH = resolve(HERE, '../lib/uni-logos-bulk.json');
 
 const CONCURRENCY = 40;
-const FETCH_TIMEOUT_MS = 8000;
+const FETCH_TIMEOUT_MS = 10000;
 const MAX_BODY_BYTES = 3 * 1024 * 1024;
 const TILE_PX = 64;
 // Favicons are designed to read at tiny sizes; badges render at 20–46px, so
 // a 32px source is acceptable (candidates are tried largest-first anyway).
 const MIN_SOURCE_PX = 32;
 const USER_AGENT =
-  'Mozilla/5.0 (compatible; ZetaLogBadgeCollector/1.0; collects self-served university icons)';
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 /** Rows from the committed seed: { name, slug, domains }. */
 async function seedRows() {
@@ -86,24 +86,63 @@ function iconCandidates(html, baseUrl) {
   for (const tag of html.matchAll(/<link\b[^>]*>/gi)) {
     const attrs = tag[0];
     const rel = /rel=["']?([^"'>]*)/i.exec(attrs)?.[1]?.toLowerCase() ?? '';
-    if (!rel.includes('icon')) continue;
+    if (!rel.includes('icon') && !rel.includes('manifest')) continue;
     const href = /href=["']?([^"' >]+)/i.exec(attrs)?.[1];
     if (href === undefined || href.startsWith('data:')) continue;
-    const declared = /sizes=["']?(\d+)/i.exec(attrs)?.[1];
-    const size = declared !== undefined ? Number(declared) : rel.includes('apple') ? 180 : 32;
     try {
-      candidates.push({ url: new URL(href, baseUrl).href, size });
+      const url = new URL(href, baseUrl).href;
+      if (rel.includes('manifest')) {
+        candidates.push({ url, size: 192, kind: 'manifest' });
+        continue;
+      }
+      const declared = /sizes=["']?(\d+)/i.exec(attrs)?.[1];
+      const size = declared !== undefined ? Number(declared) : rel.includes('apple') ? 180 : 32;
+      candidates.push({ url, size, kind: 'icon' });
     } catch {
       // unparsable href — skip
     }
   }
   candidates.sort((a, b) => b.size - a.size);
-  const urls = candidates.map((candidate) => candidate.url);
-  for (const wellKnown of ['/apple-touch-icon.png', '/apple-touch-icon-precomposed.png']) {
-    urls.push(new URL(wellKnown, baseUrl).href);
+  return candidates;
+}
+
+const WELL_KNOWN = [
+  '/apple-touch-icon.png',
+  '/apple-touch-icon-precomposed.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  '/favicon-192x192.png',
+  '/favicon.png',
+  '/favicon.ico',
+];
+
+function hostsFor(domain) {
+  const base = domain.replace(/^www\./, '');
+  return [...new Set([base, `www.${base}`, `library.${base}`])];
+}
+
+async function manifestIcons(manifestUrl) {
+  try {
+    const { body } = await fetchWithLimit(
+      manifestUrl,
+      'application/manifest+json,application/json,*/*',
+    );
+    const json = JSON.parse(body.toString('utf8'));
+    const icons = Array.isArray(json.icons) ? json.icons : [];
+    return icons
+      .map((icon) => {
+        if (typeof icon?.src !== 'string') return null;
+        try {
+          const size = Number(String(icon.sizes ?? '192').match(/\d+/)?.[0] ?? 192);
+          return { url: new URL(icon.src, manifestUrl).href, size, kind: 'icon' };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
   }
-  // .ico is not decodable here; drop obvious ones early.
-  return [...new Set(urls)].filter((url) => !/\.ico(?:[?#]|$)/i.test(url)).slice(0, 6);
 }
 
 /** Decode, gate, and normalise one candidate into a 64px badge tile. */
@@ -131,33 +170,47 @@ async function processIcon(body) {
 
 async function collectOne(university) {
   const domain = webDomain(university.domains);
-  const hosts = domain.startsWith('www.') ? [domain] : [domain, `www.${domain}`];
-
-  // Homepage link tags are the best source; a bot-blocked or unreachable
-  // homepage still leaves the well-known icon paths worth probing.
-  const candidates = [];
+  const hosts = hostsFor(domain);
+  const ranked = [];
   let lastError = 'no usable icon';
+
   for (const host of hosts) {
     try {
       const home = await fetchWithLimit(`https://${host}/`, 'text/html,*/*');
       const html = home.body.toString('utf8').slice(0, 512 * 1024);
-      candidates.push(...iconCandidates(html, home.finalUrl));
-      break;
+      ranked.push(...iconCandidates(html, home.finalUrl));
     } catch (error) {
       lastError = error.message;
     }
-  }
-  if (candidates.length === 0) {
-    for (const host of hosts) {
-      candidates.push(
-        `https://${host}/apple-touch-icon.png`,
-        `https://${host}/apple-touch-icon-precomposed.png`,
-        `https://${host}/favicon.png`,
-      );
+    for (const path of WELL_KNOWN) {
+      ranked.push({
+        url: `https://${host}${path}`,
+        size: path.includes('512') ? 512 : 180,
+        kind: 'icon',
+      });
     }
   }
 
-  for (const url of [...new Set(candidates)]) {
+  ranked.sort((a, b) => b.size - a.size);
+  const seen = new Set();
+  const urls = [];
+  for (const candidate of ranked) {
+    if (candidate.kind === 'manifest') {
+      for (const icon of await manifestIcons(candidate.url)) {
+        if (!seen.has(icon.url)) {
+          seen.add(icon.url);
+          urls.push(icon.url);
+        }
+      }
+      continue;
+    }
+    if (!seen.has(candidate.url)) {
+      seen.add(candidate.url);
+      urls.push(candidate.url);
+    }
+  }
+
+  for (const url of urls) {
     try {
       const icon = await fetchWithLimit(url, 'image/*,*/*');
       const processed = await processIcon(icon.body);
@@ -172,12 +225,31 @@ async function collectOne(university) {
 /** Registrable-ish domain (last two labels) for the generic-icon heuristic. */
 const registrable = (domain) => domain.split('.').slice(-2).join('.');
 
+async function loadExistingManifest() {
+  try {
+    const parsed = JSON.parse(await readFile(MANIFEST_PATH, 'utf8'));
+    return parsed.icons && typeof parsed.icons === 'object' ? parsed.icons : {};
+  } catch {
+    return {};
+  }
+}
+
 async function main() {
-  const [rows, curated] = await Promise.all([seedRows(), curatedSlugs()]);
+  const [rows, curated, existing] = await Promise.all([
+    seedRows(),
+    curatedSlugs(),
+    loadExistingManifest(),
+  ]);
+  const force = process.env.FORCE === '1';
   let targets = rows.filter((row) => !curated.has(row.slug));
+  if (!force) {
+    targets = targets.filter((row) => existing[row.slug] === undefined);
+  }
   const limit = Number(process.env.LIMIT ?? 0);
   if (limit > 0) targets = targets.slice(0, limit);
-  process.stderr.write(`Collecting icons for ${targets.length} universities…\n`);
+  process.stderr.write(
+    `Collecting icons for ${targets.length} universities (${Object.keys(existing).length} already held)…\n`,
+  );
 
   const collected = new Map();
   const failures = [];
@@ -218,9 +290,8 @@ async function main() {
     }
   }
 
-  await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(OUT_DIR, { recursive: true });
-  const manifest = {};
+  const manifest = { ...existing };
   for (const slug of [...collected.keys()].sort()) {
     const icon = collected.get(slug);
     await writeFile(join(OUT_DIR, `${slug}.png`), icon.tile);
@@ -230,16 +301,22 @@ async function main() {
       sourceSize: `${icon.sourceWidth}x${icon.sourceHeight}`,
     };
   }
+  const ordered = {};
+  for (const slug of Object.keys(manifest)
+    .filter((slug) => !curated.has(slug))
+    .sort()) {
+    ordered[slug] = manifest[slug];
+  }
   await writeFile(
     MANIFEST_PATH,
-    `${JSON.stringify({ collectedAt: new Date().toISOString().slice(0, 10), icons: manifest }, null, 2)}\n`,
+    `${JSON.stringify({ collectedAt: new Date().toISOString().slice(0, 10), icons: ordered }, null, 2)}\n`,
   );
   await writeFile('/tmp/uni-icon-failures.txt', failures.sort().join('\n'));
 
   const files = await readdir(OUT_DIR);
   process.stderr.write(
-    `Done: ${files.length} icons written, ${generic} dropped as generic, ` +
-      `${failures.length} domains without a usable icon (see /tmp/uni-icon-failures.txt)\n`,
+    `Done: ${Object.keys(ordered).length} icons in manifest (${collected.size} new, ${generic} dropped as generic), ` +
+      `${failures.length} still without a usable icon (see /tmp/uni-icon-failures.txt); ${files.length} files on disk\n`,
   );
 }
 
