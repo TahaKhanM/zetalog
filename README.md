@@ -25,7 +25,7 @@ ZetaLog has two parts:
   a confirmed account-deletion request immediately deletes the account and its
   associated data, apart from an anonymous security event retained for at most 30 days.
 - **A web leaderboard** that ranks checked personal bests at 30s, 60s and 120s on the
-  default Zetamac settings, globally and per UK university, with a badge earned by
+  default Zetamac settings, globally and per UK or US university, with a badge earned by
   verifying a university email.
 
 Scores are never taken on trust. The extension submits the full per-problem event
@@ -51,7 +51,7 @@ flowchart LR
 | `packages/shared` | Pure domain logic: schemas, design tokens, score recomputation, validation pipeline |
 | `apps/extension`  | WXT extension (Chrome, Manifest V3): recorder, popup, background sync               |
 | `apps/web`        | Next.js app on Vercel: leaderboards, dashboard, API routes, admin                   |
-| `supabase/`       | Postgres migrations, RLS policies, retention job, UK-university seed data           |
+| `supabase/`       | Postgres migrations, RLS policies, retention job, UK and US university seed data    |
 | `docs/`           | Operational runbooks and Chrome Web Store listing                                   |
 
 ## Design
@@ -91,7 +91,8 @@ release ZIP. See [CONTRIBUTING.md](CONTRIBUTING.md) for the engineering bar and
 Copy `.env.example` to `.env.local` and fill in the Supabase and Resend credentials
 for the web app. Before enabling extension linking, set the server-only
 `EXTENSION_OAUTH_REDIRECT_URIS` to the exact Chrome Identity callback for the
-official extension ID (`https://<extension-id>.chromiumapp.org/zetalog-link`).
+official extension ID
+(`https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link`).
 The extension needs no secrets.
 
 ## Tests

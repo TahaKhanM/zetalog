@@ -140,6 +140,7 @@ export const universityRowSchema = z.object({
   name: z.string(),
   slug: z.string(),
   domains: z.array(z.string()),
+  country: z.enum(['GB', 'US']),
 });
 export type UniversityRow = z.infer<typeof universityRowSchema>;
 

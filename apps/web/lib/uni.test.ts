@@ -22,6 +22,8 @@ describe('findUniversityForEmail', () => {
   const universities = [
     { id: 'ox', domains: ['ox.ac.uk'] },
     { id: 'imperial', domains: ['imperial.ac.uk', 'ic.ac.uk'] },
+    { id: 'harvard', domains: ['harvard.edu'] },
+    { id: 'harvard-med', domains: ['med.harvard.edu'] },
   ];
 
   it('matches an exact domain case-insensitively', () => {
@@ -32,12 +34,28 @@ describe('findUniversityForEmail', () => {
     expect(findUniversityForEmail('student@ic.ac.uk', universities)?.id).toBe('imperial');
   });
 
-  it('does NOT match a subdomain of a registered domain', () => {
-    expect(findUniversityForEmail('student@cs.ox.ac.uk', universities)).toBeNull();
+  it('matches a subdomain at a label boundary', () => {
+    expect(findUniversityForEmail('student@cs.ox.ac.uk', universities)?.id).toBe('ox');
+    expect(findUniversityForEmail('student@college.harvard.edu', universities)?.id).toBe('harvard');
   });
 
-  it('does not match a domain that merely ends with a registered one', () => {
+  it('does not match a lookalike that merely ends with the registered labels', () => {
     expect(findUniversityForEmail('student@notox.ac.uk', universities)).toBeNull();
+    expect(findUniversityForEmail('student@ox.ac.uk.evil.example', universities)).toBeNull();
+  });
+
+  it('prefers the longest (most specific) registered domain when several match', () => {
+    expect(findUniversityForEmail('student@med.harvard.edu', universities)?.id).toBe('harvard-med');
+    expect(findUniversityForEmail('student@mail.med.harvard.edu', universities)?.id).toBe(
+      'harvard-med',
+    );
+    expect(findUniversityForEmail('student@fas.harvard.edu', universities)?.id).toBe('harvard');
+  });
+
+  it('compares registered domains case-insensitively', () => {
+    const mixed = [{ id: 'mit', domains: ['MIT.EDU'] }];
+    expect(findUniversityForEmail('student@mit.edu', mixed)?.id).toBe('mit');
+    expect(findUniversityForEmail('student@CS.MIT.EDU', mixed)?.id).toBe('mit');
   });
 
   it('returns null for an unknown domain or malformed address', () => {

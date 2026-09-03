@@ -1,8 +1,10 @@
 /**
- * University email-domain matching. Matching is exact and
- * case-insensitive: `student@ox.ac.uk` matches the registered `ox.ac.uk`, but
- * a subdomain (`cs.ox.ac.uk`) or a look-alike (`notox.ac.uk`) does not. Uni
- * emails are used solely to prove affiliation and are never displayed.
+ * University email-domain matching. An address matches a registered domain
+ * when its host is equal to that domain or a subdomain of it (label-boundary
+ * suffix: `cs.ox.ac.uk` matches `ox.ac.uk`, `notox.ac.uk` does not). When more
+ * than one university matches, the longest (most specific) registered domain
+ * wins. Comparison is case-insensitive. Uni emails are used solely to prove
+ * affiliation and are never displayed.
  */
 
 /**
@@ -22,9 +24,14 @@ export interface DomainOwner {
   readonly domains: readonly string[];
 }
 
+/** Whether `emailDomain` is the registered host or a subdomain of it. */
+function matchesRegisteredDomain(emailDomain: string, registered: string): boolean {
+  return emailDomain === registered || emailDomain.endsWith(`.${registered}`);
+}
+
 /**
- * The university whose registered domains contain the address's exact domain,
- * or null. Comparison is case-insensitive; subdomains never match.
+ * The university whose registered domain is the most specific match for the
+ * address, or null. A match is an exact host or a label-boundary suffix.
  */
 export function findUniversityForEmail<U extends DomainOwner>(
   email: string,
@@ -32,9 +39,18 @@ export function findUniversityForEmail<U extends DomainOwner>(
 ): U | null {
   const domain = extractDomain(email);
   if (domain === null) return null;
-  return (
-    universities.find((university) =>
-      university.domains.some((registered) => registered.toLowerCase() === domain),
-    ) ?? null
-  );
+
+  let best: U | null = null;
+  let bestLength = -1;
+  for (const university of universities) {
+    for (const registered of university.domains) {
+      const host = registered.toLowerCase();
+      if (!matchesRegisteredDomain(domain, host)) continue;
+      if (host.length > bestLength) {
+        best = university;
+        bestLength = host.length;
+      }
+    }
+  }
+  return best;
 }

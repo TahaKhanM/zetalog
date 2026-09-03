@@ -168,6 +168,7 @@ describe('getUniversityBySlug', () => {
           name: 'University of Oxford',
           slug: 'university-of-oxford',
           domains: ['ox.ac.uk'],
+          country: 'GB',
         },
         error: null,
       },

@@ -197,14 +197,31 @@ describe('profileRowSchema', () => {
 });
 
 describe('universityRowSchema', () => {
-  it('parses a university with its domains array', () => {
-    const row = {
-      id: '44444444-4444-4444-8444-444444444444',
-      name: 'University of Oxford',
-      slug: 'university-of-oxford',
-      domains: ['ox.ac.uk'],
-    };
+  const row = {
+    id: '44444444-4444-4444-8444-444444444444',
+    name: 'University of Oxford',
+    slug: 'university-of-oxford',
+    domains: ['ox.ac.uk'],
+    country: 'GB',
+  };
+
+  it('parses a university with its domains array and country', () => {
     expect(universityRowSchema.parse(row)).toEqual(row);
+  });
+
+  it('accepts a US university', () => {
+    const us = {
+      ...row,
+      name: 'Massachusetts Institute of Technology',
+      slug: 'massachusetts-institute-of-technology',
+      domains: ['mit.edu'],
+      country: 'US',
+    };
+    expect(universityRowSchema.parse(us)).toEqual(us);
+  });
+
+  it('rejects an unsupported country', () => {
+    expect(() => universityRowSchema.parse({ ...row, country: 'FR' })).toThrow();
   });
 });
 

@@ -146,4 +146,17 @@ describe('curated logos', () => {
   it('badgeFor returns no logo for unmapped slugs', () => {
     expect(badgeFor('unknown-college', 'Unknown College').logo).toBeUndefined();
   });
+
+  it('keeps the five US schools without a usable official square mark on monogram chips', () => {
+    for (const slug of [
+      'columbia-university',
+      'new-york-university',
+      'georgia-institute-of-technology',
+      'university-of-california-los-angeles',
+      'university-of-washington',
+    ]) {
+      expect(CURATED_LOGOS[slug], slug).toBeUndefined();
+      expect(CURATED_BRANDS[slug], slug).toBeDefined();
+    }
+  });
 });

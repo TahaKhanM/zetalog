@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { chromeWebStoreUrl } from '@/lib/chrome-store';
+import { OFFICIAL_CHROME_WEB_STORE_URL, chromeWebStoreUrl } from '@/lib/chrome-store';
 
 export const metadata: Metadata = {
   title: 'How ZetaLog works',
@@ -14,10 +14,8 @@ export const dynamic = 'force-static';
 
 const ZETAMAC_URL = 'https://arithmetic.zetamac.com';
 const MICROSOFT_QUARANTINE_URL = 'https://security.microsoft.com/quarantine';
-const OFFICIAL_STORE_URL =
-  'https://chromewebstore.google.com/detail/zetalog/bhbpjdngipckdepgblhopdfijnpeefml';
 const EXTENSION_STORE_URL =
-  chromeWebStoreUrl(process.env.NEXT_PUBLIC_CHROME_WEB_STORE_URL) ?? OFFICIAL_STORE_URL;
+  chromeWebStoreUrl(process.env.NEXT_PUBLIC_CHROME_WEB_STORE_URL) ?? OFFICIAL_CHROME_WEB_STORE_URL;
 
 function StoreButton(): React.JSX.Element {
   return (
@@ -226,7 +224,10 @@ export default function HowItWorksPage(): React.JSX.Element {
               <li>
                 Open the extension then select <strong>Sync to leaderboard</strong>.
               </li>
-              <li>Complete the Chrome sign-in window if it appears.</li>
+              <li>
+                Sign in or create an account in the Chrome window. This also signs the ZetaLog
+                website in on this browser.
+              </li>
               <li>
                 Return to the popup. Check for <strong>Linked to leaderboard</strong>.
               </li>
@@ -257,7 +258,7 @@ export default function HowItWorksPage(): React.JSX.Element {
             <p className="hiw-label display">Optional university badge</p>
             <h3 id="university-title">Verify your university email</h3>
             <p>
-              If you attend a UK university, open your account and select{' '}
+              If you attend a UK or US university, open your account and select{' '}
               <strong>Verify email</strong>. Enter the code sent to your student address. Your
               university mark will appear beside your name and you can join your university
               leaderboard.

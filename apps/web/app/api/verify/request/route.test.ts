@@ -62,7 +62,17 @@ describe('POST /api/verify/request', () => {
   it('returns 404 when the domain is not a known university', async () => {
     const response = await handleVerifyRequest(request({ email: 'a@gmail.com' }), deps());
     expect(response.status).toBe(404);
-    expect(await response.json()).toMatchObject({ error: { code: 'unknown-university' } });
+    expect(await response.json()).toMatchObject({
+      error: {
+        code: 'unknown-university',
+        message: 'That email domain is not a known UK or US university.',
+      },
+    });
+  });
+
+  it('accepts a subdomain of a registered university domain', async () => {
+    const response = await handleVerifyRequest(request({ email: 'a@cs.ox.ac.uk' }), deps());
+    expect(response.status).toBe(200);
   });
 
   it('rate-limits after 3 requests to one address in an hour', async () => {

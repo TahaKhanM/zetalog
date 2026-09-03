@@ -29,7 +29,7 @@ FEATURES
 • Personal bests. Your best score at each standard duration (30s, 60s, 120s) for the default settings.
 • Skill analysis. Your solve times broken down by operation and times table, with the specific problems that slow you down.
 • Works offline. Everything runs on your device and the extension is fully functional without an account. An otherwise eligible game played offline is considered for ranking when it later syncs.
-• Optional leaderboard. Link a ZetaLog account to compare your best scores worldwide, with a per-university board if you verify a UK student email. Submitted telemetry is recomputed and checked for consistency; suspicious scores can be held for review.
+• Optional leaderboard. Link a ZetaLog account to compare your best scores worldwide, with a per-university board if you verify a UK or US student email. Submitted telemetry is recomputed and checked for consistency; suspicious scores can be held for review.
 
 HOW TO USE
 

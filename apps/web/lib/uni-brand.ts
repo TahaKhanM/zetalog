@@ -43,9 +43,9 @@ export function contrastRatio(a: string, b: string): number {
 
 /**
  * Curated official brand colours, keyed by seed slug. Sources are the
- * institutions' published visual-identity pages (verified 2026-07-21; URL per
- * entry). Monogram ink deviates to black/white/cream only where the brand's
- * own pairing would fail AA.
+ * institutions' published visual-identity pages (UK verified 2026-07-21, US
+ * verified 2026-09-03; URL per entry). Monogram ink deviates to
+ * black/white/cream only where the brand's own pairing would fail AA.
  */
 export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   // https://www.ox.ac.uk/public-affairs/style-guide — "Oxford blue" Pantone 282
@@ -80,6 +80,58 @@ export const CURATED_BRANDS: Readonly<Record<string, UniBrand>> = {
   'university-of-bristol': { bg: '#a6192e', fg: '#ffffff', monogram: 'B' },
   // PMS 2955 #003865 per gla.ac.uk/myglasgow/staff/brandtoolkit/colour
   'university-of-glasgow': { bg: '#003865', fg: '#ffffff', monogram: 'G' },
+  // https://brand.mit.edu/color — MIT Red (legacy core)
+  'massachusetts-institute-of-technology': {
+    bg: '#750014',
+    fg: '#ffffff',
+    monogram: 'M',
+  },
+  // https://identity.stanford.edu/design-elements/color/primary-colors/ — Cardinal
+  'stanford-university': { bg: '#8c1515', fg: '#ffffff', monogram: 'S' },
+  // https://seas.harvard.edu/office-communications/brand-style-guide/color-palette — Harvard Crimson
+  'harvard-university': { bg: '#a51c30', fg: '#ffffff', monogram: 'H' },
+  // https://digital.accessibility.princeton.edu/how/design/color-contrast — Princeton Orange
+  'princeton-university': { bg: '#e77500', fg: '#000000', monogram: 'P' },
+  // https://brand.berkeley.edu/visual-identity/colors/ — Berkeley Blue
+  'university-of-california-berkeley': { bg: '#002676', fg: '#ffffff', monogram: 'B' },
+  // https://brand.cmu.edu/visual-identity/colors — Carnegie Red
+  'carnegie-mellon-university': { bg: '#c41230', fg: '#ffffff', monogram: 'C' },
+  // https://visualidentity.columbia.edu/content/color — Columbia Blue (black ink for AA)
+  'columbia-university': { bg: '#b9d9eb', fg: '#000000', monogram: 'C' },
+  // https://brand.cornell.edu/design-center/colors/ — Carnelian
+  'cornell-university': { bg: '#b31b1b', fg: '#ffffff', monogram: 'C' },
+  // https://yaleidentity.yale.edu/guidelines/websites — Yale Blue
+  'yale-university': { bg: '#00356b', fg: '#ffffff', monogram: 'Y' },
+  // https://creative.uchicago.edu/color-system/ — Maroon
+  'university-of-chicago': { bg: '#800000', fg: '#ffffff', monogram: 'C' },
+  // https://wagner.nyu.edu/how-we-look — NYU Violet PMS 2597
+  'new-york-university': { bg: '#57068c', fg: '#ffffff', monogram: 'N' },
+  // https://branding.web-resources.upenn.edu/logos-and-branding/elements-penn-logo — Penn Blue
+  'university-of-pennsylvania': { bg: '#011f5b', fg: '#ffffff', monogram: 'P' },
+  // https://identity.caltech.edu/colors — Caltech Orange (black ink for AA)
+  'california-institute-of-technology': { bg: '#ff6c0c', fg: '#000000', monogram: 'C' },
+  // https://brand.umich.edu/design-resources/colors/ — Michigan Blue + Maize
+  'university-of-michigan-ann-arbor': { bg: '#00274c', fg: '#ffcb05', monogram: 'M' },
+  // https://marketing.illinois.edu/visual-identity/color — Illini Orange + Illini Blue
+  'university-of-illinois-urbana-champaign': {
+    bg: '#ff5f05',
+    fg: '#13294b',
+    monogram: 'I',
+  },
+  // https://brand.gatech.edu/our-look/colors — Tech Gold (black ink for AA)
+  'georgia-institute-of-technology': { bg: '#b39051', fg: '#000000', monogram: 'G' },
+  // https://umac.utexas.edu/brand-center/ — Burnt Orange
+  'the-university-of-texas-at-austin': { bg: '#bf5700', fg: '#ffffff', monogram: 'T' },
+  // https://brand.ucla.edu/identity/colors — UCLA Blue
+  'university-of-california-los-angeles': {
+    bg: '#2774ae',
+    fg: '#ffffff',
+    monogram: 'U',
+  },
+  // https://brand.duke.edu/colors/ — Duke Navy Blue
+  'duke-university': { bg: '#012169', fg: '#ffffff', monogram: 'D' },
+  // https://www.washington.edu/brand/brand-elements/colors/ — Spirit Purple
+  'university-of-washington': { bg: '#4b2e83', fg: '#ffffff', monogram: 'W' },
 };
 
 /**
@@ -129,6 +181,22 @@ export const CURATED_LOGOS: Readonly<Record<string, string>> = {
   'the-university-of-sheffield': '/uni-logos/the-university-of-sheffield.png',
   'university-of-birmingham': '/uni-logos/university-of-birmingham.png',
   'university-of-exeter': '/uni-logos/university-of-exeter.png',
+  'massachusetts-institute-of-technology': '/uni-logos/massachusetts-institute-of-technology.png',
+  'stanford-university': '/uni-logos/stanford-university.png',
+  'harvard-university': '/uni-logos/harvard-university.png',
+  'princeton-university': '/uni-logos/princeton-university.png',
+  'university-of-california-berkeley': '/uni-logos/university-of-california-berkeley.svg',
+  'carnegie-mellon-university': '/uni-logos/carnegie-mellon-university.png',
+  'cornell-university': '/uni-logos/cornell-university.png',
+  'yale-university': '/uni-logos/yale-university.png',
+  'university-of-chicago': '/uni-logos/university-of-chicago.png',
+  'university-of-pennsylvania': '/uni-logos/university-of-pennsylvania.png',
+  'california-institute-of-technology': '/uni-logos/california-institute-of-technology.png',
+  'university-of-michigan-ann-arbor': '/uni-logos/university-of-michigan-ann-arbor.png',
+  'university-of-illinois-urbana-champaign':
+    '/uni-logos/university-of-illinois-urbana-champaign.png',
+  'the-university-of-texas-at-austin': '/uni-logos/the-university-of-texas-at-austin.png',
+  'duke-university': '/uni-logos/duke-university.png',
 };
 
 /**
