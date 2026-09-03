@@ -62,6 +62,14 @@ export function HeaderNav(): React.JSX.Element {
     }
 
     void init();
+    // A website sign-in may finish in Chrome Identity's temporary auth window
+    // while `/link` remains open. The first-party cookies are shared, but that
+    // server-set cookie does not emit a Supabase auth event in this tab. Re-read
+    // it when the tab regains focus so the account chip updates immediately.
+    const refreshAfterExternalAuth = (): void => {
+      void init();
+    };
+    window.addEventListener('focus', refreshAfterExternalAuth);
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -70,6 +78,7 @@ export function HeaderNav(): React.JSX.Element {
     });
     return () => {
       active = false;
+      window.removeEventListener('focus', refreshAfterExternalAuth);
       subscription.unsubscribe();
     };
   }, []);

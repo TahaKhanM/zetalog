@@ -1,8 +1,10 @@
 /**
- * University email-domain matching. Matching is exact and
- * case-insensitive: `student@ox.ac.uk` matches the registered `ox.ac.uk`, but
- * a subdomain (`cs.ox.ac.uk`) or a look-alike (`notox.ac.uk`) does not. Uni
- * emails are used solely to prove affiliation and are never displayed.
+ * University email-domain matching. An address matches a registered domain
+ * when its host is equal to that domain or a subdomain of it (label-boundary
+ * suffix: `cs.ox.ac.uk` matches `ox.ac.uk`, `notox.ac.uk` does not). When more
+ * than one university matches, the longest (most specific) registered domain
+ * wins. Comparison is case-insensitive. Uni emails are used solely to prove
+ * affiliation and are never displayed.
  */
 
 /**
@@ -22,9 +24,33 @@ export interface DomainOwner {
   readonly domains: readonly string[];
 }
 
+/** Whether `emailDomain` is the registered host or a subdomain of it. */
+function matchesRegisteredDomain(emailDomain: string, registered: string): boolean {
+  return emailDomain === registered || emailDomain.endsWith(`.${registered}`);
+}
+
 /**
- * The university whose registered domains contain the address's exact domain,
- * or null. Comparison is case-insensitive; subdomains never match.
+ * Every label-boundary suffix of a domain that a registered domain could
+ * match: `mail.med.harvard.edu` → itself, `med.harvard.edu`, `harvard.edu`.
+ * A registered domain matches the email domain (per
+ * {@link findUniversityForEmail}) exactly when it appears in this list, so a
+ * datastore can pre-filter candidates with a bounded membership query instead
+ * of shipping the whole university table to the matcher (which silently
+ * truncates once the table outgrows the API's row cap). Registered domains
+ * are stored lowercase; pass a lowercase domain.
+ */
+export function domainSuffixes(domain: string): string[] {
+  const labels = domain.split('.');
+  const suffixes: string[] = [];
+  for (let start = 0; start <= labels.length - 2; start += 1) {
+    suffixes.push(labels.slice(start).join('.'));
+  }
+  return suffixes.length > 0 ? suffixes : [domain];
+}
+
+/**
+ * The university whose registered domain is the most specific match for the
+ * address, or null. A match is an exact host or a label-boundary suffix.
  */
 export function findUniversityForEmail<U extends DomainOwner>(
   email: string,
@@ -32,9 +58,18 @@ export function findUniversityForEmail<U extends DomainOwner>(
 ): U | null {
   const domain = extractDomain(email);
   if (domain === null) return null;
-  return (
-    universities.find((university) =>
-      university.domains.some((registered) => registered.toLowerCase() === domain),
-    ) ?? null
-  );
+
+  let best: U | null = null;
+  let bestLength = -1;
+  for (const university of universities) {
+    for (const registered of university.domains) {
+      const host = registered.toLowerCase();
+      if (!matchesRegisteredDomain(domain, host)) continue;
+      if (host.length > bestLength) {
+        best = university;
+        bestLength = host.length;
+      }
+    }
+  }
+  return best;
 }

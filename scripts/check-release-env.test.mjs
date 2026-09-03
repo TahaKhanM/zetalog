@@ -10,9 +10,9 @@ const valid = {
   RESEND_API_KEY: 'resend-key',
   EMAIL_FROM: 'ZetaLog <hello@zetalog.co.uk>',
   EXTENSION_OAUTH_REDIRECT_URIS:
-    'https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/zetalog-link',
+    'https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link',
   NEXT_PUBLIC_CHROME_WEB_STORE_URL:
-    'https://chromewebstore.google.com/detail/zetalog/abcdefghijklmnopabcdefghijklmnop',
+    'https://chromewebstore.google.com/detail/zetalog/bjleafpcpockiiblhkoddgomhkloaiab',
 };
 
 test('accepts a complete exact production configuration', () => {
@@ -60,7 +60,21 @@ test('requires the Store item and callback to use the same extension id', () => 
       NEXT_PUBLIC_CHROME_WEB_STORE_URL:
         'https://chromewebstore.google.com/detail/zetalog/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
     }),
-    ['the Store item ID must match an allowed Chrome Identity callback'],
+    ['NEXT_PUBLIC_CHROME_WEB_STORE_URL must target the published Store item'],
+  );
+});
+
+test('requires the published callback even while a legacy item remains allowlisted', () => {
+  assert.deepEqual(
+    releaseEnvErrors({
+      ...valid,
+      EXTENSION_OAUTH_REDIRECT_URIS:
+        'https://abcdefghijklmnopabcdefghijklmnop.chromiumapp.org/zetalog-link',
+    }),
+    [
+      'EXTENSION_OAUTH_REDIRECT_URIS must include the published Store item callback',
+      'the Store item ID must match an allowed Chrome Identity callback',
+    ],
   );
 });
 

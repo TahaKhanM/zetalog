@@ -29,7 +29,9 @@ function match(partial: Partial<IdentifierMatch> = {}): IdentifierMatch {
 function deps(over: Partial<VerifyRequestDeps> = {}): VerifyRequestDeps {
   return {
     authenticate: vi.fn(async () => Promise.resolve('user-1')),
-    listUniversities: vi.fn(async () => Promise.resolve([{ id: 'ox', domains: ['ox.ac.uk'] }])),
+    listUniversitiesByDomains: vi.fn(async () =>
+      Promise.resolve([{ id: 'ox', domains: ['ox.ac.uk'] }]),
+    ),
     resolveIdentifier: vi.fn(async () => Promise.resolve<IdentifierMatch | null>(null)),
     reserveVerification: vi.fn(async () =>
       Promise.resolve({
@@ -62,7 +64,28 @@ describe('POST /api/verify/request', () => {
   it('returns 404 when the domain is not a known university', async () => {
     const response = await handleVerifyRequest(request({ email: 'a@gmail.com' }), deps());
     expect(response.status).toBe(404);
-    expect(await response.json()).toMatchObject({ error: { code: 'unknown-university' } });
+    expect(await response.json()).toMatchObject({
+      error: {
+        code: 'unknown-university',
+        message: 'That email domain is not a known UK or US university.',
+      },
+    });
+  });
+
+  it('accepts a subdomain of a registered university domain', async () => {
+    const response = await handleVerifyRequest(request({ email: 'a@cs.ox.ac.uk' }), deps());
+    expect(response.status).toBe(200);
+  });
+
+  it('queries candidates scoped to the address domain and its suffixes', async () => {
+    const d = deps();
+    await handleVerifyRequest(request({ email: 'a@mail.cs.ox.ac.uk' }), d);
+    expect(d.listUniversitiesByDomains).toHaveBeenCalledWith([
+      'mail.cs.ox.ac.uk',
+      'cs.ox.ac.uk',
+      'ox.ac.uk',
+      'ac.uk',
+    ]);
   });
 
   it('rate-limits after 3 requests to one address in an hour', async () => {
