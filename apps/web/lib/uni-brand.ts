@@ -218,11 +218,17 @@ export const FALLBACK_DUOTONES: readonly { readonly bg: string; readonly fg: str
 /** Words that never carry a university's identity. */
 const FILLER = new Set(['the', 'university', 'of', 'college', 'school', 'institute', 'and']);
 
-/** Monogram: initial of the first significant word of the common name. */
+/**
+ * Monogram: first letter/digit of the first significant word of the common
+ * name. Unicode-aware — legacy non-Latin `.edu` institutions monogram in
+ * their own script — and immune to dataset quirks like names wrapped in
+ * literal quotes.
+ */
 export function monogramFor(name: string): string {
-  const words = name.split(/[\s,]+/).filter((word) => word.length > 0);
-  const significant = words.find((word) => !FILLER.has(word.toLowerCase())) ?? words[0] ?? '?';
-  return (significant[0] ?? '?').toUpperCase();
+  const words = name.split(/[\s,]+/).filter((word) => /[\p{L}\p{N}]/u.test(word));
+  const significant = words.find((word) => !FILLER.has(word.toLowerCase())) ?? words[0];
+  const initial = significant === undefined ? '?' : (/[\p{L}\p{N}]/u.exec(significant)?.[0] ?? '?');
+  return initial.toUpperCase();
 }
 
 /** Deterministic small hash for fallback assignment (stable across runs). */

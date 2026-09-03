@@ -102,6 +102,20 @@ test('assertSlugStability fails loudly when a committed slug is remapped', () =>
   );
 });
 
+test('a name that slugifies to nothing falls back to the primary domain', () => {
+  const unis = universitiesFromDataset(
+    [
+      {
+        alpha_two_code: 'US',
+        name: '成均館大学校',
+        domains: ['skku.edu'],
+      },
+    ],
+    new Map(),
+  );
+  assert.equal(unis[0]?.slug, 'skku-edu');
+});
+
 test('normalizeName collapses punctuation and diacritics for cross-dataset identity', () => {
   assert.equal(
     normalizeName('University of Massachusetts—Amherst'),
@@ -143,6 +157,24 @@ test('swotEduDomains maps reversed paths to .edu domains with one name per line'
     ['harvard.edu', ['Harvard University']],
   ]);
   assert.equal([...tarFiles(tar)].length, 5);
+});
+
+test('swotEduDomains drops URL/domain/email junk lines and empty files', () => {
+  const tar = tarOf([
+    [
+      'swot-master/lib/domains/edu/nscc.txt',
+      'Nashville State Community College\nhttps://www.nscc.edu\n',
+    ],
+    ['swot-master/lib/domains/edu/ssc.txt', 'South Suburban College\nssc.edu\nadmin@ssc.edu\n'],
+    ['swot-master/lib/domains/edu/scit.txt', 'https://www.scit.edu/\n'],
+    ['swot-master/lib/domains/edu/esade.txt', 'ESADE\n'],
+  ]);
+  const domains = swotEduDomains(tar);
+  assert.deepEqual([...domains.entries()].sort(), [
+    ['esade.edu', ['ESADE']],
+    ['nscc.edu', ['Nashville State Community College']],
+    ['ssc.edu', ['South Suburban College']],
+  ]);
 });
 
 test('mergeSwot skips covered domains, attaches by name, and adds system entries', () => {
