@@ -134,7 +134,8 @@ export function* tarFiles(tarBuffer) {
     const size = parseInt(readString(124, 12).trim(), 8) || 0;
     const type = String.fromCharCode(block[156] ?? 0);
     const prefix = readString(345, 155);
-    const path = longName ?? (prefix === '' ? readString(0, 100) : `${prefix}/${readString(0, 100)}`);
+    const path =
+      longName ?? (prefix === '' ? readString(0, 100) : `${prefix}/${readString(0, 100)}`);
     longName = null;
     const body = tarBuffer.subarray(offset + 512, offset + 512 + size);
     if (type === 'L') {
@@ -268,7 +269,7 @@ export function parseSeedPairs(sql) {
  * domain migrating between sources) is only warned about — the production
  * row persists untouched, which is harmless.
  */
-export function assertSlugStability(previousSql, universities, warn = () => {}) {
+export function assertSlugStability(previousSql, universities, warn) {
   const previous = parseSeedPairs(previousSql);
   if (previous.size === 0 && /insert into public\.universities/i.test(previousSql)) {
     throw new Error('Slug stability check could not parse any (slug, name) pairs from seed.sql');
@@ -289,7 +290,7 @@ export function assertSlugStability(previousSql, universities, warn = () => {}) 
     );
   }
   if (missing.length > 0) {
-    warn(
+    warn?.(
       `Note: ${missing.length} committed slug(s) left the regenerated seed (existing rows persist): ${missing.join(', ')}\n`,
     );
   }

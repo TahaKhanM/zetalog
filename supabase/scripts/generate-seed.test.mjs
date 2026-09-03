@@ -129,27 +129,42 @@ test('swotEduDomains maps reversed paths to .edu domains with one name per line'
   const tar = tarOf([
     ['swot-master/lib/domains/edu/harvard.txt', 'Harvard University\n'],
     ['swot-master/lib/domains/edu/harvard/college.txt', 'Harvard College\n'],
-    ['swot-master/lib/domains/edu/cuny.txt', 'CUNY Hunter\nCity University of New York (CUNY) System\n'],
+    [
+      'swot-master/lib/domains/edu/cuny.txt',
+      'CUNY Hunter\nCity University of New York (CUNY) System\n',
+    ],
     ['swot-master/lib/domains/uk/ac/ox.txt', 'University of Oxford\n'],
     ['swot-master/README.md', 'not a domain'],
   ]);
   const domains = swotEduDomains(tar);
-  assert.deepEqual(
-    [...domains.entries()].sort(),
-    [
-      ['college.harvard.edu', ['Harvard College']],
-      ['cuny.edu', ['CUNY Hunter', 'City University of New York (CUNY) System']],
-      ['harvard.edu', ['Harvard University']],
-    ],
-  );
+  assert.deepEqual([...domains.entries()].sort(), [
+    ['college.harvard.edu', ['Harvard College']],
+    ['cuny.edu', ['CUNY Hunter', 'City University of New York (CUNY) System']],
+    ['harvard.edu', ['Harvard University']],
+  ]);
   assert.equal([...tarFiles(tar)].length, 5);
 });
 
 test('mergeSwot skips covered domains, attaches by name, and adds system entries', () => {
   const base = [
-    { name: 'University of Oxford', country: 'GB', domains: ['ox.ac.uk'], slug: 'university-of-oxford' },
-    { name: 'Harvard University', country: 'US', domains: ['harvard.edu'], slug: 'harvard-university' },
-    { name: 'University of Missouri', country: 'US', domains: ['missouri.edu'], slug: 'university-of-missouri' },
+    {
+      name: 'University of Oxford',
+      country: 'GB',
+      domains: ['ox.ac.uk'],
+      slug: 'university-of-oxford',
+    },
+    {
+      name: 'Harvard University',
+      country: 'US',
+      domains: ['harvard.edu'],
+      slug: 'harvard-university',
+    },
+    {
+      name: 'University of Missouri',
+      country: 'US',
+      domains: ['missouri.edu'],
+      slug: 'university-of-missouri',
+    },
   ];
   const swot = new Map([
     ['college.harvard.edu', ['Harvard University']], // suffix-covered -> skip
@@ -182,13 +197,21 @@ test('universitiesFromDataset slugs swot additions after both country passes', (
     new Map([['york.edu', ['University of York']]]),
   );
   // The GB school keeps its slug; the swot addition gets the collision suffix.
-  assert.equal(fresh.find((u) => u.country === 'GB' && u.name === 'University of York')?.slug, 'university-of-york');
+  assert.equal(
+    fresh.find((u) => u.country === 'GB' && u.name === 'University of York')?.slug,
+    'university-of-york',
+  );
   assert.equal(fresh.find((u) => u.country === 'US')?.slug, 'university-of-york-2');
 });
 
 test('renderSeedSql upserts so re-seeding refreshes domains in place', () => {
   const sql = renderSeedSql([
-    { name: 'Harvard University', slug: 'harvard-university', domains: ['harvard.edu'], country: 'US' },
+    {
+      name: 'Harvard University',
+      slug: 'harvard-university',
+      domains: ['harvard.edu'],
+      country: 'US',
+    },
   ]);
   assert.match(
     sql,
