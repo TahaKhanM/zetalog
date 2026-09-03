@@ -30,6 +30,25 @@ function matchesRegisteredDomain(emailDomain: string, registered: string): boole
 }
 
 /**
+ * Every label-boundary suffix of a domain that a registered domain could
+ * match: `mail.med.harvard.edu` → itself, `med.harvard.edu`, `harvard.edu`.
+ * A registered domain matches the email domain (per
+ * {@link findUniversityForEmail}) exactly when it appears in this list, so a
+ * datastore can pre-filter candidates with a bounded membership query instead
+ * of shipping the whole university table to the matcher (which silently
+ * truncates once the table outgrows the API's row cap). Registered domains
+ * are stored lowercase; pass a lowercase domain.
+ */
+export function domainSuffixes(domain: string): string[] {
+  const labels = domain.split('.');
+  const suffixes: string[] = [];
+  for (let start = 0; start <= labels.length - 2; start += 1) {
+    suffixes.push(labels.slice(start).join('.'));
+  }
+  return suffixes.length > 0 ? suffixes : [domain];
+}
+
+/**
  * The university whose registered domain is the most specific match for the
  * address, or null. A match is an exact host or a label-boundary suffix.
  */

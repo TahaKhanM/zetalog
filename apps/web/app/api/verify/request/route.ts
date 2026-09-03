@@ -42,9 +42,12 @@ export async function POST(request: Request): Promise<Response> {
   return handleVerifyRequest(request, {
     authenticate: async () => userIdFromCookies(await createClient()),
     resolveIdentifier: createIdentifierResolver(service),
-    listUniversities: async () => {
-      const { data, error } = await service.from('universities').select('id, domains');
-      if (error !== null) throw new Error(`listUniversities: ${error.message}`);
+    listUniversitiesByDomains: async (domains) => {
+      const { data, error } = await service
+        .from('universities')
+        .select('id, domains')
+        .overlaps('domains', [...domains]);
+      if (error !== null) throw new Error(`listUniversitiesByDomains: ${error.message}`);
       return z.array(z.object({ id: z.string(), domains: z.array(z.string()) })).parse(data);
     },
     reserveVerification: async ({ userId, email, codeHash, expiresAtMs: expires }) => {

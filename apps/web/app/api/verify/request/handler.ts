@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { adjudicateAliasClaim, type IdentifierMatch } from '@/lib/auth-modes';
 import type { SendResult } from '@/lib/email/types';
 import { apiError, apiJson, readJsonBody } from '@/lib/http';
-import { findUniversityForEmail } from '@/lib/uni';
+import { domainSuffixes, extractDomain, findUniversityForEmail } from '@/lib/uni';
 import { expiresAtMs, generateCode, hashCode, type RandomInt } from '@/lib/verification';
 
 /**
@@ -23,7 +23,15 @@ const bodySchema = z.object({ email: z.email() });
 /** Injected dependencies for the core handler. */
 export interface VerifyRequestDeps {
   authenticate: () => Promise<string | null>;
-  listUniversities: () => Promise<{ id: string; domains: string[] }[]>;
+  /**
+   * Universities whose registered domains overlap the given candidates (the
+   * email domain and its label-boundary suffixes). Scoping the query to the
+   * address keeps the result tiny and immune to datastore row caps — fetching
+   * the whole table silently truncated once it passed 1,000 rows.
+   */
+  listUniversitiesByDomains: (
+    domains: readonly string[],
+  ) => Promise<{ id: string; domains: string[] }[]>;
   /** Resolve who (if anyone) already owns this address as email or alias. */
   resolveIdentifier: (email: string) => Promise<IdentifierMatch | null>;
   /** Atomically reserve the per-address/global quotas and persist the pending OTP. */
@@ -69,7 +77,10 @@ export async function handleVerifyRequest(
   const email = parsed.data.email.toLowerCase();
   const nowMs = deps.now();
 
-  const university = findUniversityForEmail(email, await deps.listUniversities());
+  const domain = extractDomain(email);
+  const candidates =
+    domain === null ? [] : await deps.listUniversitiesByDomains(domainSuffixes(domain));
+  const university = findUniversityForEmail(email, candidates);
   if (university === null) {
     return apiError(
       404,
