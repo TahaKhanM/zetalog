@@ -240,6 +240,10 @@ button {
  * the blackboard) — white is the one neutral both schemes share with the art. */
 .brand-mark__img {
   display: block;
+  width: var(--brand-size);
+  height: var(--brand-size);
+  flex-shrink: 0;
+  object-fit: contain;
   border-radius: 9px;
   background: white;
   padding: 3px;
@@ -259,8 +263,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 5px;
   font-family: var(--font-display);
   font-stretch: 110%;
@@ -273,28 +277,33 @@ button {
 }
 
 .uni-badge--profile {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 7px;
   font-size: 0.82rem;
 }
 
 /* University-board masthead mark: large enough to brand the page. */
 .uni-badge--masthead {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   border-radius: 11px;
   font-size: 1.3rem;
 }
 
 .board-title-row {
+  min-width: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.85rem;
 }
 
 .uni-badge--logo {
+  display: inline-block;
+  vertical-align: middle;
   object-fit: contain;
+  object-position: center;
+  padding: 2px;
   background: white;
 }
 
@@ -991,52 +1000,9 @@ button {
   box-shadow: 0 1px 2px var(--surface-shadow);
 }
 
-/* Board + quiet right stat rail (stacks on narrow viewports). */
+/* The leaderboard fills the available shell width. */
 .board-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 10.5rem;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-@media (max-width: 720px) {
-  .board-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .stat-rail {
-    flex-direction: row;
-  }
-}
-
-/* Broadsheet stat rail: ruled figures, no boxes — the board is the only card. */
-.stat-rail {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-  padding-top: 0.4rem;
-}
-
-.stat-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding-top: 0.55rem;
-  border-top: 2px solid var(--rule-strong);
-  flex: 1;
-}
-
-.stat-tile__value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--surface-heading);
-  line-height: 1;
-}
-
-.stat-tile__label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--meta-text);
+  min-width: 0;
 }
 
 .player__badge-link {
@@ -1059,8 +1025,30 @@ button {
 }
 
 .board-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: clamp(1.9rem, 5vw, 2.6rem);
   line-height: 1;
+}
+
+@media (max-width: 560px) {
+  .board-title-row {
+    flex-direction: column;
+  }
+
+  .board-title {
+    font-size: clamp(1.65rem, 7.5vw, 1.9rem);
+  }
+}
+
+@media (max-width: 360px) {
+  .site-header__row {
+    gap: 0.6rem;
+  }
+
+  .wordmark {
+    font-size: 1.15rem;
+  }
 }
 
 /* One control bar on every board: duration tabs left, university filter right.
@@ -1079,12 +1067,16 @@ button {
 }
 
 .uni-filter {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .uni-filter__select {
-  min-width: 12rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 24rem;
 }
 
 .uni-filter__label {
@@ -1141,13 +1133,13 @@ th.ltable__rank {
 
 /* Badges live in their own narrow column so every mark lands on the same
  * vertical line regardless of name length. */
-.ltable__badge-h,
-.ltable__badge-c {
-  width: 2.4rem;
+th.ltable__badge-h,
+td.ltable__badge-c {
+  width: 3rem;
   padding-inline: 0.35rem;
 }
 
-.ltable__badge-c {
+td.ltable__badge-c {
   text-align: center;
   line-height: 0;
 }

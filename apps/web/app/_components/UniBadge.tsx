@@ -7,7 +7,7 @@ import { badgeFor } from '@/lib/uni-brand';
  * university's brand colours. Colours/assets come exclusively from
  * `lib/uni-brand.ts`; sizes match the ledger-table and profile contexts.
  */
-const BADGE_PX = { table: 20, profile: 28, masthead: 46 } as const;
+const BADGE_PX = { table: 24, profile: 32, masthead: 48 } as const;
 
 export function UniBadge({
   slug,
