@@ -1,9 +1,5 @@
 import { parseDuration } from '@/lib/leaderboard';
-import {
-  getCachedBoardStats,
-  getCachedLeaderboard,
-  getCachedUniversityOptions,
-} from '@/lib/public-board';
+import { getCachedLeaderboard, getCachedUniversityOptions } from '@/lib/public-board';
 
 import { LeaderboardView } from './_components/LeaderboardView';
 
@@ -24,10 +20,9 @@ export default async function HomePage({
   searchParams: Promise<SearchParams>;
 }): Promise<React.JSX.Element> {
   const duration = parseDuration((await searchParams).d);
-  const [entries, uniOptions, stats] = await Promise.all([
+  const [entries, uniOptions] = await Promise.all([
     getCachedLeaderboard(duration, null),
     getCachedUniversityOptions(),
-    getCachedBoardStats(),
   ]);
 
   return (
@@ -38,7 +33,6 @@ export default async function HomePage({
       uniOptions={uniOptions}
       currentSlug={null}
       showBadges
-      stats={stats}
     />
   );
 }

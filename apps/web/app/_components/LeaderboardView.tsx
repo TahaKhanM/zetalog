@@ -1,7 +1,7 @@
 import type { RankableDuration } from '@zetalog/shared';
 import Link from 'next/link';
 
-import type { BoardStats, UniversityOption } from '@/lib/db/queries';
+import type { UniversityOption } from '@/lib/db/queries';
 import type { LeaderboardEntry } from '@/lib/db/rows';
 import { leaderboardBadgeForEntry } from '@/lib/leaderboard-badge';
 
@@ -22,7 +22,6 @@ interface LeaderboardViewProps {
   readonly currentSlug: string | null;
   /** University badges are shown on the global board, redundant on a uni board. */
   readonly showBadges: boolean;
-  readonly stats: BoardStats;
   /** A university board's own mark, branded large in the masthead. */
   readonly universityBadge?: { readonly slug: string; readonly name: string } | undefined;
 }
@@ -30,7 +29,7 @@ interface LeaderboardViewProps {
 /**
  * The shared leaderboard surface: an editorial masthead — eyebrow,
  * maroon rule, duration tabs as large index numerals — over a ruled ledger
- * table, with a quiet stat rail. Server-rendered and identity-free (the
+ * table. Server-rendered and identity-free (the
  * viewer's own row is decorated client-side by ViewerRowHighlight).
  */
 export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element {
@@ -118,12 +117,6 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
             </div>
           )}
         </div>
-
-        <aside className="stat-rail" aria-label="Leaderboard statistics">
-          <StatTile label="Players" value={props.stats.players} />
-          <StatTile label="Universities" value={props.stats.universities} />
-          <StatTile label="Games validated" value={props.stats.gamesValidated} />
-        </aside>
       </div>
 
       {/* The board above is a cached, identity-free server render. This client
@@ -131,15 +124,6 @@ export function LeaderboardView(props: LeaderboardViewProps): React.JSX.Element 
           stays cacheable and signed-out visitors cost zero auth work. */}
       <ViewerRowHighlight showAddBadge={props.showBadges} />
     </section>
-  );
-}
-
-function StatTile({ label, value }: { label: string; value: number }): React.JSX.Element {
-  return (
-    <div className="stat-tile">
-      <span className="stat-tile__value num">{value.toLocaleString('en-GB')}</span>
-      <span className="stat-tile__label">{label}</span>
-    </div>
   );
 }
 
@@ -184,8 +168,8 @@ function LeaderboardBadge({ entry }: { entry: LeaderboardEntry }): React.JSX.Ele
         alt={`${badge.name} badge`}
         title={badge.name}
         className="uni-badge uni-badge--logo leaderboard-badge"
-        width={20}
-        height={20}
+        width={24}
+        height={24}
       />
     );
   }
