@@ -10,9 +10,16 @@ export function BrandMark({
   variant: 'lockup' | 'mark';
   size?: number;
 }): React.JSX.Element {
-  // Plain <img>: a fixed-pixel static asset; next/image adds nothing at 24px.
+  // Plain <img>: a small static asset with an explicit, non-shrinking size.
   const img = (
-    <img src="/icon-96.png" alt="" width={size} height={size} className="brand-mark__img" />
+    <img
+      src="/icon-96.png"
+      alt=""
+      width={size}
+      height={size}
+      className="brand-mark__img"
+      style={{ '--brand-size': `${String(size)}px` } as React.CSSProperties}
+    />
   );
   if (variant === 'mark') return img;
   return (
