@@ -1,107 +1,169 @@
-<p align="center">
-  <img src="Assets/icons/icon-128.png" alt="ZetaLog" width="88" height="88" />
-</p>
+<p align="center"><img src="Assets/icons/icon-128.png" alt="ZetaLog" width="88" height="88" /></p>
 
-<h1 align="center">ZetaLog</h1>
+# ZetaLog
 
-<p align="center">
-  A score tracker and worldwide leaderboard for
-  <a href="https://arithmetic.zetamac.com/">Zetamac</a>, the mental-arithmetic
-  game used to build speed for quant interviews.
-</p>
+ZetaLog records [Zetamac](https://arithmetic.zetamac.com/) mental-arithmetic games,
+shows how a player's speed changes over time and maintains global and university
+leaderboards. The Chrome extension works without an account or a network connection.
+Players can later link an account and submit their recorded games for server-side
+validation.
 
-<p align="center">
-  <a href="https://www.zetalog.co.uk">zetalog.co.uk</a>
-</p>
+[Website](https://www.zetalog.co.uk) ·
+[Chrome extension](https://chromewebstore.google.com/detail/zetalog/bjleafpcpockiiblhkoddgomhkloaiab)
 
----
+The interesting engineering problem is the boundary between **offline ownership of
+personal data** and **a shared ranking that cannot trust a client-supplied score**.
+The extension records an event stream; the server replays it, checks its consistency
+and decides whether it can rank. Authentication, retries, moderation and account
+removal all have to preserve that distinction.
 
-ZetaLog has two parts:
+![Extension score history and progress](docs/store/assets/02-recent-score-history.jpg)
 
-- **A Chrome extension** that records every Zetamac game you play, with no setup and
-  no account. It charts your progress, keeps a personal-best per duration and works
-  fully offline. Restarts and outliers are flagged for review rather than silently
-  dropped. Removed games are retained with an active account for history and audit;
-  a confirmed account-deletion request immediately deletes the account and its
-  associated data, apart from an anonymous security event retained for at most 30 days.
-- **A web leaderboard** that ranks checked personal bests at 30s, 60s and 120s on the
-  default Zetamac settings, globally and per UK or US university, with a badge earned by
-  verifying a university email.
+## What is built
 
-Scores are never taken on trust. The extension submits the full per-problem event
-stream (problem text, keystroke timings, answer moments) and the server **recomputes
-the score** from it, then runs physiological, consistency and per-user statistical
-checks before a game is allowed to rank. Anything suspicious lands in a review queue.
+- A Manifest V3 extension with automatic recording, local game history, progress
+  analysis and personal bests. Restarts and suspicious games remain reviewable.
+- A Next.js website with personal dashboards and leaderboards at 30, 60 and 120
+  seconds on default Zetamac settings. University-email verification adds a badge;
+  university boards cover the seeded UK and US institutions.
+- Account linking through Chrome Identity and PKCE, revocable installation
+  credentials, opt-in synchronization, an admin review queue and account erasure.
+- A shared TypeScript domain package, Supabase migrations and database tests,
+  browser tests and release-artifact checks.
 
-## Architecture
+## From a game to a leaderboard entry
 
 ```mermaid
 flowchart LR
-    Z[Zetamac page] -->|content script records\nper-problem event stream| E[Extension\nlocal storage]
-    E -->|popup| G[Progress, analysis,\nhistory]
-    E -->|opt-in sync| A[POST /api/games]
-    A -->|recompute + validate| V{Judge}
-    V -->|accepted| D[(Supabase Postgres)]
-    V -->|suspicious| Q[Admin review queue]
-    D --> L[Leaderboards\nglobal + per-university]
+    Z[Zetamac DOM] --> R[Extension recorder]
+    R --> L[Local storage and popup]
+    L -->|linked account, retryable upload| A[Authenticated API]
+    A --> S[Replay answers and check telemetry]
+    S --> Q[Quarantine or reject]
+    S -->|accepted| D[(Postgres)]
+    D --> B[Personal bests and leaderboards]
+    Q --> M[Manual review]
 ```
 
-| Path              | Contents                                                                            |
-| ----------------- | ----------------------------------------------------------------------------------- |
-| `packages/shared` | Pure domain logic: schemas, design tokens, score recomputation, validation pipeline |
-| `apps/extension`  | WXT extension (Chrome, Manifest V3): recorder, popup, background sync               |
-| `apps/web`        | Next.js app on Vercel: leaderboards, dashboard, API routes, admin                   |
-| `supabase/`       | Postgres migrations, RLS policies, retention job, UK and US university seed data    |
-| `docs/`           | Operational runbooks and Chrome Web Store listing                                   |
+[`recomputeScore`](packages/shared/src/score.ts) pairs displayed arithmetic problems
+with inputs and acceptance events. It solves each problem independently and counts
+only verified answers. The claimed page score is retained for comparison, but
+`server_score` is the ranking value.
 
-## Design
+[`judge`](packages/shared/src/validation/verdict.ts) combines four kinds of evidence:
 
-The domain core is deterministic and dependency-free: scoring, validation and
-anti-abuse rules are pure functions in `packages/shared`, with clocks and randomness
-injected rather than read. Both the extension (client-side pre-flagging) and the
-server (authoritative judging) run the same code, so a score is evaluated identically
-wherever it is checked.
+| Check                                          | Purpose                                                                            | Decision               |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------- |
+| Timeline and allowed problem ranges            | Detect inconsistent timestamps, excessive duration and impossible generator output | Reject hard violations |
+| Event-stream integrity                         | Detect orphan acceptances and mismatched answers                                   | Quarantine for review  |
+| Timing, input cadence and problem distribution | Flag implausible speed, pasted inputs, uniform cadence and unusual problem samples | Quarantine for review  |
+| Accepted-score history                         | Flag an unusually large personal-best jump                                         | Quarantine for review  |
 
-The server is the only writer. All game writes go through the API with the Supabase
-service role; row-level security is default-deny and the service-role key never
-reaches a client bundle. Every external boundary (DOM, network, storage) is validated
-with [zod](https://zod.dev) schemas and errors are returned as typed values rather
-than thrown.
+A claimed-score mismatch alone does not invalidate the independently recomputed
+score. An event anomaly does require review: a recorder defect and fabricated
+telemetry can look similar, so preserving the evidence is more useful than
+silently discarding it.
 
-Extension linking uses Chrome Identity with PKCE. Chrome 116 or later is required.
-One explicit Link click opens the browser-owned authorization flow; the extension
-keeps its PKCE verifier and exchanges the returned code for an installation credential.
-Website access or refresh tokens never pass to the extension. A healthy legacy link
-migrates silently; only a legacy link that has already failed needs the user to relink.
-See `docs/store/CHROMEWEBSTORE.md` for the required Chrome Web Store ID and deployment
-order.
+These checks **do not prove that a human played a game**. The browser and its
+telemetry remain under the player's control. Plausible fabricated streams can evade
+heuristics and exceptional legitimate games can be flagged. The thresholds are
+engineering rules, not a published classifier with measured false-positive rates.
+Server-issued start challenges add online evidence; offline submissions remain
+supported, so the system cannot require trusted online timing for every game.
 
-## Development
+## Design decisions
+
+**One replay implementation.** Scoring and validation live in
+[`packages/shared`](packages/shared/src). The functions take explicit inputs and
+history, making their decisions reproducible in both the extension and API. Pure
+logic is easier to exercise exhaustively than scoring embedded in a DOM handler.
+Capture, storage and database access stay outside that core.
+
+**Retryable writes with a database boundary.** The submission pipeline uses an
+injected [`SubmitPort`](apps/web/lib/games/submit.ts). The
+[Supabase adapter](apps/web/lib/games/port.ts) passes the validated record to an atomic
+SQL operation that handles `(user_id, client_game_id)` deduplication and quota
+checking together. A retry returns the existing result, including a game the user
+subsequently removed. An application-only quota check would race between concurrent
+requests; the preliminary check here is an optimization, not the final authority.
+
+**The API owns privileged writes.** Supabase's service role is server-only. API
+handlers authenticate the user, scope reads and writes to that identity and validate
+request bodies. RLS and explicit database grants constrain direct client access;
+they do not replace authorization inside code using the service role. Database
+errors can throw at adapters and are handled at the HTTP boundary.
+
+**Extension credentials are separate from website sessions.** Linking uses an exact
+Chrome Identity callback and an S256 PKCE challenge. A short-lived authorization
+code is exchanged for a revocable extension credential. Website refresh tokens are
+not copied into the extension; high-entropy credential secrets are stored as hashes
+server-side. Chrome 116 or later is required for the linking flow.
+
+**Local-first is a deliberate cost.** Games can be recorded before sign-in and
+backfilled later, but synchronization must tolerate duplicate requests, old client
+clocks and intermittent connectivity. Client play times are display data; database
+receive times drive submission quotas. Personal analytics and public ranking are
+separate concerns.
+
+## Run locally
+
+Use **Node.js 24+** and **pnpm 10.30.3**, as declared in `package.json`.
 
 ```sh
-pnpm install
-pnpm verify        # format, lint, typecheck, test, build: the gate CI runs
+pnpm install --frozen-lockfile
+pnpm verify
 ```
 
-`pnpm verify` must pass before every commit. Protected CI also starts a fresh
-Supabase stack, runs pgTAP and full-stack E2E, then browser-tests the exact retained
-release ZIP. See [CONTRIBUTING.md](CONTRIBUTING.md) for the engineering bar and
-[`docs/ops/release-readiness.md`](docs/ops/release-readiness.md) for the release gates.
+The verification build does not need production secrets. For a connected local web
+app, create its environment file in the app directory:
 
-Copy `.env.example` to `.env.local` and fill in the Supabase and Resend credentials
-for the web app. Before enabling extension linking, set the server-only
-`EXTENSION_OAUTH_REDIRECT_URIS` to the exact Chrome Identity callback for the
-official extension ID
-(`https://bjleafpcpockiiblhkoddgomhkloaiab.chromiumapp.org/zetalog-link`).
-The extension needs no secrets.
+```sh
+cp .env.example apps/web/.env.local
+pnpm --filter @zetalog/web dev
+```
 
-## Tests
+Set the Supabase URL, anonymous key and server-only service-role key in that file.
+Apply the migrations to a local Supabase instance or a separate development
+project, seed universities and configure authentication/email before testing
+account flows. The exact callback allowlist is documented in
+[Chrome Web Store setup](docs/store/CHROMEWEBSTORE.md). The extension needs no secrets.
 
-More than 900 unit tests across the workspace, plus Playwright end-to-end runs for the
-extension and the web app. `packages/shared` holds 100% branch coverage, enforced in
-CI. Database policies are covered by pgTAP.
+For extension development:
 
-## Licenses
+```sh
+pnpm --filter @zetalog/extension dev
+# Or produce a loadable Chromium build:
+pnpm --filter @zetalog/extension build
+```
 
-The bundled fonts are licensed under the SIL Open Font License 1.1; see
-[THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+Load `apps/extension/.output/chrome-mv3` as an unpacked extension at
+`chrome://extensions`, then play on Zetamac. Development linking requires the
+callback for that extension ID to be explicitly permitted; recording works signed out.
+
+## Verification and scope
+
+`pnpm verify` runs formatting, lint, TypeScript checks, tests and both application
+builds. The shared package enforces 100% statement, function, line and branch
+coverage; that measures exercised paths, not resistance to all possible cheating.
+The web and extension have their own suites for authentication, linking, retries,
+storage and UI behavior.
+
+```sh
+pnpm test:release-tooling
+pnpm --filter @zetalog/extension exec playwright test e2e/extension.spec.ts e2e/link.spec.ts
+```
+
+CI additionally starts a fresh Supabase stack, applies migrations, runs pgTAP and
+full-stack browser checks and inspects the retained extension ZIP. These require
+Docker and installed Playwright browsers. See the
+[release checklist](docs/ops/release-readiness.md) for the difference between a
+passing local build and a verified release.
+
+This repository demonstrates capture and synchronization reliability, explicit
+trust boundaries and testable domain logic. It does not establish that arithmetic
+practice predicts interview performance or that every accepted score is genuine.
+The September 2026 review tightened anomaly quarantine and clarified those limits;
+it did not retroactively relabel existing games.
+
+[Contribution guide](CONTRIBUTING.md) · [Security reporting](SECURITY.md) ·
+[Third-party asset and font licenses](THIRD-PARTY-LICENSES.md)
