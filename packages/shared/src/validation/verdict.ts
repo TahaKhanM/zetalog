@@ -36,7 +36,9 @@ const REJECTING_RULES: ReadonlySet<ConsistencyViolation['rule']> = new Set([
  * Outcome policy: fabrication evidence rejects; plausibility doubts
  * quarantine for human review; everything else is accepted. A
  * claimed-score mismatch alone does not reject because the recomputed
- * score is authoritative regardless of what the page displayed.
+ * score is authoritative regardless of what the page displayed. Event-stream
+ * anomalies require review: they can indicate either a capture defect or a
+ * fabricated record, even when the remaining solved problems look plausible.
  *
  * The problem-stream checks slot into the same policy: a hard range
  * violation is an impossible stream (reject); an operation-mix, entropy, or
@@ -54,7 +56,10 @@ export function judge(record: GameRecord, history: HistoryContext): Verdict {
     problemViolations.length > 0;
   const outcome: ValidationOutcome = rejected
     ? 'rejected'
-    : flags.length > 0 || historyFlag !== null || problemFlags.length > 0
+    : flags.length > 0 ||
+        historyFlag !== null ||
+        problemFlags.length > 0 ||
+        violations.some((violation) => violation.rule === 'event-anomalies')
       ? 'quarantined'
       : 'accepted';
 
