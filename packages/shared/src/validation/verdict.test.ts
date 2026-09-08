@@ -133,4 +133,32 @@ describe('judge', () => {
     expect(verdict.outcome).toBe('accepted');
     expect(verdict.violations.map((v) => v.rule)).toContain('claimed-score-mismatch');
   });
+
+  it('quarantines an orphan acceptance even when every scored problem is plausible', () => {
+    const record = cleanRecord();
+    const verdict = judge(
+      { ...record, events: [...record.events, { kind: 'accepted', at: 1100, answer: 7 }] },
+      noHistory,
+    );
+    expect(verdict.serverScore).toBe(1);
+    expect(verdict.violations.map((violation) => violation.rule)).toContain('event-anomalies');
+    expect(verdict.outcome).toBe('quarantined');
+  });
+
+  it('quarantines a mismatched acceptance instead of ranking the remaining valid score', () => {
+    const verdict = judge(
+      {
+        ...cleanRecord(),
+        events: [
+          ...cleanRecord().events,
+          { kind: 'problem', at: 2000, text: '8 - 3' },
+          { kind: 'input', at: 2900, value: '4' },
+          { kind: 'accepted', at: 3000, answer: 5 },
+        ],
+      },
+      noHistory,
+    );
+    expect(verdict.serverScore).toBe(1);
+    expect(verdict.outcome).toBe('quarantined');
+  });
 });
