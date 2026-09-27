@@ -2,6 +2,8 @@
 
 # ZetaLog
 
+[![ci](https://github.com/TahaKhanM/zetalog/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TahaKhanM/zetalog/actions/workflows/ci.yml)
+
 A Chrome extension and website for tracking [Zetamac](https://arithmetic.zetamac.com/) mental-arithmetic practice. The extension records games offline and shows score history. Linked accounts can sync games to personal dashboards and global or university leaderboards.
 
 [Website](https://www.zetalog.co.uk) · [Chrome extension](https://chromewebstore.google.com/detail/zetalog/bjleafpcpockiiblhkoddgomhkloaiab)
